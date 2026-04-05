@@ -269,6 +269,28 @@ class LEB_Database_Handler {
         return true;
     }
 
+    /**
+     * Delete an existing type record by its ID.
+     *
+     * @param int $id Row ID to delete.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function delete_type( int $id ) {
+        global $wpdb;
+
+        $deleted = $wpdb->delete(
+            $this->types_table,
+            [ 'id' => $id ],
+            [ '%d' ]
+        );
+
+        if ( false === $deleted ) {
+            return new WP_Error( 'leb_delete_failed', __( 'Failed to delete the type. Please try again.', 'listing-engine-backend' ) );
+        }
+
+        return true;
+    }
+
     // ─────────────────────────────────────────────────────────
     // Internal Helpers
     // ─────────────────────────────────────────────────────────

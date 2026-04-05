@@ -1,0 +1,281 @@
+/* ─────────────────────────────────────────────────────────
+   Global Reset & Shared LEB Components
+───────────────────────────────────────────────────────── */
+.leb-wrap *,
+.leb-wrap *::before,
+.leb-wrap *::after {
+    box-sizing: border-box;
+}
+
+.leb-wrap {
+    font-family:      var(--leb-font-family);
+    color:            var(--leb-text-color);
+    background-color: var(--leb-bg-light);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-right: 0;
+}
+
+.leb-wrap h1 {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.leb-loading-overlay {
+    position:    absolute;
+    inset:       0;
+    z-index:     10;
+    display:     flex;
+    align-items:     center;
+    justify-content: center;
+    background:  var(--leb-overlay-bg);
+    border-radius: inherit;
+}
+
+.leb-spinner {
+    width:  28px;
+    height: 28px;
+    border: 3px solid var(--leb-border-default);
+    border-top-color: var(--leb-primary-color);
+    border-radius: 50%;
+    animation: lebSpin 0.7s linear infinite;
+}
+
+@keyframes lebSpin {
+    to { transform: rotate(360deg); }
+}
+
+.leb-empty-state {
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    justify-content: center;
+    padding:         3rem 1.5rem;
+    text-align:      center;
+    color:           var(--leb-text-muted);
+    gap:             12px;
+}
+
+.leb-empty-state__icon {
+    width:  48px;
+    height: 48px;
+    opacity: 0.4;
+}
+
+.leb-empty-state__title {
+    font-size:   0.9375rem;
+    font-weight: 600;
+    color:       var(--leb-secondary-color);
+    margin:      0;
+}
+
+.leb-empty-state__subtitle {
+    font-size: 0.8125rem;
+    margin:    0;
+}
+
+.leb-badge {
+    display:       inline-flex;
+    align-items:   center;
+    gap:           5px;
+    padding:       3px 12px;
+    border-radius: 100rem;
+    font-size:     0.75rem;
+    font-weight:   600;
+    border:        1px solid transparent;
+    line-height:   1.6;
+}
+
+.leb-badge--success {
+    background-color: var(--leb-success-light-bg);
+    color:            var(--leb-success-color);
+    border-color:     var(--leb-success-color);
+}
+
+.leb-badge--warning {
+    background-color: var(--leb-warning-light-bg);
+    color:            var(--leb-warning-color);
+    border-color:     var(--leb-warning-color);
+}
+
+.leb-badge--error {
+    background-color: var(--leb-error-light-bg);
+    color:            var(--leb-error-color);
+    border-color:     var(--leb-error-color);
+}
+
+.leb-sr-only {
+    position: absolute;
+    width:    1px;
+    height:   1px;
+    padding:  0;
+    margin:   -1px;
+    overflow: hidden;
+    clip:     rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border:   0;
+}
+
+/* ── Add / Edit Type Form ────────────────────────────────────────
+   Scoped to #leb-add-edit-type to prevent conflicts.
+─────────────────────────────────────────────────────────────── */
+
+#leb-add-edit-type {
+    font-family: var(--leb-font-family);
+    color:       var(--leb-text-color);
+    display:     flex;
+    justify-content: center;
+    padding:     2rem 1rem;
+    min-height:  80vh;
+    align-items: flex-start;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+#leb-add-edit-type .leb-ae-card {
+    background:    var(--leb-white);
+    width:         100%;
+    max-width:     520px;
+    border-radius: 12px;
+    box-shadow:    var(--leb-card-shadow);
+    border:        1px solid var(--leb-border-color);
+    padding:       2rem;
+    display:       flex;
+    flex-direction: column;
+    gap:           1.5rem;
+}
+
+/* ── Card Header ──────────────────────────────────────────── */
+#leb-add-edit-type .leb-ae-header {
+    display:       flex;
+    align-items:   center;
+    gap:           0.75rem;
+    border-bottom: 1px solid var(--leb-border-default);
+    padding-bottom: 1rem;
+}
+
+#leb-add-edit-type .leb-ae-back-btn {
+    width:         36px;
+    height:        36px;
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    background:    var(--leb-bg-light);
+    border:        1px solid var(--leb-border-default);
+    border-radius: 50%;
+    cursor:        pointer;
+    color:         var(--leb-secondary-color);
+    flex-shrink:   0;
+    transition:    background-color 0.15s ease;
+    text-decoration: none;
+}
+
+#leb-add-edit-type .leb-ae-back-btn:hover {
+    background-color: var(--leb-border-default);
+}
+
+#leb-add-edit-type .leb-ae-back-btn svg {
+    width:  18px;
+    height: 18px;
+}
+
+#leb-add-edit-type .leb-ae-card-title {
+    font-size:   1.25rem;
+    font-weight: 600;
+    color:       var(--leb-secondary-color);
+    margin:      0;
+    line-height: 1.3;
+}
+
+/* ── Form Fields ──────────────────────────────────────────── */
+#leb-add-edit-type .leb-ae-field {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.5rem;
+}
+
+#leb-add-edit-type .leb-ae-label {
+    font-size:   0.8125rem;
+    font-weight: 600;
+    color:       var(--leb-secondary-color);
+}
+
+#leb-add-edit-type .leb-ae-input {
+    width:            100%;
+    min-height:       46px;
+    border:           1px solid var(--leb-border-default);
+    border-radius:    8px;
+    background:       var(--leb-bg-light);
+    padding:          0.65rem 1rem;
+    font-size:        0.9375rem;
+    font-family:      var(--leb-font-family);
+    color:            var(--leb-text-color);
+    outline:          none;
+    transition:       border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+#leb-add-edit-type .leb-ae-input::placeholder {
+    color: var(--leb-text-muted);
+}
+
+#leb-add-edit-type .leb-ae-input:hover {
+    background: var(--leb-white);
+}
+
+#leb-add-edit-type .leb-ae-input:focus {
+    border-color:     var(--leb-primary-color);
+    background:       var(--leb-white);
+    box-shadow:       var(--leb-focus-shadow);
+}
+
+/* ── Submit Button ────────────────────────────────────────── */
+#leb-add-edit-type .leb-ae-submit-btn {
+    width:            100%;
+    min-height:       48px;
+    background:       var(--leb-primary-color);
+    color:            var(--leb-white);
+    border:           none;
+    border-radius:    8px;
+    padding:          0.75rem 1rem;
+    margin-top:       0.5rem;
+    font-size:        1.0625rem;
+    font-weight:      600;
+    font-family:      var(--leb-font-family);
+    cursor:           pointer;
+    display:          flex;
+    align-items:      center;
+    justify-content:  center;
+    gap:              8px;
+    transition:       opacity 0.15s ease, transform 0.15s ease;
+}
+
+#leb-add-edit-type .leb-ae-submit-btn:hover {
+    opacity:   0.9;
+    transform: translateY(-1px);
+}
+
+#leb-add-edit-type .leb-ae-submit-btn:active {
+    transform: translateY(0);
+    opacity:   1;
+}
+
+#leb-add-edit-type .leb-ae-submit-btn:disabled {
+    opacity: 0.65;
+    cursor:  not-allowed;
+    transform: none;
+}
+
+/* Spinner inside button */
+#leb-add-edit-type .leb-ae-btn-spinner {
+    width:        18px;
+    height:       18px;
+    border:       2px solid var(--leb-white-alpha-40);
+    border-top-color: var(--leb-white);
+    border-radius: 50%;
+    animation:    lebSpin 0.65s linear infinite;
+    display:      none;
+}
+
+#leb-add-edit-type .leb-ae-submit-btn.leb-loading .leb-ae-btn-spinner {
+    display: block;
+}

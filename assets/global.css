@@ -17,12 +17,6 @@
 
     /* ── Typography ── */
     --leb-font-family:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --leb-font-size-xs:  0.75rem;    /* 12px */
-    --leb-font-size-sm:  0.8125rem;  /* 13px */
-    --leb-font-size-md:  0.9375rem;  /* 15px */
-    --leb-font-size-lg:  1.0625rem;  /* 17px */
-    --leb-font-size-xl:  1.25rem;    /* 20px */
-    --leb-font-size-2xl: 1.75rem;    /* 28px */
 
     /* ── Brand / Primary Palette ── */
     --leb-primary-color:    #F15E74;   /* Coral red – buttons, accents */
@@ -57,22 +51,8 @@
     --leb-card-shadow:      0 12px 30px rgba(0, 0, 0, 0.05);
     --leb-focus-shadow:     0 0 0 4px var(--leb-primary-light-bg);
 
-    /* ── Spacing ── */
-    --leb-spacing-xs:  4px;
-    --leb-spacing-sm:  8px;
-    --leb-spacing-md:  16px;
-    --leb-spacing-lg:  24px;
-    --leb-spacing-xl:  32px;
-
-    /* ── Border Radius ── */
-    --leb-radius-sm:   6px;
-    --leb-radius:      8px;
-    --leb-radius-md:   12px;
-    --leb-radius-lg:   14px;
-    --leb-radius-xl:   18px;
-    --leb-radius-pill: 100rem;
-
-    /* ── Transitions ── */
-    --leb-transition-fast:   0.15s ease;
-    --leb-transition-normal: 0.25s ease;
+    /* ── Alpha / Transparency ── */
+    --leb-overlay-bg:       rgba(255, 255, 255, 0.75);
+    --leb-overlay-dark:     rgba(0, 0, 0, 0.15); /* Darker backdrop for modals */
+    --leb-white-alpha-40:   rgba(255, 255, 255, 0.4);
 }

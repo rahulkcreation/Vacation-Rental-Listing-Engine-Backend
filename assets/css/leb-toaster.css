@@ -54,17 +54,17 @@
     padding:     14px 42px 14px 16px;
 
     background-color: var(--leb-white);
-    border-radius:    var(--leb-radius-md);
+    border-radius:    8px;
     border:           1px solid var(--leb-border-default);
     border-left:      4px solid var(--leb-primary-color);
     box-shadow:       var(--leb-card-shadow);
 
     font-family:  var(--leb-font-family);
-    font-size:    var(--leb-font-size-sm);
+    font-size:    0.8125rem;
     color:        var(--leb-text-muted);
     line-height:  1.5;
 
-    animation:    lebToastFadeIn 0.3s var(--leb-transition-normal) forwards;
+    animation:    lebToastFadeIn 0.3s ease forwards;
 
     /* Hidden by default; JS sets display:flex. */
     display:      none;
@@ -131,8 +131,8 @@
     padding:     0;
     cursor:      pointer;
     color:       var(--leb-text-muted);
-    border-radius: var(--leb-radius-sm);
-    transition:  color var(--leb-transition-fast), background-color var(--leb-transition-fast);
+    border-radius: 4px;
+    transition:  color 0.15s ease, background-color 0.15s ease;
     font-size:   18px;
     line-height: 1;
 }
@@ -150,6 +150,6 @@
         min-width:  200px;
         max-width:  calc(100vw - 32px);
         top:        16px;
-        font-size:  var(--leb-font-size-xs);
+        font-size:  0.75rem;
     }
 }

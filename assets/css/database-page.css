@@ -1,0 +1,318 @@
+/* ─────────────────────────────────────────────────────────
+   Global Reset & Shared LEB Components
+───────────────────────────────────────────────────────── */
+.leb-wrap *,
+.leb-wrap *::before,
+.leb-wrap *::after {
+    box-sizing: border-box;
+}
+
+.leb-wrap {
+    font-family: var(--leb-font-family);
+    color: var(--leb-text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-right: 0;
+}
+
+.leb-wrap h1 {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.leb-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--leb-overlay-bg);
+    border-radius: inherit;
+}
+
+.leb-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--leb-border-default);
+    border-top-color: var(--leb-primary-color);
+    border-radius: 50%;
+    animation: lebSpin 0.7s linear infinite;
+}
+
+@keyframes lebSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.leb-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--leb-text-muted);
+    gap: 12px;
+}
+
+.leb-empty-state__icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.4;
+}
+
+.leb-empty-state__title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--leb-secondary-color);
+    margin: 0;
+}
+
+.leb-empty-state__subtitle {
+    font-size: 0.8125rem;
+    margin: 0;
+}
+
+.leb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 12px;
+    border-radius: 100rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    line-height: 1.6;
+}
+
+.leb-badge--success {
+    background-color: var(--leb-success-light-bg);
+    color: var(--leb-success-color);
+    border-color: var(--leb-success-color);
+}
+
+.leb-badge--warning {
+    background-color: var(--leb-warning-light-bg);
+    color: var(--leb-warning-color);
+    border-color: var(--leb-warning-color);
+}
+
+.leb-badge--error {
+    background-color: var(--leb-error-light-bg);
+    color: var(--leb-error-color);
+    border-color: var(--leb-error-color);
+}
+
+.leb-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Database Page ───────────────────────────────────────────────
+   Scoped to #leb-database-page to prevent conflicts.
+─────────────────────────────────────────────────────────────── */
+
+#leb-database-page {
+    font-family: var(--leb-font-family);
+    color: var(--leb-text-color);
+    max-width: 1200px;
+    margin: 2rem auto;
+    width: 96%;
+}
+
+/* ── Page Header ─────────────────────────────────────────── */
+#leb-database-page .leb-db-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: var(--leb-white);
+    padding: 1rem 1.25rem;
+    border-radius: 14px;
+    box-shadow: var(--leb-card-shadow);
+    margin-bottom: 28px;
+}
+
+#leb-database-page .leb-db-icon-box {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px var(--leb-primary-glow);
+    flex-shrink: 0;
+}
+
+#leb-database-page .leb-db-icon-box svg {
+    width: 24px;
+    height: 24px;
+    color: var(--leb-white);
+}
+
+#leb-database-page .leb-db-page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--leb-secondary-color);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin: 0;
+}
+
+@media (width <=425px) {
+    #leb-database-page .leb-db-page-title {
+        font-size: 1.4rem;
+    }
+}
+
+    /* ── Cards Grid ──────────────────────────────────────────── */
+    #leb-database-page .leb-db-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    @media (width <=1150px) {
+        #leb-database-page .leb-db-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+
+    @media (width <=768px) {
+        #leb-database-page .leb-db-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+
+
+    /* ── Individual Card ─────────────────────────────────────── */
+    #leb-database-page .leb-db-card {
+        background: var(--leb-white);
+        border: 1px solid var(--leb-border-color);
+        border-radius: 18px;
+        box-shadow: var(--leb-card-shadow);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #leb-database-page .leb-db-card-title {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: var(--leb-secondary-color);
+        margin: 0;
+    }
+
+    /* ── Status Indicators ───────────────────────────────────── */
+    #leb-database-page .leb-db-statuses {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    #leb-database-page .leb-db-status-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #leb-database-page .leb-db-status-label {
+        font-size: 0.75rem;
+        color: var(--leb-text-muted);
+        font-weight: 500;
+        flex-shrink: 0;
+        min-width: 110px;
+    }
+
+    /* ── Action Buttons ──────────────────────────────────────── */
+    #leb-database-page .leb-db-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding-top: 6px;
+        border-top: 1px solid var(--leb-border-color);
+        margin-top: 2px;
+    }
+
+    #leb-database-page .leb-db-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 16px;
+        border-radius: 100rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        font-family: var(--leb-font-family);
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    #leb-database-page .leb-db-btn:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
+
+    #leb-database-page .leb-db-btn:active {
+        transform: translateY(0);
+    }
+
+    #leb-database-page .leb-db-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    #leb-database-page .leb-db-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Refresh: outlined style */
+    #leb-database-page .leb-db-btn--refresh {
+        background: var(--leb-bg-light);
+        border-color: var(--leb-border-default);
+        color: var(--leb-secondary-color);
+    }
+
+    /* Create/Repair: filled primary */
+    #leb-database-page .leb-db-btn--repair {
+        background: var(--leb-primary-color);
+        border-color: var(--leb-primary-color);
+        color: var(--leb-white);
+        box-shadow: 0 4px 10px var(--leb-primary-glow);
+    }
+
+    /* ── Card spinning loader ────────────────────────────────── */
+    #leb-database-page .leb-db-card-spin {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--leb-border-default);
+        border-top-color: var(--leb-primary-color);
+        border-radius: 50%;
+        animation: lebSpin 0.65s linear infinite;
+        display: none;
+        flex-shrink: 0;
+    }
+
+    #leb-database-page .leb-db-btn.leb-btn-loading .leb-db-card-spin {
+        display: block;
+    }
+
+    #leb-database-page .leb-db-btn.leb-btn-loading .leb-db-btn-label {
+        display: none;
+    }

@@ -3,347 +3,12 @@
  * type-management.php
  *
  * Types List view – search, mobile-card table, and pagination.
- * Matches the design in screen/main-screen.html exactly.
- *
- * Loaded by leb_render_type_management_page() in the main plugin file.
- *
- * @package ListingEngineBackend
  */
 
-// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<style>
-    /* ── Type Management – List Screen ──────────────────────────────
-       Scoped to #leb-type-list to prevent conflicts with other templates.
-    ─────────────────────────────────────────────────────────────── */
-
-    #leb-type-list {
-        font-family: var(--leb-font-family);
-        color:       var(--leb-text-color);
-        max-width:   1200px;
-        margin:      20px auto;
-        padding:     0 16px;
-    }
-
-    /* ── Header ─────────────────────────────────────────────────── */
-    #leb-type-list .leb-tl-header {
-        display:          flex;
-        align-items:      center;
-        justify-content:  space-between;
-        flex-wrap:        wrap;
-        gap:              16px;
-        background-color: var(--leb-white);
-        padding:          1rem 1.25rem;
-        border-radius:    var(--leb-radius-lg);
-        box-shadow:       var(--leb-card-shadow);
-        margin-bottom:    24px;
-    }
-
-    #leb-type-list .leb-tl-header-left {
-        display:     flex;
-        align-items: center;
-        gap:         14px;
-    }
-
-    #leb-type-list .leb-tl-icon-box {
-        width:         48px;
-        height:        48px;
-        background:    linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
-        border-radius: var(--leb-radius-lg);
-        display:       flex;
-        align-items:   center;
-        justify-content: center;
-        box-shadow:    0 6px 20px var(--leb-primary-glow);
-        flex-shrink:   0;
-    }
-
-    #leb-type-list .leb-tl-icon-box svg {
-        width:  24px;
-        height: 24px;
-        color:  var(--leb-white);
-    }
-
-    #leb-type-list .leb-tl-page-title {
-        font-size:      var(--leb-font-size-2xl);
-        font-weight:    700;
-        color:          var(--leb-secondary-color);
-        letter-spacing: -0.03em;
-        line-height:    1.2;
-        margin:         0;
-    }
-
-    #leb-type-list .leb-tl-add-btn {
-        display:          inline-flex;
-        align-items:      center;
-        gap:              6px;
-        background-color: var(--leb-primary-color);
-        color:            var(--leb-white);
-        border:           none;
-        border-radius:    var(--leb-radius-pill);
-        padding:          0.55rem 1.1rem;
-        font-size:        var(--leb-font-size-sm);
-        font-weight:      600;
-        font-family:      var(--leb-font-family);
-        cursor:           pointer;
-        box-shadow:       0 4px 14px var(--leb-primary-glow);
-        transition:       transform var(--leb-transition-fast), opacity var(--leb-transition-fast);
-        text-decoration:  none;
-    }
-
-    #leb-type-list .leb-tl-add-btn:hover {
-        opacity:   0.9;
-        transform: translateY(-1px);
-    }
-
-    #leb-type-list .leb-tl-add-btn svg {
-        width:  16px;
-        height: 16px;
-        flex-shrink: 0;
-    }
-
-    /* ── Search Bar ─────────────────────────────────────────────── */
-    #leb-type-list .leb-tl-search-wrap {
-        display:          flex;
-        align-items:      center;
-        gap:              10px;
-        background-color: var(--leb-white);
-        border:           2px solid var(--leb-border-color);
-        border-radius:    var(--leb-radius-lg);
-        padding:          6px 8px 6px 18px;
-        box-shadow:       var(--leb-card-shadow);
-        margin-bottom:    20px;
-        transition:       border-color var(--leb-transition-normal);
-    }
-
-    #leb-type-list .leb-tl-search-wrap.leb-search-focused {
-        border-color: var(--leb-primary-color);
-    }
-
-    #leb-type-list .leb-tl-search-icon {
-        width:       20px;
-        height:      20px;
-        flex-shrink: 0;
-        color:       var(--leb-text-muted);
-        transition:  color var(--leb-transition-normal);
-    }
-
-    #leb-type-list .leb-tl-search-wrap.leb-search-focused .leb-tl-search-icon {
-        color: var(--leb-primary-color);
-    }
-
-    #leb-type-list .leb-tl-search-input {
-        flex:        1;
-        border:      none;
-        outline:     none;
-        font-size:   var(--leb-font-size-md);
-        font-family: var(--leb-font-family);
-        color:       var(--leb-text-color);
-        background:  transparent;
-        padding:     8px 0;
-    }
-
-    #leb-type-list .leb-tl-search-input::placeholder {
-        color: var(--leb-text-muted);
-    }
-
-    #leb-type-list .leb-tl-search-clear {
-        display:       none;
-        align-items:   center;
-        justify-content: center;
-        width:         32px;
-        height:        32px;
-        border:        none;
-        background:    #f1f3f5;
-        border-radius: var(--leb-radius-sm);
-        color:         var(--leb-text-muted);
-        cursor:        pointer;
-        flex-shrink:   0;
-        transition:    background-color var(--leb-transition-fast);
-    }
-
-    #leb-type-list .leb-tl-search-clear:hover {
-        background-color: var(--leb-border-default);
-    }
-
-    #leb-type-list .leb-tl-search-clear svg {
-        width:  16px;
-        height: 16px;
-    }
-
-    #leb-type-list .leb-tl-search-clear.leb-clear-visible {
-        display: flex;
-    }
-
-    /* ── Table Section ──────────────────────────────────────────── */
-    #leb-type-list .leb-tl-table-wrap {
-        background:    var(--leb-white);
-        border-radius: var(--leb-radius-xl);
-        box-shadow:    var(--leb-card-shadow);
-        border:        1px solid var(--leb-border-color);
-        overflow:      hidden;
-        position:      relative;
-        min-height:    180px;
-    }
-
-    /* Cards list container */
-    #leb-type-list .leb-tl-cards-list {
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        gap:    0;
-    }
-
-    /* Individual card row */
-    #leb-type-list .leb-tl-card {
-        margin:        6px;
-        padding:       12px 16px;
-        border:        1px solid var(--leb-border-color);
-        border-radius: var(--leb-radius-md);
-        display:       flex;
-        flex-direction: column;
-        gap:           6px;
-    }
-
-    #leb-type-list .leb-tl-card-row {
-        display:         flex;
-        flex-direction:  row;
-        justify-content: space-between;
-        align-items:     center;
-        width:           100%;
-        gap:             12px;
-    }
-
-    #leb-type-list .leb-tl-card-label {
-        font-size:   var(--leb-font-size-xs);
-        font-weight: 600;
-        color:       var(--leb-text-muted);
-        flex-shrink: 0;
-        min-width:   70px;
-    }
-
-    #leb-type-list .leb-tl-card-value {
-        font-size:   var(--leb-font-size-sm);
-        font-weight: 400;
-        color:       var(--leb-text-color);
-        text-align:  right;
-        word-break:  break-all;
-    }
-
-    /* Card action row */
-    #leb-type-list .leb-tl-card-actions {
-        margin-top:  6px;
-        padding-top: 8px;
-        border-top:  1px solid var(--leb-border-color);
-        display:     flex;
-        justify-content: flex-end;
-    }
-
-    #leb-type-list .leb-tl-edit-btn {
-        display:       inline-flex;
-        align-items:   center;
-        gap:           5px;
-        background:    var(--leb-primary-color);
-        color:         var(--leb-white);
-        border:        none;
-        border-radius: var(--leb-radius-pill);
-        padding:       5px 18px;
-        font-size:     var(--leb-font-size-xs);
-        font-weight:   600;
-        font-family:   var(--leb-font-family);
-        cursor:        pointer;
-        transition:    opacity var(--leb-transition-fast);
-        text-decoration: none;
-    }
-
-    #leb-type-list .leb-tl-edit-btn:hover {
-        opacity: 0.85;
-    }
-
-    #leb-type-list .leb-tl-edit-btn svg {
-        width:  14px;
-        height: 14px;
-    }
-
-    /* ── Pagination Bar ─────────────────────────────────────────── */
-    #leb-type-list .leb-tl-pagination {
-        display:         flex;
-        align-items:     center;
-        justify-content: space-between;
-        flex-wrap:       wrap;
-        gap:             12px;
-        padding:         14px 20px;
-        border-top:      1px solid var(--leb-border-color);
-    }
-
-    #leb-type-list .leb-tl-pagination-text {
-        font-size: var(--leb-font-size-sm);
-        color:     var(--leb-text-muted);
-    }
-
-    #leb-type-list .leb-tl-page-controls {
-        display:     flex;
-        align-items: center;
-        gap:         4px;
-    }
-
-    #leb-type-list .leb-pg-btn {
-        display:         flex;
-        align-items:     center;
-        justify-content: center;
-        width:           34px;
-        height:          34px;
-        border:          1px solid var(--leb-border-color);
-        border-radius:   var(--leb-radius-sm);
-        background:      var(--leb-white);
-        color:           var(--leb-text-muted);
-        font-size:       var(--leb-font-size-sm);
-        font-weight:     600;
-        font-family:     var(--leb-font-family);
-        cursor:          pointer;
-        transition:      all var(--leb-transition-fast);
-    }
-
-    #leb-type-list .leb-pg-btn:hover:not(:disabled) {
-        border-color: var(--leb-primary-color);
-        color:        var(--leb-primary-color);
-    }
-
-    #leb-type-list .leb-pg-btn.leb-pg-active {
-        background:   var(--leb-primary-color);
-        border-color: var(--leb-primary-color);
-        color:        var(--leb-white);
-    }
-
-    #leb-type-list .leb-pg-btn:disabled {
-        opacity: 0.4;
-        cursor:  not-allowed;
-    }
-
-    #leb-type-list .leb-pg-btn svg {
-        width:  16px;
-        height: 16px;
-    }
-
-    /* ── Responsive ─────────────────────────────────────────────── */
-    @media (max-width: 480px) {
-        #leb-type-list .leb-tl-page-title {
-            font-size: 1.4rem;
-        }
-
-        #leb-type-list .leb-tl-header-right {
-            flex-grow: 1;
-        }
-
-        #leb-type-list .leb-tl-add-btn {
-            width:           100%;
-            justify-content: center;
-        }
-    }
-</style>
-
 <div id="leb-type-list" class="leb-wrap">
 
     <!-- ── Page Header ──────────────────────────────────── -->
@@ -500,13 +165,15 @@ document.addEventListener( 'DOMContentLoaded', function () {
         }
 
         var html = '';
-        items.forEach( function ( row ) {
+        items.forEach( function ( row, index ) {
+            var sno     = ( ( lebState.currentPage - 1 ) * lebState.perPage ) + index + 1;
             var editUrl = '<?php echo esc_js( admin_url( 'admin.php?page=leb-types&leb_action=edit&id=' ) ); ?>' + encodeURIComponent( row.id );
+
             html += [
                 '<div class="leb-tl-card">',
                 '  <div class="leb-tl-card-row">',
-                '    <span class="leb-tl-card-label">ID</span>',
-                '    <span class="leb-tl-card-value">' + lebEscHtml( row.id ) + '</span>',
+                '    <span class="leb-tl-card-label">S.No</span>',
+                '    <span class="leb-tl-card-value">' + sno + '</span>',
                 '  </div>',
                 '  <div class="leb-tl-card-row">',
                 '    <span class="leb-tl-card-label">Name</span>',
@@ -528,11 +195,29 @@ document.addEventListener( 'DOMContentLoaded', function () {
                 '      </svg>',
                 '      Edit',
                 '    </a>',
+                '    <button class="leb-tl-delete-btn" data-id="' + row.id + '" data-name="' + row.name + '">',
+                '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
+                '        <polyline points="3 6 5 6 21 6"/>',
+                '        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+                '        <line x1="10" y1="11" x2="10" y2="17"/>',
+                '        <line x1="14" y1="11" x2="14" y2="17"/>',
+                '      </svg>',
+                '      Delete',
+                '    </button>',
                 '  </div>',
                 '</div>',
             ].join( '' );
         } );
         domCardsList.innerHTML = html;
+
+        // Bind Delete Buttons
+        domCardsList.querySelectorAll( '.leb-tl-delete-btn' ).forEach( function ( btn ) {
+            btn.addEventListener( 'click', function () {
+                var id   = this.getAttribute( 'data-id' );
+                var name = this.getAttribute( 'data-name' );
+                lebConfirmDelete( id, name );
+            } );
+        } );
     }
 
     /* ── Render: Pagination ──────────────────────────────────── */
@@ -594,6 +279,60 @@ document.addEventListener( 'DOMContentLoaded', function () {
                 }
             } );
         }
+    }
+
+    /* ── Deletion Logic ──────────────────────────────────────── */
+    function lebConfirmDelete( id, name ) {
+        if ( typeof LEB_Confirm === 'undefined' ) {
+            // Fallback if global component is not loaded.
+            if ( confirm( 'Are you sure you want to delete "' + name + '"?' ) ) {
+                lebPerformDelete( id );
+            }
+            return;
+        }
+
+        LEB_Confirm.show( {
+            title       : 'Delete Entry?',
+            message     : 'Are you sure you want to delete "' + name + '"? This action is irreversible.',
+            confirmText : 'Delete Now',
+            cancelText  : 'Cancel',
+            type        : 'leb-warning',
+            onConfirm   : function () {
+                lebPerformDelete( id );
+            }
+        } );
+    }
+
+    function lebPerformDelete( id ) {
+        var formData = new FormData();
+        formData.append( 'action', 'leb_delete_type' );
+        formData.append( 'nonce',  nonce );
+        formData.append( 'id',     id );
+
+        lebShowLoading();
+
+        fetch( ajaxUrl, { method: 'POST', body: formData, credentials: 'same-origin' } )
+            .then( function ( r ) { return r.json(); } )
+            .then( function ( data ) {
+                lebHideLoading();
+                if ( data.success ) {
+                    if ( typeof LEB_Toaster !== 'undefined' ) {
+                        LEB_Toaster.show( data.data.message || 'Deleted successfully.', 'success' );
+                    }
+                    // Refresh current page.
+                    lebFetchTypes();
+                } else {
+                    if ( typeof LEB_Toaster !== 'undefined' ) {
+                        LEB_Toaster.show( data.data.message || 'Failed to delete.', 'error' );
+                    }
+                }
+            } )
+            .catch( function () {
+                lebHideLoading();
+                if ( typeof LEB_Toaster !== 'undefined' ) {
+                    LEB_Toaster.show( 'Network error. Please try again.', 'error' );
+                }
+            } );
     }
 
     /* ── AJAX Fetch ──────────────────────────────────────────── */

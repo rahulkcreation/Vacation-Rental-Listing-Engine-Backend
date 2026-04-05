@@ -3,12 +3,6 @@
  * database-page.php
  *
  * Database Management screen.
- * Displays a grid of status cards – one per registered LEB table.
- * Each card shows existence & row-completeness, with Refresh and Create/Repair actions.
- *
- * Loaded by leb_render_database_page() in the main plugin file.
- *
- * @package ListingEngineBackend
  */
 
 // Exit if accessed directly.
@@ -21,171 +15,6 @@ global $wpdb;
 $leb_types_table = $wpdb->prefix . 'ls_types';
 $leb_status      = leb_check_table_status( $leb_types_table );
 ?>
-<style>
-    /* ── Database Page ───────────────────────────────────────────────
-       Scoped to #leb-database-page to prevent conflicts.
-    ─────────────────────────────────────────────────────────────── */
-
-    #leb-database-page {
-        font-family: var(--leb-font-family);
-        color:       var(--leb-text-color);
-        max-width:   1200px;
-        margin:      20px auto;
-        padding:     0 16px;
-    }
-
-    /* ── Page Header ─────────────────────────────────────────── */
-    #leb-database-page .leb-db-header {
-        display:          flex;
-        align-items:      center;
-        gap:              14px;
-        background-color: var(--leb-white);
-        padding:          1rem 1.25rem;
-        border-radius:    var(--leb-radius-lg);
-        box-shadow:       var(--leb-card-shadow);
-        margin-bottom:    28px;
-    }
-
-    #leb-database-page .leb-db-icon-box {
-        width:         48px;
-        height:        48px;
-        background:    linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
-        border-radius: var(--leb-radius-lg);
-        display:       flex;
-        align-items:   center;
-        justify-content: center;
-        box-shadow:    0 6px 20px var(--leb-primary-glow);
-        flex-shrink:   0;
-    }
-
-    #leb-database-page .leb-db-icon-box svg {
-        width:  24px;
-        height: 24px;
-        color:  var(--leb-white);
-    }
-
-    #leb-database-page .leb-db-page-title {
-        font-size:      var(--leb-font-size-2xl);
-        font-weight:    700;
-        color:          var(--leb-secondary-color);
-        letter-spacing: -0.03em;
-        line-height:    1.2;
-        margin:         0;
-    }
-
-    /* ── Cards Grid ──────────────────────────────────────────── */
-    #leb-database-page .leb-db-grid {
-        display:               grid;
-        grid-template-columns: repeat( auto-fill, minmax( 280px, 1fr ) );
-        gap:                   20px;
-    }
-
-    /* ── Individual Card ─────────────────────────────────────── */
-    #leb-database-page .leb-db-card {
-        background:    var(--leb-white);
-        border:        1px solid var(--leb-border-color);
-        border-radius: var(--leb-radius-xl);
-        box-shadow:    var(--leb-card-shadow);
-        padding:       1.5rem;
-        display:       flex;
-        flex-direction: column;
-        gap:           14px;
-        position:      relative;
-        overflow:      hidden;
-    }
-
-    #leb-database-page .leb-db-card-title {
-        font-size:   var(--leb-font-size-lg);
-        font-weight: 700;
-        color:       var(--leb-secondary-color);
-        margin:      0;
-    }
-
-    /* ── Status Indicators ───────────────────────────────────── */
-    #leb-database-page .leb-db-statuses {
-        display:        flex;
-        flex-direction: column;
-        gap:            8px;
-    }
-
-    #leb-database-page .leb-db-status-row {
-        display:     flex;
-        align-items: center;
-        gap:         8px;
-    }
-
-    #leb-database-page .leb-db-status-label {
-        font-size:   var(--leb-font-size-xs);
-        color:       var(--leb-text-muted);
-        font-weight: 500;
-        flex-shrink: 0;
-        min-width:   110px;
-    }
-
-    /* ── Action Buttons ──────────────────────────────────────── */
-    #leb-database-page .leb-db-actions {
-        display:    flex;
-        gap:        8px;
-        flex-wrap:  wrap;
-        padding-top: 6px;
-        border-top: 1px solid var(--leb-border-color);
-        margin-top: 2px;
-    }
-
-    #leb-database-page .leb-db-btn {
-        display:       inline-flex;
-        align-items:   center;
-        gap:           5px;
-        padding:       6px 16px;
-        border-radius: var(--leb-radius-pill);
-        font-size:     var(--leb-font-size-xs);
-        font-weight:   600;
-        font-family:   var(--leb-font-family);
-        cursor:        pointer;
-        border:        1px solid transparent;
-        transition:    opacity var(--leb-transition-fast), transform var(--leb-transition-fast);
-    }
-
-    #leb-database-page .leb-db-btn:hover { opacity: 0.85; transform: translateY(-1px); }
-    #leb-database-page .leb-db-btn:active { transform: translateY(0); }
-    #leb-database-page .leb-db-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    #leb-database-page .leb-db-btn svg {
-        width:  14px;
-        height: 14px;
-    }
-
-    /* Refresh: outlined style */
-    #leb-database-page .leb-db-btn--refresh {
-        background:   var(--leb-bg-light);
-        border-color: var(--leb-border-default);
-        color:        var(--leb-secondary-color);
-    }
-
-    /* Create/Repair: filled primary */
-    #leb-database-page .leb-db-btn--repair {
-        background:   var(--leb-primary-color);
-        border-color: var(--leb-primary-color);
-        color:        var(--leb-white);
-        box-shadow:   0 4px 10px var(--leb-primary-glow);
-    }
-
-    /* ── Card spinning loader ────────────────────────────────── */
-    #leb-database-page .leb-db-card-spin {
-        width:        16px;
-        height:       16px;
-        border:       2px solid var(--leb-border-default);
-        border-top-color: var(--leb-primary-color);
-        border-radius: 50%;
-        animation:    lebSpin 0.65s linear infinite;
-        display:      none;
-        flex-shrink:  0;
-    }
-
-    #leb-database-page .leb-db-btn.leb-btn-loading .leb-db-card-spin { display: block; }
-    #leb-database-page .leb-db-btn.leb-btn-loading .leb-db-btn-label { display: none; }
-</style>
-
 <div id="leb-database-page" class="leb-wrap">
 
     <!-- ── Page Header ───────────────────────────────────── -->
@@ -291,8 +120,16 @@ function leb_render_db_card_statuses( array $status ): void {
 document.addEventListener( 'DOMContentLoaded', function () {
     'use strict';
 
+    if ( typeof LEB_Ajax === 'undefined' ) {
+        console.warn( 'LEB_Ajax is not defined. AJAX functionality may be broken. Check if assets are enqueued correctly.' );
+    }
+
     var ajaxUrl = ( typeof LEB_Ajax !== 'undefined' ) ? LEB_Ajax.ajax_url : '';
     var nonce   = ( typeof LEB_Ajax !== 'undefined' ) ? LEB_Ajax.nonce   : '';
+
+    if ( typeof LEB_Toaster === 'undefined' ) {
+        console.warn( 'LEB_Toaster is not defined. UI notifications will not be shown.' );
+    }
 
     /* ── Badge HTML builder (mirrors PHP leb_render_db_card_statuses) ── */
     function lebBuildStatusHtml( tableData ) {

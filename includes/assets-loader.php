@@ -101,39 +101,57 @@ function leb_enqueue_global_styles() {
  * and localized LEB_Ajax data are available before inline template scripts execute.
  */
 function leb_enqueue_toaster_assets() {
-    $css_path = LEB_PLUGIN_DIR . 'assets/css/leb-toaster.css';
-    $js_path  = LEB_PLUGIN_DIR . 'assets/js/leb-toaster.js';
+    // Toast Notification system.
+    wp_register_style( 'leb-toaster',  LEB_PLUGIN_URL . 'assets/css/leb-toaster.css', [], LEB_VERSION );
+    wp_register_script( 'leb-toaster', LEB_PLUGIN_URL . 'assets/js/leb-toaster.js',   [], LEB_VERSION, true );
 
-    wp_enqueue_style(
-        'leb-toaster',
-        LEB_ASSETS_CSS_URL . 'leb-toaster.css',
-        [ 'leb-global' ],
-        file_exists( $css_path ) ? (string) filemtime( $css_path ) : LEB_VERSION
-    );
+    // Confirmation Modal system.
+    wp_register_style( 'leb-confirmation',  LEB_PLUGIN_URL . 'assets/css/leb-confirmation.css', [], LEB_VERSION );
+    wp_register_script( 'leb-confirmation', LEB_PLUGIN_URL . 'assets/js/leb-confirmation.js',   [], LEB_VERSION, true );
 
-    wp_enqueue_script(
-        'leb-toaster',
-        LEB_ASSETS_JS_URL . 'leb-toaster.js',
-        [],
-        file_exists( $js_path ) ? (string) filemtime( $js_path ) : LEB_VERSION,
-        false  // Load in header so LEB_Toaster is available for inline scripts.
-    );
+    wp_enqueue_style( 'leb-toaster' );
+    wp_enqueue_script( 'leb-toaster' );
+
+    // Global Confirmation.
+    wp_enqueue_style( 'leb-confirmation' );
+    wp_enqueue_script( 'leb-confirmation' );
 }
 
 /**
- * Enqueue the admin-specific stylesheet.
+ * Enqueue the admin-specific stylesheet(s).
  *
  * @param string $hook_suffix Current admin page hook.
  */
 function leb_enqueue_admin_styles( string $hook_suffix ) {
-    $file_path = LEB_PLUGIN_DIR . 'assets/css/leb-admin.css';
+    $template_handle = '';
+    $template_file   = '';
 
-    wp_enqueue_style(
-        'leb-admin',
-        LEB_ASSETS_CSS_URL . 'leb-admin.css',
-        [ 'leb-global' ],
-        file_exists( $file_path ) ? (string) filemtime( $file_path ) : LEB_VERSION
-    );
+    // Robust matching for Types / Add-Edit pages.
+    if ( false !== strpos( $hook_suffix, 'leb-types' ) ) {
+        $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
+        if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
+            $template_handle = 'leb-add-edit-type';
+            $template_file   = 'add-edit-type.css';
+        } else {
+            $template_handle = 'leb-type-management';
+            $template_file   = 'type-management.css';
+        }
+    } 
+    // Robust matching for Database page.
+    elseif ( false !== strpos( $hook_suffix, 'leb-database' ) ) {
+        $template_handle = 'leb-database-page';
+        $template_file   = 'database-page.css';
+    }
+
+    if ( $template_handle && $template_file ) {
+        $full_path = LEB_PLUGIN_DIR . 'assets/css/' . $template_file;
+        wp_enqueue_style(
+            $template_handle,
+            LEB_ASSETS_CSS_URL . $template_file,
+            [],
+            file_exists( $full_path ) ? (string) filemtime( $full_path ) : LEB_VERSION
+        );
+    }
 }
 
 /**

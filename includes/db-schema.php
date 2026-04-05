@@ -73,7 +73,7 @@ function leb_check_table_status( $table_name ) {
     $exists = (bool) $wpdb->get_var(
         $wpdb->prepare(
             'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s',
-            DB_NAME,
+            $wpdb->dbname,
             $table_name
         )
     );
