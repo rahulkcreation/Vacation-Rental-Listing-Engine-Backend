@@ -1,0 +1,155 @@
+/**
+ * leb-toaster.css
+ *
+ * Styles for the LEB Toaster notification system.
+ * Covers all four types: success, error, warning, info.
+ *
+ * Position: fixed top-center, slide-in from above.
+ * Uses only CSS variables defined in global.css.
+ *
+ * @package ListingEngineBackend
+ */
+
+/* ─────────────────────────────────────────────────────────
+   Animations
+   ───────────────────────────────────────────────────────── */
+@keyframes lebToastFadeIn {
+    from {
+        opacity:   0;
+        transform: translateX(-50%) translateY(-18px) scale(0.97);
+    }
+    to {
+        opacity:   1;
+        transform: translateX(-50%) translateY(0)     scale(1);
+    }
+}
+
+@keyframes lebToastFadeOut {
+    from {
+        opacity:   1;
+        transform: translateX(-50%) translateY(0)     scale(1);
+    }
+    to {
+        opacity:   0;
+        transform: translateX(-50%) translateY(-18px) scale(0.97);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Base Toast
+   ───────────────────────────────────────────────────────── */
+.leb-toast {
+    position:    fixed;
+    top:         24px;
+    left:        50%;
+    transform:   translateX(-50%);
+    z-index:     100000;  /* Above WP admin notices */
+
+    display:     flex;
+    align-items: flex-start;
+    gap:         10px;
+
+    min-width:   300px;
+    max-width:   420px;
+    padding:     14px 42px 14px 16px;
+
+    background-color: var(--leb-white);
+    border-radius:    var(--leb-radius-md);
+    border:           1px solid var(--leb-border-default);
+    border-left:      4px solid var(--leb-primary-color);
+    box-shadow:       var(--leb-card-shadow);
+
+    font-family:  var(--leb-font-family);
+    font-size:    var(--leb-font-size-sm);
+    color:        var(--leb-text-muted);
+    line-height:  1.5;
+
+    animation:    lebToastFadeIn 0.3s var(--leb-transition-normal) forwards;
+
+    /* Hidden by default; JS sets display:flex. */
+    display:      none;
+}
+
+.leb-toast.leb-toast--visible {
+    display: flex;
+}
+
+/* Exit animation class added by JS. */
+.leb-toast.leb-toast--hiding {
+    animation: lebToastFadeOut 0.3s ease-out forwards;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Type Variants (left-border colour override only)
+   ───────────────────────────────────────────────────────── */
+.leb-toast--success { border-left-color: var(--leb-success-color); }
+.leb-toast--error   { border-left-color: var(--leb-error-color); }
+.leb-toast--warning { border-left-color: var(--leb-warning-color); }
+.leb-toast--info    { border-left-color: var(--leb-info-color); }
+
+/* ─────────────────────────────────────────────────────────
+   Icon Slot
+   ───────────────────────────────────────────────────────── */
+.leb-toast__icon {
+    flex-shrink:  0;
+    width:        18px;
+    height:       18px;
+    margin-top:   1px;
+    stroke-width: 2.5;
+}
+
+.leb-toast--success .leb-toast__icon { color: var(--leb-success-color); }
+.leb-toast--error   .leb-toast__icon { color: var(--leb-error-color); }
+.leb-toast--warning .leb-toast__icon { color: var(--leb-warning-color); }
+.leb-toast--info    .leb-toast__icon { color: var(--leb-info-color); }
+
+/* ─────────────────────────────────────────────────────────
+   Message Body
+   ───────────────────────────────────────────────────────── */
+.leb-toast__message {
+    flex:       1;
+    min-width:  0;
+    word-break: break-word;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Close Button
+   ───────────────────────────────────────────────────────── */
+.leb-toast__close {
+    position:    absolute;
+    top:         8px;
+    right:       8px;
+    width:       26px;
+    height:      26px;
+
+    display:     flex;
+    align-items:     center;
+    justify-content: center;
+
+    background:  none;
+    border:      none;
+    padding:     0;
+    cursor:      pointer;
+    color:       var(--leb-text-muted);
+    border-radius: var(--leb-radius-sm);
+    transition:  color var(--leb-transition-fast), background-color var(--leb-transition-fast);
+    font-size:   18px;
+    line-height: 1;
+}
+
+.leb-toast__close:hover {
+    color:            var(--leb-primary-color);
+    background-color: var(--leb-primary-light-bg);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Responsive
+   ───────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .leb-toast {
+        min-width:  200px;
+        max-width:  calc(100vw - 32px);
+        top:        16px;
+        font-size:  var(--leb-font-size-xs);
+    }
+}

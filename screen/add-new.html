@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" class="leb-html">
+
+<head class="leb-head">
+    <meta charset="UTF-8" class="leb-meta-charset">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" class="leb-meta-viewport">
+    <title class="leb-title">Application Review</title>
+
+    <style class="leb-style">
+        /* --- User Provided Variables --- */
+        :root {
+            /* Primary colors */
+            --am-d-primary: #F15E74;
+            --am-d-secondary: #2C3E50;
+            --am-d-accent: #2563eb;
+            --am-d-bg: #FAFAFA;
+            --am-d-text: #000000;
+
+            /* Status colors */
+            --am-d-success: #16a34a;
+            --am-d-warning: #f59e0b;
+            --am-d-error: #ea0124;
+
+            /* UI colors */
+            --am-d-white: #ffffff;
+            --am-d-card-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+            --am-d-border-light: #e9eef3;
+            --am-d-border-default: #e2e8f0;
+            --am-d-grey-light-text: #5a6e7c;
+
+            /* Light BGS */
+            --am-d-light-yellow-bg: #fff2dc;
+            --am-d-light-red-bg: #ffe6ea;
+            --am-d-light-green-bg: #d5ffe5;
+        }
+
+        /* --- Global Reset & Base Styles --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        .leb-body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--am-d-bg);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--am-d-text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .leb-main-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Content Container --- */
+        .leb-content-container {
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Centered vertically for better look */
+            padding: 2rem 1rem;
+            flex: 1;
+        }
+
+        /* --- Main Card Layout --- */
+        .leb-review-card {
+            background-color: var(--am-d-white);
+            width: 100%;
+            max-width: 500px; /* Slightly narrower for a form */
+            border-radius: 12px;
+            box-shadow: var(--am-d-card-shadow);
+            padding: 2rem;
+            border: 1px solid var(--am-d-border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* --- Card Header (Back, Title, ID) --- */
+        .leb-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            border-bottom: 1px solid var(--am-d-border-default);
+            padding-bottom: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .leb-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem; /* Better gap between icon and title */
+        }
+
+        .leb-btn-back {
+            background: var(--am-d-bg); /* Slight background */
+            border: 1px solid var(--am-d-border-default);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--am-d-secondary);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            width: 36px;
+            height: 36px;
+        }
+
+        .leb-btn-back:hover {
+            background-color: var(--am-d-border-default);
+        }
+
+        .leb-icon-arrow {
+            width: 18px;
+            height: 18px;
+        }
+
+        .leb-card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--am-d-secondary);
+        }
+
+        /* --- Form Entries --- */
+        .leb-entry {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .leb-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--am-d-secondary); /* Using existing secondary color */
+        }
+
+        input.leb-input {
+            width: 100%;
+            min-height: 44px; /* Better touch target height */
+            border-radius: 8px;
+            border: 1px solid var(--am-d-border-default); /* Fixed border color */
+            background-color: var(--am-d-bg);
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            color: var(--am-d-text);
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        input.leb-input::placeholder {
+            color: var(--am-d-grey-light-text);
+        }
+
+        input.leb-input:hover {
+            border-color: var(--am-d-border-light);
+            background-color: var(--am-d-white);
+        }
+
+        input.leb-input:focus,
+        input.leb-input:focus-visible,
+        input.leb-input:active {
+            border-color: var(--am-d-primary);
+            background-color: var(--am-d-white);
+            /* Using existing light red var for a soft glow focus effect */
+            box-shadow: 0 0 0 4px var(--am-d-light-red-bg); 
+        }
+
+        /* --- Submit Button --- */
+        button.leb-btn {
+            background-color: var(--am-d-primary);
+            border: none; /* Removed the solid black border */
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            min-height: 48px;
+            color: var(--am-d-white);
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button.leb-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+          
+        }
+
+        button.leb-btn:active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="leb-body">
+
+    <div class="leb-main-wrapper">
+
+        <!-- Main Content Area -->
+        <main class="leb-content-container">
+
+            <!-- Professional Card Wrapper -->
+            <article class="leb-review-card">
+
+                <!-- Section 1: Review Header -->
+                <header class="leb-card-header">
+                    <div class="leb-header-left">
+                        <button class="leb-btn-back" aria-label="Go Back">
+                            <!-- Back Arrow Icon -->
+                            <svg class="leb-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                        </button>
+                        <h2 class="leb-card-title">Application Review</h2>
+                    </div>
+                </header>
+
+                <!-- Input Fields -->
+                <div class="leb-entry">
+                    <label class="leb-label">Enter Type Name</label>
+                    <input class="leb-input" type="text" placeholder="e.g. Residential">
+                </div>
+
+                <div class="leb-entry">
+                    <label class="leb-label">Slug</label>
+                    <input class="leb-input" type="text" placeholder="/flat">
+                </div>
+
+                <!-- Submit Button -->
+                <button class="leb-btn" type="submit">Add New Listing</button>
+
+            </article>
+        </main>
+    </div>
+
+</body>
+</html>
