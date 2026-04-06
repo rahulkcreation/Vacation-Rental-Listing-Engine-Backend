@@ -1112,6 +1112,12 @@ function leb_ajax_listing_create_listing()
         'dates'       => isset($_POST['dates'])       ? wp_unslash($_POST['dates'])   : '[]',
     ];
 
+    // Validate images
+    $image_check = leb_validate_listing_images($data['images']);
+    if (is_wp_error($image_check)) {
+        wp_send_json_error(['message' => $image_check->get_error_message()]);
+    }
+
     $handler = new LEB_Database_Handler();
     $result  = $handler->create_listing($data);
 
@@ -1155,6 +1161,12 @@ function leb_ajax_listing_update_listing()
         'images'      => isset($_POST['images'])      ? wp_unslash($_POST['images'])  : '[]',
         'dates'       => isset($_POST['dates'])       ? wp_unslash($_POST['dates'])   : '[]',
     ];
+
+    // Validate images
+    $image_check = leb_validate_listing_images($data['images']);
+    if (is_wp_error($image_check)) {
+        wp_send_json_error(['message' => $image_check->get_error_message()]);
+    }
 
     $handler = new LEB_Database_Handler();
     $result  = $handler->update_listing($id, $data);
@@ -1409,4 +1421,60 @@ function leb_skip_svg_image_editor($editors, $path)
         return false;
     }
     return $editors;
+}
+
+/**
+ * Helper: Validate listing images against constraints (1MB, 1200x800).
+ *
+ * @param array|string $images The images array (from JS).
+ * @return true|WP_Error
+ */
+function leb_validate_listing_images($images)
+{
+    if (is_string($images)) {
+        $images = json_decode($images, true);
+    }
+
+    if (! is_array($images) || empty($images)) {
+        return new WP_Error('invalid_images', __('Please select at least one property image.', 'listing-engine-backend'));
+    }
+
+    foreach ($images as $img) {
+        $id = isset($img['id']) ? absint($img['id']) : 0;
+        if (! $id) {
+            continue;
+        }
+
+        // Check file size
+        $file_path = get_attached_file($id);
+        if ($file_path && file_exists($file_path)) {
+            $size = filesize($file_path);
+            if ($size > 1048576) { // 1MB
+                return new WP_Error(
+                    'image_too_large',
+                    sprintf(__('Image "%s" exceeds 1MB limit.', 'listing-engine-backend'), get_the_title($id))
+                );
+            }
+        }
+
+        // Check dimensions
+        $meta = wp_get_attachment_metadata($id);
+        if ($meta) {
+            $w = isset($meta['width']) ? absint($meta['width']) : 0;
+            $h = isset($meta['height']) ? absint($meta['height']) : 0;
+            if ($w !== 1200 || $h !== 800) {
+                return new WP_Error(
+                    'invalid_dimensions',
+                    sprintf(
+                        __('Image "%s" must be exactly 1200x800px (Actual: %dx%d).', 'listing-engine-backend'),
+                        get_the_title($id),
+                        $w,
+                        $h
+                    )
+                );
+            }
+        }
+    }
+
+    return true;
 }

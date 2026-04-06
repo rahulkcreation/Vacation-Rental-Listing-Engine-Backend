@@ -30,7 +30,7 @@ class LEB_Database_Handler
     private string $types_table;
 
     /**
-     * The fully-qualified name of the ls_ameneties table.
+     * The fully-qualified name of the ls_amenities table.
      *
      * @var string
      */
@@ -409,7 +409,7 @@ class LEB_Database_Handler
     // ─────────────────────────────────────────────────────────
 
     /**
-     * Create or repair the ls_ameneties table.
+     * Create or repair the ls_amenities table.
      *
      * Uses dbDelta() for safe upgrades. SVG validation is intentionally
      * handled at the AJAX/template layer; this method only concerns itself
@@ -1100,7 +1100,7 @@ class LEB_Database_Handler
      *     @type int    $price       Price per night.
      *     @type int    $type        Type ID from ls_types.
      *     @type int    $location    Location ID from ls_location.
-     *     @type string $ameneties   Comma-separated amenity IDs.
+     *     @type string $amenities   Comma-separated amenity IDs.
      *     @type string $status      Listing status (draft, pending, published, rejected).
      *     @type string $images      JSON array of image objects.
      *     @type string $dates       JSON array of blocked date strings.

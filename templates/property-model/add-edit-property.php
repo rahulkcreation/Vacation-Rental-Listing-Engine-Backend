@@ -36,7 +36,10 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
                 </a>
                 <span class="leb-aep-nav__heading">Back to Listings</span>
             </div>
-            
+            <div class="leb-aep-nav__right">
+                <span class="leb-aep-autosave-status" id="autosaveStatus"></span>
+                
+            </div>
         </nav>
 
         <!-- ══════════════════════════════════════════
@@ -52,6 +55,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
                 class="leb-aep-input"
                 placeholder="e.g. Luxurious Beachfront Villa"
                 aria-required="true"
+                required
             >
         </div>
 
@@ -59,7 +63,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
              SECTION 3: PROPERTY IMAGES (WP MEDIA)
         ══════════════════════════════════════════ -->
         <div class="leb-aep-section">
-            <label class="leb-aep-label">Property Images</label>
+            <label class="leb-aep-label">Property Images <span class="leb-aep-req" aria-hidden="true">*</span></label>
             <div class="leb-aep-upload-area" id="uploadArea" role="button" tabindex="0" aria-label="Click to open Media Library and select images">
                 <div class="leb-aep-upload-icon" aria-hidden="true">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -67,7 +71,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
                     </svg>
                 </div>
                 <div class="leb-aep-upload-text">Click to upload or drag &amp; drop</div>
-                <div class="leb-aep-upload-subtext">PNG, JPG, WEBP · up to 5 MB each · max 10 images</div>
+                <div class="leb-aep-upload-subtext">PNG, JPG, WEBP · Max 1MB each · Exact 1200x800px</div>
             </div>
             <div class="leb-aep-image-grid" id="imagePreviewGrid"></div>
         </div>
@@ -76,12 +80,13 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
              SECTION 4: DESCRIPTION
         ══════════════════════════════════════════ -->
         <div class="leb-aep-section">
-            <label for="propertyDescription" class="leb-aep-label">Description</label>
+            <label for="propertyDescription" class="leb-aep-label">Description <span class="leb-aep-req" aria-hidden="true">*</span></label>
             <textarea
                 id="propertyDescription"
                 class="leb-aep-textarea"
                 placeholder="Describe your property, nearby attractions, unique features…"
                 aria-required="true"
+                required
             ></textarea>
         </div>
 
@@ -89,32 +94,32 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
              SECTION 5: PROPERTY DETAILS (STEPPER GRID)
         ══════════════════════════════════════════ -->
         <div class="leb-aep-section">
-            <div class="leb-aep-section-heading">Property Details</div>
+            <div class="leb-aep-section-heading">Property Details <span class="leb-aep-req" aria-hidden="true">*</span></div>
             <div class="leb-aep-details-grid">
 
                 <div class="leb-aep-detail-field">
-                    <label for="guests" class="leb-aep-detail-label">Guests</label>
-                    <input type="number" id="guests" class="leb-aep-detail-input" min="1" step="1" placeholder="0">
+                    <label for="guests" class="leb-aep-detail-label">Guests <span class="leb-aep-req">*</span></label>
+                    <input type="number" id="guests" class="leb-aep-detail-input" min="1" step="1" placeholder="0" required>
                 </div>
 
                 <div class="leb-aep-detail-field">
-                    <label for="bedrooms" class="leb-aep-detail-label">Bedrooms</label>
-                    <input type="number" id="bedrooms" class="leb-aep-detail-input" min="0" step="1" placeholder="0">
+                    <label for="bedrooms" class="leb-aep-detail-label">Bedrooms <span class="leb-aep-req">*</span></label>
+                    <input type="number" id="bedrooms" class="leb-aep-detail-input" min="0" step="1" placeholder="0" required>
                 </div>
 
                 <div class="leb-aep-detail-field">
-                    <label for="beds" class="leb-aep-detail-label">Beds</label>
-                    <input type="number" id="beds" class="leb-aep-detail-input" min="0" step="1" placeholder="0">
+                    <label for="beds" class="leb-aep-detail-label">Beds <span class="leb-aep-req">*</span></label>
+                    <input type="number" id="beds" class="leb-aep-detail-input" min="0" step="1" placeholder="0" required>
                 </div>
 
                 <div class="leb-aep-detail-field">
-                    <label for="bathrooms" class="leb-aep-detail-label">Bathrooms</label>
-                    <input type="number" id="bathrooms" class="leb-aep-detail-input" min="0" step="1" placeholder="0">
+                    <label for="bathrooms" class="leb-aep-detail-label">Bathrooms <span class="leb-aep-req">*</span></label>
+                    <input type="number" id="bathrooms" class="leb-aep-detail-input" min="0" step="1" placeholder="0" required>
                 </div>
 
                 <div class="leb-aep-detail-field">
-                    <label for="pricePerNight" class="leb-aep-detail-label">Price (₹/night)</label>
-                    <input type="number" id="pricePerNight" class="leb-aep-detail-input" min="0" step="0.01" placeholder="0.00">
+                    <label for="pricePerNight" class="leb-aep-detail-label">Price (₹/night) <span class="leb-aep-req">*</span></label>
+                    <input type="number" id="pricePerNight" class="leb-aep-detail-input" min="0" step="0.01" placeholder="0.00" required>
                 </div>
 
             </div>
@@ -128,7 +133,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
 
                 <!-- Amenities Multi-Select (spans full width on 2-col grid) -->
                 <div class="leb-aep-select-wrap leb-aep-select-wrap--full" id="amenitiesSelectWrapper">
-                    <label class="leb-aep-label">Amenities</label>
+                    <label class="leb-aep-label">Amenities <span class="leb-aep-req" aria-hidden="true">*</span></label>
                     <div class="leb-aep-select-trigger" id="amenitiesTrigger"
                          tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select amenities">
                         <span class="leb-aep-selected-tags" id="amenitiesSelectedTags">
@@ -145,7 +150,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
 
                 <!-- Location Single-Select -->
                 <div class="leb-aep-select-wrap" id="locationSelectWrapper">
-                    <label class="leb-aep-label">Location</label>
+                    <label class="leb-aep-label">Location <span class="leb-aep-req" aria-hidden="true">*</span></label>
                     <div class="leb-aep-select-trigger" id="locationTrigger"
                          tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select location">
                         <span id="locationSelectedDisplay">
@@ -162,7 +167,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
 
                 <!-- Property Type Single-Select -->
                 <div class="leb-aep-select-wrap" id="propertyTypeSelectWrapper">
-                    <label class="leb-aep-label">Property Type</label>
+                    <label class="leb-aep-label">Property Type <span class="leb-aep-req" aria-hidden="true">*</span></label>
                     <div class="leb-aep-select-trigger" id="propertyTypeTrigger"
                          tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select property type">
                         <span id="propertyTypeSelectedDisplay">
@@ -237,7 +242,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
              SECTION 8: LISTING STATUS
         ══════════════════════════════════════════ -->
         <div class="leb-aep-section">
-            <label class="leb-aep-label">Listing Status</label>
+            <label class="leb-aep-label">Listing Status <span class="leb-aep-req" aria-hidden="true">*</span></label>
             <div class="leb-aep-select-wrap leb-aep-select-wrap--status" id="statusSelectWrapper">
                 <div class="leb-aep-select-trigger" id="statusTrigger"
                      tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select listing status">

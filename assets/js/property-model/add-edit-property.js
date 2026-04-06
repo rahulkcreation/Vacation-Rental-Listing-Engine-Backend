@@ -86,6 +86,7 @@
         datesSummary:   $('selectedDatesSummary'),
         datesCount:     $('selectedDatesCount'),
         datesChips:     $('selectedDatesChips'),
+        autosaveStatus: $('autosaveStatus'),
     };
 
     /* ══════════════════════════════════════════════════════════════
@@ -100,6 +101,7 @@
         renderCalendar();
         bindCalendarNav();
         bindFormSubmit();
+        bindAutosaveListeners();
 
         window.addEventListener('resize', handleResize);
 
@@ -142,6 +144,7 @@
                             DOM.typeDisplay.innerHTML = '<span class="leb-aep-selected-single">' + esc(t.name) + '</span>';
                             highlightSelected(DOM.typeDropdown, t.id);
                             closeDropdown(DOM.typeTrigger, DOM.typeDropdown);
+                            triggerAutosave();
                         });
                         DOM.typeDropdown.appendChild(div);
                     });
@@ -162,6 +165,7 @@
                             DOM.locDisplay.innerHTML = '<span class="leb-aep-selected-single">' + esc(l.name) + '</span>';
                             highlightSelected(DOM.locDropdown, l.id);
                             closeDropdown(DOM.locTrigger, DOM.locDropdown);
+                            triggerAutosave();
                         });
                         DOM.locDropdown.appendChild(div);
                     });
@@ -196,6 +200,7 @@
                                 div.querySelector('.leb-aep-checkbox').textContent = '✓';
                             }
                             renderAmenityTags();
+                            triggerAutosave();
                         });
                         DOM.amenDropdown.appendChild(div);
                     });
@@ -274,6 +279,7 @@
                 opt.classList.add('selected');
                 DOM.statusDisplay.innerHTML = opt.innerHTML;
                 closeDropdown(DOM.statusTrigger, DOM.statusDropdown);
+                triggerAutosave();
             });
         });
 
@@ -303,6 +309,7 @@
                 const opt = DOM.amenDropdown.querySelector('[data-value="' + rid + '"]');
                 if (opt) { opt.classList.remove('selected'); opt.querySelector('.leb-aep-checkbox').textContent = ''; }
                 renderAmenityTags();
+                triggerAutosave();
             });
             DOM.amenTags.appendChild(tag);
         });
@@ -333,7 +340,7 @@
     }
 
     function openMediaLibrary() {
-        if (typeof wp === 'undefined' || !wp.media) { LEB_Toaster.error('Media library unavailable.'); return; }
+        if (typeof wp === 'undefined' || !wp.media) { LEB_Toaster.show('Media library unavailable.', 'error'); return; }
         const frame = wp.media({
             title:   'Select Property Images',
             button:  { text: 'Add Images' },
@@ -342,16 +349,45 @@
         });
         frame.on('select', function () {
             const attachments = frame.state().get('selection').toJSON();
+            let rejectedCount = 0;
+            let errorMsg = '';
+
             attachments.forEach(function (att) {
-                if (state.images.length >= 10) return;
-                if (state.images.some(function (img) { return img.id === att.id; })) return;
+                /* ── Strict Validation ────────────────────────── */
+                const sizeLimit = 1048576; // 1MB (1024 * 1024)
+                
+                // Get image size (fallback to 0 if unknown)
+                const imgSizeInBytes = att.filesizeInBytes || att.fileLength || 0;
+                
+                const isSizeOk  = imgSizeInBytes <= sizeLimit && imgSizeInBytes > 0;
+                const isDimOk   = (parseInt(att.width) === 1200 && parseInt(att.height) === 800);
+
+                if (!isSizeOk || !isDimOk) {
+                    rejectedCount++;
+                    if (!isSizeOk) {
+                        errorMsg = 'Image file size must be 1MB or less.';
+                    } else if (!isDimOk) {
+                        errorMsg = 'Image dimensions must be exactly 1200x800px.';
+                    }
+                    return;
+                }
+
                 state.images.push({
                     id:         att.id,
                     url:        (att.sizes && att.sizes.medium) ? att.sizes.medium.url : att.url,
                     sort_order: state.images.length,
                 });
             });
+
+            if (rejectedCount > 0) {
+                const finalMsg = rejectedCount > 1 
+                    ? rejectedCount + ' images rejected due to invalid size or dimensions.'
+                    : 'Image rejected: ' + errorMsg;
+                LEB_Toaster.show(finalMsg, 'error');
+            }
+
             renderImages();
+            triggerAutosave();
         });
         frame.open();
     }
@@ -379,6 +415,7 @@
                 state.images.splice(idx, 1);
                 state.images.forEach(function (img, i) { img.sort_order = i; });
                 renderImages();
+                triggerAutosave();
             });
             item.appendChild(btn);
             DOM.imageGrid.appendChild(item);
@@ -402,6 +439,7 @@
                 state.images.splice(dropIdx, 0, tmp);
                 state.images.forEach(function (img, i) { img.sort_order = i; });
                 renderImages();
+                triggerAutosave();
             });
         });
     }
@@ -433,6 +471,7 @@
                 else { state.blockedDates.add(key); }
                 renderCalendar();
                 renderDatesSummary();
+                triggerAutosave();
             });
         });
 
@@ -501,6 +540,7 @@
             chip.querySelector('.leb-aep-chip-remove').addEventListener('click', function () {
                 state.blockedDates.delete(this.dataset.date);
                 renderCalendar();
+                triggerAutosave();
             });
             DOM.datesChips.appendChild(chip);
         });
@@ -512,6 +552,7 @@
         clearBtn.addEventListener('click', function () {
             state.blockedDates.clear();
             renderCalendar();
+            triggerAutosave();
         });
         DOM.datesChips.appendChild(clearBtn);
     }
@@ -550,7 +591,7 @@
     function fetchListing() {
         jQuery.post(LEB_Ajax.ajax_url, { action: 'leb_listing_get_listing', nonce: LEB_Ajax.nonce, id: state.id }, function (res) {
             if (!res.success) {
-                LEB_Toaster.error((res.data && res.data.message) || 'Failed to load property.');
+                LEB_Toaster.show((res.data && res.data.message) || 'Failed to load property.', 'error');
                 return;
             }
             const d = res.data.listing;
@@ -636,61 +677,222 @@
         DOM.form.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            /* Basic validation */
-            const title = DOM.title.value.trim();
-            if (!title) { DOM.title.classList.add('error'); LEB_Toaster.error('Property title is required.'); return; }
-            DOM.title.classList.remove('error');
+            /* ── Validation ─────────────────────────────────── */
+            let valid = true;
 
-            if (!state.typeId) { LEB_Toaster.error('Please select a property type.'); return; }
-            if (state.images.length === 0) { LEB_Toaster.error('Please add at least one image.'); return; }
+            const title = DOM.title ? DOM.title.value.trim() : '';
+            if (!title) {
+                if (DOM.title) DOM.title.classList.add('error');
+                LEB_Toaster.show('Property title is required.', 'error');
+                valid = false;
+            } else {
+                if (DOM.title) DOM.title.classList.remove('error');
+            }
 
-            const guests = parseInt(DOM.guests.value, 10);
-            if (!guests || guests < 1) { DOM.guests.classList.add('error'); LEB_Toaster.error('Number of guests must be at least 1.'); return; }
-            DOM.guests.classList.remove('error');
+            const desc = DOM.description ? DOM.description.value.trim() : '';
+            if (!desc) {
+                if (DOM.description) DOM.description.classList.add('error');
+                LEB_Toaster.show('Description is required.', 'error');
+                valid = false;
+            } else {
+                if (DOM.description) DOM.description.classList.remove('error');
+            }
 
-            const price = parseFloat(DOM.price.value);
-            if (!price || price <= 0) { DOM.price.classList.add('error'); LEB_Toaster.error('Please enter a valid price per night.'); return; }
-            DOM.price.classList.remove('error');
+            if (!state.typeId) {
+                if (DOM.typeTrigger) DOM.typeTrigger.classList.add('error');
+                LEB_Toaster.show('Please select a property type.', 'error');
+                valid = false;
+            } else {
+                if (DOM.typeTrigger) DOM.typeTrigger.classList.remove('error');
+            }
 
+            if (!state.locationId) {
+                if (DOM.locTrigger) DOM.locTrigger.classList.add('error');
+                LEB_Toaster.show('Please select a location.', 'error');
+                valid = false;
+            } else {
+                if (DOM.locTrigger) DOM.locTrigger.classList.remove('error');
+            }
+
+            if (state.amenityIds.size === 0) {
+                if (DOM.amenTrigger) DOM.amenTrigger.classList.add('error');
+                LEB_Toaster.show('Please select at least one amenity.', 'error');
+                valid = false;
+            } else {
+                if (DOM.amenTrigger) DOM.amenTrigger.classList.remove('error');
+            }
+
+            if (state.images.length === 0) {
+                LEB_Toaster.show('Please add at least one property image (1200x800).', 'error');
+                valid = false;
+            }
+
+            const guests = DOM.guests ? parseInt(DOM.guests.value, 10) : 0;
+            if (!guests || guests < 1) {
+                if (DOM.guests) DOM.guests.classList.add('error');
+                LEB_Toaster.show('Number of guests must be at least 1.', 'error');
+                valid = false;
+            } else {
+                if (DOM.guests) DOM.guests.classList.remove('error');
+            }
+
+            ['bedrooms', 'beds', 'bathrooms'].forEach(id => {
+                const el = DOM[id];
+                if (el && (!el.value || parseInt(el.value, 10) < 0)) {
+                    el.classList.add('error');
+                    valid = false;
+                } else if (el) {
+                    el.classList.remove('error');
+                }
+            });
+
+            const price = DOM.price ? parseFloat(DOM.price.value) : 0;
+            if (!price || price <= 0) {
+                if (DOM.price) DOM.price.classList.add('error');
+                LEB_Toaster.show('Please enter a valid price per night.', 'error');
+                valid = false;
+            } else {
+                if (DOM.price) DOM.price.classList.remove('error');
+            }
+
+            if (!valid) return;
+
+            /* ── Disable button ─────────────────────────────── */
             DOM.submitBtn.disabled = true;
             DOM.submitBtn.textContent = 'Saving…';
 
+            /* ── Determine action (create vs update) ──────── */
+            const isEdit  = state.id > 0;
+            const action  = isEdit ? 'leb_listing_update_listing' : 'leb_listing_create_listing';
+
+            /* ── Build payload ──────────────────────────────── */
             const payload = {
-                action:        'leb_listing_save_listing',
-                nonce:         LEB_Ajax.nonce,
-                id:            state.id,
-                title:         title,
-                description:   DOM.description.value.trim(),
-                guests:        DOM.guests.value,
-                bedroom:       DOM.bedrooms.value,
-                bed:           DOM.beds.value,
-                bathroom:      DOM.bathrooms.value,
-                price:         DOM.price.value,
-                type:          state.typeId,
-                location:      state.locationId,
-                status:        state.status,
-                amenities:     Array.from(state.amenityIds),
-                images:        state.images,
-                blocked_dates: Array.from(state.blockedDates),
+                action:      action,
+                nonce:       LEB_Ajax.nonce,
+                title:       title,
+                description: DOM.description ? DOM.description.value.trim() : '',
+                guests:      DOM.guests     ? DOM.guests.value     : 0,
+                bedroom:     DOM.bedrooms   ? DOM.bedrooms.value   : 0,
+                bed:         DOM.beds       ? DOM.beds.value       : 0,
+                bathroom:    DOM.bathrooms  ? DOM.bathrooms.value  : 0,
+                price:       DOM.price      ? DOM.price.value      : 0,
+                type:        state.typeId,
+                location:    state.locationId,
+                status:      state.status,
+                /* PHP expects amenities as a JSON-encoded string */
+                amenities:   JSON.stringify(Array.from(state.amenityIds)),
+                /* PHP handler key is 'images' (serialised array sent via jQuery) */
+                images:      state.images,
+                /* PHP handler key is 'dates' (not 'blocked_dates') */
+                dates:       Array.from(state.blockedDates),
             };
 
+            /* Add ID only for update */
+            if (isEdit) { payload.id = state.id; }
+
+            /* ── AJAX call ──────────────────────────────────── */
             jQuery.post(LEB_Ajax.ajax_url, payload, function (res) {
-                DOM.submitBtn.disabled = false;
-                DOM.submitBtn.textContent = state.id > 0 ? 'Update Listing' : 'Publish Listing';
+                DOM.submitBtn.disabled    = false;
+                DOM.submitBtn.textContent = isEdit ? 'Update Listing' : 'Publish Listing';
+
                 if (res.success) {
-                    LEB_Toaster.success('Property saved successfully!');
+                    LEB_Toaster.show(
+                        res.data.message || (isEdit ? 'Property updated successfully!' : 'Property created successfully!'),
+                        'success'
+                    );
+                    /* After create, update state.id with the new listing's ID */
+                    if (!isEdit && res.data.id) { state.id = res.data.id; }
+
+                    /* Redirect back to the list after a short delay */
                     setTimeout(function () {
-                        window.location.href = res.data.redirect_url;
-                    }, 600);
+                        window.location.href = LEB_Ajax.manage_url ||
+                            (window.location.href.split('?')[0] + '?page=leb-properties');
+                    }, 900);
                 } else {
-                    LEB_Toaster.error((res.data && res.data.message) || 'Error saving property.');
+                    LEB_Toaster.show(
+                        (res.data && res.data.message) ? res.data.message : 'Error saving property.',
+                        'error'
+                    );
                 }
             }).fail(function () {
-                DOM.submitBtn.disabled = false;
-                DOM.submitBtn.textContent = state.id > 0 ? 'Update Listing' : 'Publish Listing';
-                LEB_Toaster.error('Network error. Please try again.');
+                DOM.submitBtn.disabled    = false;
+                DOM.submitBtn.textContent = isEdit ? 'Update Listing' : 'Publish Listing';
+                LEB_Toaster.show('Network error. Please try again.', 'error');
             });
         });
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       AUTOSAVE LOGIC
+    ══════════════════════════════════════════════════════════════ */
+    function debounce(func, wait) {
+        let timeout;
+        return function () {
+            const context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
+    const triggerAutosave = debounce(function () {
+        const title = DOM.title ? DOM.title.value.trim() : '';
+        if (!title) return; // Don't autosave without a title
+
+        if (DOM.autosaveStatus) {
+            DOM.autosaveStatus.textContent = 'Saving…';
+            DOM.autosaveStatus.style.opacity = '1';
+        }
+
+        const isEdit = state.id > 0;
+        const action = isEdit ? 'leb_listing_update_listing' : 'leb_listing_create_listing';
+
+        const payload = {
+            action:      action,
+            nonce:       LEB_Ajax.nonce,
+            title:       title,
+            description: DOM.description ? DOM.description.value.trim() : '',
+            guests:      DOM.guests     ? DOM.guests.value     : 0,
+            bedroom:     DOM.bedrooms   ? DOM.bedrooms.value   : 0,
+            bed:         DOM.beds       ? DOM.beds.value       : 0,
+            bathroom:    DOM.bathrooms  ? DOM.bathrooms.value  : 0,
+            price:       DOM.price      ? DOM.price.value      : 0,
+            type:        state.typeId,
+            location:    state.locationId,
+            status:      state.status,
+            amenities:   JSON.stringify(Array.from(state.amenityIds)),
+            images:      state.images,
+            dates:       Array.from(state.blockedDates),
+        };
+
+        if (isEdit) payload.id = state.id;
+
+        jQuery.post(LEB_Ajax.ajax_url, payload, function (res) {
+            if (res.success) {
+                if (!isEdit && res.data.id) {
+                    state.id = res.data.id;
+                    // Update URL so refresh doesn't create new
+                    const newUrl = window.location.href.split('&id=')[0] + '&id=' + state.id;
+                    window.history.replaceState({ path: newUrl }, '', newUrl);
+                }
+                if (DOM.autosaveStatus) {
+                    const now = new Date();
+                    DOM.autosaveStatus.textContent = 'Saved at ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+                    setTimeout(() => { if (DOM.autosaveStatus) DOM.autosaveStatus.style.opacity = '0.6'; }, 2000);
+                }
+            }
+        });
+    }, 2000);
+
+    function bindAutosaveListeners() {
+        const triggers = [
+            DOM.title, DOM.description, DOM.guests, DOM.bedrooms, DOM.beds, DOM.bathrooms, DOM.price
+        ];
+        triggers.forEach(el => {
+            if (el) el.addEventListener('input', triggerAutosave);
+        });
+
+        // Dropdown changes, image changes, and calendar changes already call triggerAutosave manually
+        // in their respective handlers for better precision.
     }
 
     /* ══════════════════════════════════════════════════════════════

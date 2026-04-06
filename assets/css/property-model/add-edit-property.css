@@ -36,7 +36,7 @@ form#propertyForm {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 14px 0;
+    padding: 14px 20px;
     margin-bottom: 28px;
     border-bottom: 1px solid var(--leb-border-default);
     background: var(--leb-white);
@@ -49,6 +49,27 @@ form#propertyForm {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.leb-aep-nav__right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: right;
+}
+
+.leb-aep-autosave-status {
+    font-size: 12px;
+    color: var(--leb-text-muted);
+    font-weight: 400;
+    transition: opacity 0.3s ease;
+}
+
+.leb-aep-nav__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--leb-secondary-color);
+    margin: 0;
 }
 
 .leb-aep-back-btn {
@@ -151,15 +172,18 @@ form#propertyForm {
 }
 
 .leb-aep-input.error,
-.leb-aep-textarea.error {
-    border-color: var(--leb-error-color);
-    background: var(--leb-error-light-bg);
+.leb-aep-textarea.error,
+.leb-aep-detail-input.error,
+.leb-aep-select-trigger.error {
+    border-color: var(--leb-error-color) !important;
+    background: var(--leb-error-light-bg) !important;
 }
 
 .leb-aep-input.success,
-.leb-aep-textarea.success {
-    border-color: var(--leb-success-color);
-    background: var(--leb-success-light-bg);
+.leb-aep-textarea.success,
+.leb-aep-detail-input.success {
+    border-color: var(--leb-success-color) !important;
+    background: var(--leb-success-light-bg) !important;
 }
 
 .leb-aep-textarea {
