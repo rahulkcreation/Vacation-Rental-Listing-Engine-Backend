@@ -1010,6 +1010,21 @@ class LEB_Database_Handler
             ARRAY_A
         );
 
+        // Process images: Decode the JSON and take the first image's URL.
+        if ($items) {
+            foreach ($items as &$item) {
+                if (! empty($item['first_image'])) {
+                    $imgs = json_decode($item['first_image'], true);
+                    if (is_array($imgs) && ! empty($imgs[0]['url'])) {
+                        $item['first_image'] = $imgs[0]['url'];
+                    } else {
+                        $item['first_image'] = '';
+                    }
+                }
+            }
+            unset($item);
+        }
+
         return [
             'items' => $items ?: [],
             'total' => $total,

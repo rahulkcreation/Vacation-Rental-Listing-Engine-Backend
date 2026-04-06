@@ -116,10 +116,7 @@ $add_new_url = admin_url( 'admin.php?page=leb-properties&leb_action=add' );
          STATUS TABS
     ══════════════════════════════════════════ -->
     <div class="leb-pm-status-tabs" id="leb-pm-status-tabs">
-        <div class="leb-pm-tab leb-pm-tab--active" data-status="">
-            All <span id="leb-pm-count-all">0</span>
-        </div>
-        <div class="leb-pm-tab" data-status="published">
+        <div class="leb-pm-tab leb-pm-tab--active" data-status="published">
             Published <span id="leb-pm-count-published">0</span>
         </div>
         <div class="leb-pm-tab" data-status="pending">

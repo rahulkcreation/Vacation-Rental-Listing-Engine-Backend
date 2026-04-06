@@ -19,7 +19,7 @@
         page:        1,
         perPage:     10,
         search:      '',
-        status:      '',       // '' = All
+        status:      'published', // Default to published instead of '' (All)
         selected:    new Set(),
     };
 
@@ -39,7 +39,6 @@
         paginationInfo: document.getElementById('leb-pm-pagination-info'),
         paginationCtrl: document.getElementById('leb-pm-pagination-controls'),
         // Tab counts
-        countAll:       document.getElementById('leb-pm-count-all'),
         countPublished: document.getElementById('leb-pm-count-published'),
         countDraft:     document.getElementById('leb-pm-count-draft'),
         countPending:   document.getElementById('leb-pm-count-pending'),
@@ -74,6 +73,11 @@
                 renderCards(res.data.items || []);
                 renderPagination(res.data);
                 updateTabCounts(res.data.status_counts || {});
+                
+                // Show notification if no items found in search
+                if (lebPmState.search && (!res.data.items || res.data.items.length === 0)) {
+                    LEB_Toaster.info('No listings found for "' + lebPmState.search + '"');
+                }
             } else {
                 renderCards([]);
                 LEB_Toaster.error((res.data && res.data.message) || 'Failed to load listings.');
@@ -103,7 +107,7 @@
             (window.location.href.split('?')[0] + '?page=leb-properties&leb_action=edit&id=');
 
         DOM.body.innerHTML = items.map(function (item, index) {
-            // Thumbnail
+            // Thumbnail - item.first_image is now a URL string from backend
             const thumb = item.first_image
                 ? '<img class="leb-pm-card-thumb" src="' + escHtml(item.first_image) + '" alt="" loading="lazy">'
                 : '<div class="leb-pm-card-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--leb-border-light);">'
@@ -129,7 +133,7 @@
 
                 +   '<div class="leb-pm-card-row">'
                 +     '<div class="leb-pm-card-label">Title</div>'
-                +     '<div class="leb-pm-card-value leb-pm-card-value--title">' + escHtml(item.title) + '</div>'
+                +     '<div class="leb-pm-card-value">' + escHtml(item.title) + '</div>'
                 +   '</div>'
 
                 +   '<div class="leb-pm-card-row">'
@@ -234,12 +238,6 @@
      * TAB COUNTS
      * ═══════════════════════════════════════════════════════════ */
     function updateTabCounts(counts) {
-        const all = (parseInt(counts.published, 10) || 0)
-                  + (parseInt(counts.draft, 10)      || 0)
-                  + (parseInt(counts.pending, 10)    || 0)
-                  + (parseInt(counts.rejected, 10)   || 0);
-
-        if (DOM.countAll)       DOM.countAll.textContent       = all;
         if (DOM.countPublished) DOM.countPublished.textContent = counts.published || 0;
         if (DOM.countDraft)     DOM.countDraft.textContent     = counts.draft     || 0;
         if (DOM.countPending)   DOM.countPending.textContent   = counts.pending   || 0;
@@ -260,7 +258,7 @@
                     t.classList.remove('leb-pm-tab--active');
                 });
                 tab.classList.add('leb-pm-tab--active');
-                lebPmState.status = tab.dataset.status || '';
+                lebPmState.status = tab.dataset.status || 'published';
                 lebPmState.page   = 1;
                 fetchListings();
             });
@@ -352,7 +350,8 @@
                 if (!id) return;
 
                 LEB_Confirm.show('Are you sure you want to delete this property?', function () {
-                    performAJAXAction('leb_listing_delete_listings', [id], 'Property deleted successfully.', function () {
+                    // Corrected action: leb_listing_delete_listing (singular)
+                    performAJAXAction('leb_listing_delete_listing', [id], 'Property deleted successfully.', function () {
                         if (DOM.body.children.length === 1 && lebPmState.page > 1) {
                             lebPmState.page--;
                         }
@@ -393,7 +392,8 @@
         let successMsg = '';
 
         if (actionType === 'delete') {
-            action     = 'leb_listing_delete_listings';
+            // Corrected action: leb_listing_bulk_delete
+            action     = 'leb_listing_bulk_delete';
             confirmMsg = 'Delete ' + ids.length + ' selected propert' + (ids.length > 1 ? 'ies' : 'y') + '?';
             successMsg = 'Properties deleted.';
         } else {
@@ -405,7 +405,7 @@
         LEB_Confirm.show(confirmMsg, function () {
             performAJAXAction(action, ids, successMsg, function () {
                 lebPmState.selected.clear();
-                if (actionType === 'delete' && DOM.body.children.length === ids.length && lebPmState.page > 1) {
+                if (actionType === 'delete' && DOM.body.children.length <= ids.length && lebPmState.page > 1) {
                     lebPmState.page--;
                 }
                 fetchListings();

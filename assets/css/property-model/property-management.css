@@ -26,7 +26,7 @@
     right: -5%;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, var(--leb-primary-light-bg) 0%, rgba(255, 255, 255, 0) 70%);
+    background: radial-gradient(circle, var(--leb-primary-light-bg) 0%, transparent 70%);
     border-radius: 50%;
     opacity: 0.6;
 }
@@ -37,7 +37,7 @@
     left: -10%;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, var(--leb-info-light-bg) 0%, rgba(255, 255, 255, 0) 70%);
+    background: radial-gradient(circle, var(--leb-info-light-bg) 0%, transparent 70%);
     border-radius: 50%;
     opacity: 0.5;
 }
@@ -323,7 +323,7 @@
     box-shadow: var(--leb-card-shadow);
     margin-bottom: 20px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     text-align: center;
     align-items: center;
     gap: 4px;
@@ -369,13 +369,13 @@
 }
 
 .leb-pm-tab--active span {
-    border-color: rgba(255, 255, 255, 0.4);
+    border-color: var(--leb-white-alpha-40);
     color: var(--leb-white);
 }
 
 @media (max-width: 768px) {
     .leb-pm-status-tabs {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 6px;
         padding: 8px;
     }
@@ -505,6 +505,7 @@
 .leb-pm-card:hover {
     border-color: var(--leb-border-default);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    /* Very subtle shadow, keeping as is or using var if matched */
 }
 
 .leb-pm-card.leb-pm-card--selected {
@@ -521,6 +522,11 @@
     height: 16px !important;
     accent-color: var(--leb-primary-color);
     cursor: pointer;
+}
+
+.leb-pm-card input[type=checkbox]:checked:before {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
 }
 
 /* Card Serial Number */
@@ -617,8 +623,8 @@
 
 .leb-pm-status-badge--draft {
     background: var(--leb-warning-light-bg);
-    color: #b45309;
-    border: 1px solid #f59e0b;
+    color: var(--leb-warning-color);
+    border: 1px solid var(--leb-warning-color);
 }
 
 .leb-pm-status-badge--pending {
@@ -672,7 +678,7 @@
 
 .leb-pm-action-btn--delete {
     color: var(--leb-error-color);
-    border-color: rgba(234, 1, 36, 0.25);
+    border-color: var(--leb-primary-glow);
 }
 
 .leb-pm-action-btn--delete:hover {
