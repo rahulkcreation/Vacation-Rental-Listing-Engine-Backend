@@ -1,520 +1,548 @@
 /**
  * property-management.css
- *
- * Styles for the Property Listing Dashboard.
- * All classes are uniquely scoped to .leb-prop-mgmt-* to avoid conflicts.
+ * Overhauled to the new Premium UI.
  *
  * @package ListingEngineBackend
  */
 
-/* ─── Wrapper ─────────────────────────────────────────────── */
-.leb-prop-mgmt-wrap {
-    max-width: 1320px;
-    margin: 20px auto;
-    padding: 0 24px;
-    font-family: var(--leb-font-family);
-    color: var(--leb-secondary-color);
-}
+/* ─── Layout & Background ──────────────────────────────────── */
 
-/* ─── Page Header ─────────────────────────────────────────── */
-.leb-prop-mgmt-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-}
-
-.leb-prop-mgmt-title {
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-    color: var(--leb-secondary-color);
-}
-
-.leb-prop-mgmt-subtitle {
-    font-size: 14px;
-    margin: 0;
-    color: var(--leb-text-muted);
-}
-
-/* ─── Buttons ──────────────────────────────────────────────── */
-.leb-prop-mgmt-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    white-space: nowrap;
-    font-family: var(--leb-font-family);
-}
-
-.leb-prop-mgmt-btn--primary {
-    background: var(--leb-primary-color);
-    color: var(--leb-white);
-    box-shadow: 0 2px 8px var(--leb-primary-glow);
-}
-.leb-prop-mgmt-btn--primary:hover {
-    background: var(--leb-primary-dark);
-    box-shadow: 0 4px 16px var(--leb-primary-glow);
-    transform: translateY(-1px);
-    color: var(--leb-white);
-}
-
-.leb-prop-mgmt-btn--sm {
-    padding: 6px 14px;
-    font-size: 13px;
-    border-radius: 8px;
-}
-
-.leb-prop-mgmt-btn--outline {
-    background: transparent;
-    border: 1.5px solid var(--leb-border-default);
-    color: var(--leb-secondary-color);
-}
-.leb-prop-mgmt-btn--outline:hover {
-    background: var(--leb-bg-light);
-    border-color: var(--leb-primary-color);
-    color: var(--leb-primary-color);
-}
-
-.leb-prop-mgmt-btn--danger {
-    background: transparent;
-    border: 1.5px solid var(--leb-error-color);
-    color: var(--leb-error-color);
-}
-.leb-prop-mgmt-btn--danger:hover {
-    background: var(--leb-error-color);
-    color: var(--leb-white);
-}
-
-/* ─── Toolbar (Tabs + Search) ─────────────────────────────── */
-.leb-prop-mgmt-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.leb-prop-mgmt-tabs {
-    display: flex;
-    gap: 4px;
-    background: var(--leb-border-color);
-    border-radius: 12px;
-    padding: 4px;
-    flex-wrap: wrap;
-}
-
-.leb-prop-mgmt-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    border: none;
-    background: transparent;
-    color: var(--leb-text-muted);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: var(--leb-font-family);
-}
-.leb-prop-mgmt-tab:hover {
-    color: var(--leb-secondary-color);
-    background: var(--leb-white-alpha-40);
-}
-.leb-prop-mgmt-tab--active {
-    background: var(--leb-white);
-    color: var(--leb-primary-color);
-    box-shadow: var(--leb-card-shadow);
-    font-weight: 600;
-}
-
-.leb-prop-mgmt-tab__count {
-    background: var(--leb-bg-light);
-    padding: 1px 7px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 600;
-    min-width: 18px;
-    text-align: center;
-}
-.leb-prop-mgmt-tab--active .leb-prop-mgmt-tab__count {
-    background: var(--leb-primary-light-bg);
-    color: var(--leb-primary-color);
-}
-
-/* Search */
-.leb-prop-mgmt-search {
-    position: relative;
-    min-width: 260px;
-}
-.leb-prop-mgmt-search__icon {
-    position: absolute;
-    top: 50%;
-    left: 14px;
-    transform: translateY(-50%);
-    color: var(--leb-text-muted);
-    pointer-events: none;
-}
-.leb-prop-mgmt-search__input {
+.leb-pl-bg-decoration {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 10px 16px 10px 42px;
-    border: 1.5px solid var(--leb-border-default);
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: var(--leb-font-family);
-    color: var(--leb-secondary-color);
-    background: var(--leb-white);
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box;
-}
-.leb-prop-mgmt-search__input:focus {
-    border-color: var(--leb-primary-color);
-    box-shadow: var(--leb-focus-shadow);
-}
-.leb-prop-mgmt-search__input::placeholder {
-    color: var(--leb-text-muted);
-}
-
-/* ─── Bulk Actions Bar ────────────────────────────────────── */
-.leb-prop-mgmt-bulk-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 12px 20px;
-    background: var(--leb-primary-light-bg);
-    border: 1.5px solid var(--leb-primary-color);
-    border-radius: 12px;
-    margin-bottom: 16px;
-    animation: leb-prop-slide-down 0.25s ease;
-}
-.leb-prop-mgmt-bulk-bar__count {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--leb-primary-color);
-}
-.leb-prop-mgmt-bulk-bar__actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-@keyframes leb-prop-slide-down {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ─── Table ───────────────────────────────────────────────── */
-.leb-prop-mgmt-table-wrap {
-    background: var(--leb-white);
-    border-radius: 14px;
-    border: 1.5px solid var(--leb-border-default);
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
     overflow: hidden;
 }
 
-.leb-prop-mgmt-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
+.leb-pl-bg-orb-1 {
+    position: absolute;
+    top: -10%;
+    right: -5%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--leb-primary-light-bg) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    opacity: 0.6;
 }
 
-.leb-prop-mgmt-table__th {
-    padding: 14px 16px;
-    text-align: left;
-    font-size: 12px;
+.leb-pl-bg-orb-2 {
+    position: absolute;
+    bottom: -15%;
+    left: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--leb-info-light-bg) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.leb-pl-main-container {
+    max-width: 1400px;
+    margin: 20px auto;
+    position: relative;
+    z-index: 1;
+    width: 96%;
+    font-family: var(--leb-font-family);
+    color: var(--leb-text-color);
+}
+
+/* ─── Header ──────────────────────────────────── */
+.leb-pl-header-section {
+    margin-bottom: 30px;
+}
+
+.leb-pl-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    background-color: var(--leb-white);
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: var(--leb-card-shadow);
+}
+
+.leb-pl-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.leb-pl-header-icon-box {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--leb-primary-glow);
+}
+
+.leb-pl-header-icon-svg {
+    width: 24px;
+    height: 24px;
+    color: var(--leb-white);
+}
+
+.leb-pl-page-title {
+    font-size: 1.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--leb-text-muted);
-    background: var(--leb-bg-light);
-    border-bottom: 1.5px solid var(--leb-border-default);
-    white-space: nowrap;
-}
-.leb-prop-mgmt-table__th--check {
-    width: 44px;
-    text-align: center;
-}
-.leb-prop-mgmt-table__th--actions {
-    width: 100px;
-    text-align: center;
+    color: var(--leb-secondary-color);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin: 0;
 }
 
-/* Table Row */
-.leb-prop-mgmt-table__tr {
-    transition: background 0.15s ease;
-}
-.leb-prop-mgmt-table__tr:hover {
-    background: var(--leb-border-color);
-}
-.leb-prop-mgmt-table__tr--selected {
-    background: var(--leb-primary-light-bg) !important;
-}
-
-.leb-prop-mgmt-table__td {
-    padding: 14px 16px;
-    font-size: 14px;
-    border-bottom: 1px solid var(--leb-border-default);
-    vertical-align: middle;
-}
-.leb-prop-mgmt-table__td--check {
-    width: 44px;
-    text-align: center;
-}
-.leb-prop-mgmt-table__td--actions {
-    text-align: center;
+.add-type-btn {
+    background-color: var(--leb-primary-color);
+    padding: 0.6rem 1.2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--leb-border-color);
+    color: var(--leb-white);
+    box-shadow: var(--leb-card-shadow);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
-/* Property cell (thumbnail + title) */
-.leb-prop-mgmt-property-cell {
+.add-type-btn:hover {
+    background-color: var(--leb-primary-dark);
+}
+
+/* ─── Search Bar ──────────────────────────────────── */
+.leb-pl-search-section {
+    margin-bottom: 24px;
+}
+
+.leb-pl-search-bar-wrapper {
+    background-color: var(--leb-white);
+    border-radius: 14px;
+    padding: 8px 12px 8px 22px;
     display: flex;
     align-items: center;
     gap: 12px;
-    min-width: 240px;
+    box-shadow: var(--leb-card-shadow);
+    border: 2px solid var(--leb-border-color);
+    transition: all 0.3s ease;
 }
-.leb-prop-mgmt-property-thumb {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: var(--leb-border-color);
+
+.leb-pl-search-bar-wrapper.leb-pl-search-focused {
+    border-color: var(--leb-primary-color);
+}
+
+.leb-pl-search-icon {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.leb-prop-mgmt-property-info {
+
+.leb-pl-search-icon-svg {
+    width: 20px;
+    height: 20px;
+    color: var(--leb-text-muted);
+    transition: color 0.3s ease;
+}
+
+.leb-pl-search-bar-wrapper.leb-pl-search-focused .leb-pl-search-icon-svg {
+    color: var(--leb-primary-color);
+}
+
+.leb-pl-search-input {
+    flex: 1;
+    border: none !important;
+    outline: none;
+    font-size: 0.9375rem;
+    color: var(--leb-text-color) !important;
+    background: transparent;
+    font-family: inherit;
+    padding: 6px 0 !important;
+}
+
+.leb-pl-search-input::placeholder {
+    color: var(--leb-text-muted);
+    font-weight: 400;
+}
+
+.leb-pl-search-clear-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--leb-bg-light);
+    color: var(--leb-text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.leb-pl-search-clear-btn:hover {
+    background-color: var(--leb-border-default);
+    color: var(--leb-secondary-color);
+}
+
+.leb-pl-search-clear-btn.leb-pl-search-clear-visible {
+    display: flex;
+}
+
+.leb-pl-search-clear-svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ─── Status Wrapper ──────────────────────────────────── */
+.leb-pl-status {
+    background-color: var(--leb-white);
+    padding: 6px;
+    border-radius: 1rem;
+    box-shadow: var(--leb-card-shadow);
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    text-align: center;
+    align-items: center;
+}
+
+.status {
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    color: var(--leb-text-color);
+    transition: all 0.2s;
+    border-radius: 1rem;
+}
+
+.status span {
+    border: solid 1px var(--leb-border-color);
+    padding: 1px 5px;
+    border-radius: 100rem;
+    font-size: 0.8rem;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+}
+
+.status.active {
+    background-color: var(--leb-primary-color);
+    color: var(--leb-white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status.active span {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+    .leb-pl-status {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 10px;
+    }
+}
+
+/* ─── Table Section ──────────────────────────────────── */
+
+.leb-pl-table-section {
+    background: var(--leb-white);
+    border-radius: 18px;
+    box-shadow: var(--leb-card-shadow);
+    border: 1px solid var(--leb-border-color);
+    overflow: hidden;
+}
+
+.leb-pl-table-scroll {
+    overflow-x: hidden;
+    /* Changed from auto since we have cards wrapping correctly */
+    width: 100%;
+}
+
+.leb-pl-t-datas {
+    position: relative;
+    margin: 15px;
+    padding: 30px 20px 15px 20px;
+    border: 1px solid var(--leb-border-color);
+    border-radius: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--leb-bg-light);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.leb-prop-mgmt-property-title {
+
+.leb-pl-t-datas:hover {
+    border-color: var(--leb-border-default);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.leb-pl-t-datas.selected {
+    background: var(--leb-primary-light-bg);
+    border-color: var(--leb-primary-color);
+}
+
+.leb-pl-t-data-entry {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+}
+
+.leb-pl-data-label {
+    font-size: 0.85rem;
     font-weight: 600;
-    font-size: 14px;
-    color: var(--leb-secondary-color);
-    line-height: 1.4;
-}
-.leb-prop-mgmt-property-details {
-    font-size: 12px;
     color: var(--leb-text-muted);
 }
 
-/* ─── Status Badge ────────────────────────────────────────── */
-.leb-prop-mgmt-status {
+.leb-pl-data-entry {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--leb-text-color);
+    text-align: right;
+}
+
+.leb-pl-t-data-action {
+    margin-top: 5px;
+    border-top: 1px solid var(--leb-border-color);
+    padding-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.leb-pl-data-status {
+    padding: 4px 12px;
+    border-radius: 100rem;
+    font-size: 13px;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    gap: 6px;
     text-transform: capitalize;
-    white-space: nowrap;
-}
-.leb-prop-mgmt-status--published {
-    background: var(--leb-success-light-bg);
-    color: var(--leb-success-color);
-}
-.leb-prop-mgmt-status--draft {
-    background: var(--leb-bg-light);
-    color: var(--leb-text-muted);
-}
-.leb-prop-mgmt-status--pending {
-    background: var(--leb-warning-light-bg);
-    color: var(--leb-warning-color);
-}
-.leb-prop-mgmt-status--rejected {
-    background: var(--leb-error-light-bg);
-    color: var(--leb-error-color);
-}
-.leb-prop-mgmt-status__dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
 }
 
-/* ─── Action Buttons ──────────────────────────────────────── */
-.leb-prop-mgmt-actions {
+.leb-pl-data-status--published {
+    background: var(--leb-success-light-bg);
+    color: var(--leb-success-color);
+    border: 1px solid var(--leb-success-color);
+}
+
+.leb-pl-data-status--draft {
+    background: var(--leb-warning-light-bg);
+    color: var(--leb-text-color);
+    border: 1px solid var(--leb-border-color);
+}
+
+.leb-pl-data-status--pending {
+    background: var(--leb-warning-light-bg);
+    color: var(--leb-warning-color);
+    border: 1px solid var(--leb-warning-color);
+}
+
+.leb-pl-data-status--rejected {
+    background: var(--leb-error-light-bg);
+    color: var(--leb-error-color);
+    border: 1px solid var(--leb-error-color);
+}
+
+.leb-pl-data-btn {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--leb-white);
+    color: var(--leb-secondary-color);
+    border-radius: 100rem;
+    padding: 6px 16px;
+    border: 1px solid var(--leb-border-default);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.leb-pl-data-btn:hover {
+    background-color: var(--leb-bg-light);
+    border-color: var(--leb-secondary-color);
+}
+
+.leb-pl-data-entry-delete {
+    color: var(--leb-error-color) !important;
+}
+
+.leb-pl-data-entry-delete:hover {
+    background-color: var(--leb-error-light-bg) !important;
+    border-color: var(--leb-error-color) !important;
+}
+
+.leb-pl-action-btn-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.leb-pl-s-no {
+    background-color: var(--leb-primary-color);
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--leb-white);
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-}
-.leb-prop-mgmt-action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    border: 1.5px solid var(--leb-border-default);
-    background: var(--leb-white);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: var(--leb-text-muted);
-}
-.leb-prop-mgmt-action-btn:hover {
-    border-color: var(--leb-primary-color);
-    color: var(--leb-primary-color);
-    background: var(--leb-primary-light-bg);
-}
-.leb-prop-mgmt-action-btn--delete:hover {
-    border-color: var(--leb-error-color);
-    color: var(--leb-error-color);
-    background: var(--leb-error-light-bg);
 }
 
-/* ─── Checkbox ────────────────────────────────────────────── */
-.leb-prop-mgmt-checkbox {
+input.leb-pl-checkbox {
     width: 18px;
     height: 18px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
     accent-color: var(--leb-primary-color);
     cursor: pointer;
 }
 
-/* ─── Pagination ──────────────────────────────────────────── */
-.leb-prop-mgmt-pagination {
+.leb-data-img-cont {
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--leb-border-color);
+    padding: 3px;
+    background: var(--leb-white);
+    display: flex;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+img.leb-data-img {
+    border-radius: 8px;
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+}
+
+/* ─── Pagination ──────────────────────────────────── */
+
+.leb-pl-pagination-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 20px 0;
+    padding: 16px 24px;
+    border-top: 1px solid var(--leb-border-color);
     flex-wrap: wrap;
+    gap: 12px;
+    background: var(--leb-white);
 }
-.leb-prop-mgmt-pagination__info {
-    font-size: 13px;
+
+.leb-pl-pagination-text {
+    font-size: 0.85rem;
     color: var(--leb-text-muted);
 }
-.leb-prop-mgmt-pagination__controls {
+
+.leb-pl-pagination-controls {
     display: flex;
-    gap: 4px;
+    align-items: center;
+    gap: 6px;
 }
-.leb-prop-mgmt-page-btn {
-    display: inline-flex;
+
+.leb-pl-page-btn {
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
+    width: 36px;
     height: 36px;
-    padding: 0 10px;
     border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    border: 1.5px solid var(--leb-border-default);
-    background: var(--leb-white);
+    border: 1px solid var(--leb-border-default);
+    background-color: var(--leb-white);
     color: var(--leb-secondary-color);
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: var(--leb-font-family);
 }
-.leb-prop-mgmt-page-btn:hover {
-    border-color: var(--leb-primary-color);
-    color: var(--leb-primary-color);
+
+.leb-pl-page-btn:hover:not(:disabled) {
+    background-color: var(--leb-bg-light);
+    border-color: var(--leb-secondary-color);
 }
-.leb-prop-mgmt-page-btn--active {
-    background: var(--leb-primary-color);
+
+.leb-pl-page-btn-active {
+    background-color: var(--leb-primary-color);
     border-color: var(--leb-primary-color);
     color: var(--leb-white);
 }
-.leb-prop-mgmt-page-btn:disabled {
+
+.leb-pl-page-btn-active:hover:not(:disabled) {
+    background-color: var(--leb-primary-dark);
+}
+
+.leb-pl-page-btn[disabled] {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
-/* ─── Empty State ─────────────────────────────────────────── */
-.leb-prop-mgmt-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 64px 20px;
-    text-align: center;
-    gap: 12px;
-}
-.leb-prop-mgmt-empty h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--leb-secondary-color);
-}
-.leb-prop-mgmt-empty p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--leb-text-muted);
+.leb-pl-page-btn-svg {
+    width: 16px;
+    height: 16px;
 }
 
-/* ─── Loading ─────────────────────────────────────────────── */
-.leb-prop-mgmt-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    gap: 16px;
-    color: var(--leb-text-muted);
-    font-size: 14px;
-}
-.leb-prop-mgmt-spinner {
-    width: 36px;
-    height: 36px;
-    border: 3px solid var(--leb-border-default);
-    border-top-color: var(--leb-primary-color);
-    border-radius: 50%;
-    animation: leb-prop-spin 0.65s linear infinite;
-}
+/* ─── Responsive Adjustments ──────────────────────────────────── */
+@media (max-width: 420px) {
+    .leb-pl-page-title {
+        font-size: 1.4rem;
+    }
 
-@keyframes leb-prop-spin {
-    to { transform: rotate(360deg); }
-}
+    .leb-pl-header-icon-box {
+        width: 40px;
+        height: 40px;
+    }
 
-/* ─── Responsive ──────────────────────────────────────────── */
-@media (max-width: 1024px) {
-    .leb-prop-mgmt-table__th:nth-child(4),
-    .leb-prop-mgmt-table__td:nth-child(4) { /* Location */
-        display: none;
+    .leb-pl-header-right {
+        flex-grow: 1;
+    }
+
+    .add-type-btn {
+        display: flex;
+        width: 100%;
+        justify-content: center;
     }
 }
 
-@media (max-width: 768px) {
-    .leb-prop-mgmt-wrap {
-        padding: 0 12px;
+@media (min-width: 768px) {
+    .leb-pl-table-mobile {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        padding: 5px 10px;
     }
-    .leb-prop-mgmt-header {
-        flex-direction: column;
+
+    .leb-pl-t-datas {
+        margin: 0;
     }
-    .leb-prop-mgmt-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .leb-prop-mgmt-tabs {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-    }
-    .leb-prop-mgmt-search {
-        min-width: unset;
-    }
-    .leb-prop-mgmt-table__th:nth-child(3),
-    .leb-prop-mgmt-table__td:nth-child(3), /* Type */
-    .leb-prop-mgmt-table__th:nth-child(6),
-    .leb-prop-mgmt-table__td:nth-child(6) { /* Host */
-        display: none;
-    }
-    .leb-prop-mgmt-pagination {
-        flex-direction: column;
-        align-items: center;
-    }
-    .leb-prop-mgmt-bulk-bar {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
+}
+
+@media (min-width: 1024px) {
+    .leb-pl-table-mobile {
+        grid-template-columns: repeat(3, 1fr);
     }
 }

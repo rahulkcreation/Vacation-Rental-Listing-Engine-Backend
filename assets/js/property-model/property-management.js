@@ -82,7 +82,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════
-     * RENDER TABLE ROWS
+     * RENDER TABLE ROWS (PREMIUM UI CARDS)
      * ═══════════════════════════════════════════════════════════ */
     function renderRows(items) {
         if (!items.length) {
@@ -97,51 +97,51 @@
 
         const editBase = lebState.editBaseUrl || (window.location.href.split('?')[0] + '?page=leb-properties&leb_action=edit&id=');
 
-        DOM.body.innerHTML = items.map(function (item) {
+        DOM.body.innerHTML = items.map(function (item, index) {
             const thumb = item.first_image
-                ? '<img class="leb-prop-mgmt-property-thumb" src="' + escHtml(item.first_image) + '" alt="">'
-                : '<div class="leb-prop-mgmt-property-thumb" style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';
-
-            const details = [];
-            if (item.guests)   details.push(item.guests + ' guests');
-            if (item.bedroom)  details.push(item.bedroom + ' bed');
-            if (item.bathroom) details.push(item.bathroom + ' bath');
+                ? '<img class="leb-data-img" src="' + escHtml(item.first_image) + '" alt="">'
+                : '<div class="leb-data-img" style="display:flex;align-items:center;justify-content:center;background:#e9eef3;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';
 
             const status = (item.status || 'draft').toLowerCase();
+            const sNo = ((lebState.page - 1) * lebState.perPage) + index + 1;
 
-            return '<tr class="leb-prop-mgmt-table__tr" data-id="' + item.id + '">'
-                + '<td class="leb-prop-mgmt-table__td leb-prop-mgmt-table__td--check">'
-                +     '<input type="checkbox" class="leb-prop-mgmt-checkbox leb-prop-row-check" value="' + item.id + '">'
-                + '</td>'
-                + '<td class="leb-prop-mgmt-table__td">'
-                +     '<div class="leb-prop-mgmt-property-cell">'
-                +         thumb
-                +         '<div class="leb-prop-mgmt-property-info">'
-                +             '<span class="leb-prop-mgmt-property-title">' + escHtml(item.title) + '</span>'
-                +             '<span class="leb-prop-mgmt-property-details">' + escHtml(details.join(' · ')) + '</span>'
-                +         '</div>'
+            return '<div class="leb-pl-t-datas" data-id="' + item.id + '">'
+                + '<input class="leb-pl-checkbox leb-prop-row-check" type="checkbox" value="' + item.id + '">'
+                + '<div class="leb-data-img-cont">' + thumb + '</div>'
+                + '<div class="leb-pl-s-no">' + sNo + '</div>'
+                + '<div class="data-entry">'
+                +     '<div class="leb-pl-t-data-entry">'
+                +         '<div class="leb-pl-data-label">Title</div>'
+                +         '<div class="leb-pl-data-entry" style="font-weight:600;">' + escHtml(item.title) + '</div>'
                 +     '</div>'
-                + '</td>'
-                + '<td class="leb-prop-mgmt-table__td">' + escHtml(item.type_name || '—') + '</td>'
-                + '<td class="leb-prop-mgmt-table__td">' + escHtml(item.location || '—') + '</td>'
-                + '<td class="leb-prop-mgmt-table__td"><strong>₹' + Number(item.price || 0).toLocaleString('en-IN') + '</strong>/night</td>'
-                + '<td class="leb-prop-mgmt-table__td">' + escHtml(item.username || '—') + '</td>'
-                + '<td class="leb-prop-mgmt-table__td">'
-                +     '<span class="leb-prop-mgmt-status leb-prop-mgmt-status--' + status + '">'
-                +         '<span class="leb-prop-mgmt-status__dot"></span>' + status
-                +     '</span>'
-                + '</td>'
-                + '<td class="leb-prop-mgmt-table__td leb-prop-mgmt-table__td--actions">'
-                +     '<div class="leb-prop-mgmt-actions">'
-                +         '<a href="' + editBase + item.id + '" class="leb-prop-mgmt-action-btn" title="Edit">'
-                +             '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
-                +         '</a>'
-                +         '<button class="leb-prop-mgmt-action-btn leb-prop-mgmt-action-btn--delete leb-prop-delete-btn" data-id="' + item.id + '" title="Delete">'
-                +             '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>'
-                +         '</button>'
+                +     '<div class="leb-pl-t-data-entry">'
+                +         '<div class="leb-pl-data-label">Type</div>'
+                +         '<div class="leb-pl-data-entry">' + escHtml(item.type_name || '—') + '</div>'
                 +     '</div>'
-                + '</td>'
-                + '</tr>';
+                +     '<div class="leb-pl-t-data-entry">'
+                +         '<div class="leb-pl-data-label">Price</div>'
+                +         '<div class="leb-pl-data-entry">₹' + Number(item.price || 0).toLocaleString('en-IN') + ' / Night</div>'
+                +     '</div>'
+                +     '<div class="leb-pl-t-data-entry">'
+                +         '<div class="leb-pl-data-label">Host</div>'
+                +         '<div class="leb-pl-data-entry">' + escHtml(item.username || '—') + '</div>'
+                +     '</div>'
+                +     '<div class="leb-pl-t-data-entry">'
+                +         '<div class="leb-pl-data-label">Status</div>'
+                +         '<div class="leb-pl-data-entry"><span class="leb-pl-data-status leb-pl-data-status--' + status + '">' + status + '</span></div>'
+                +     '</div>'
+                + '</div>'
+                + '<div class="leb-pl-t-data-entry leb-pl-t-data-action">'
+                +     '<a href="' + editBase + item.id + '" class="leb-pl-data-btn">'
+                +         '<svg class="leb-pl-action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>'
+                +         'Edit'
+                +     '</a>'
+                +     '<button class="leb-pl-data-btn leb-pl-data-entry-delete leb-prop-delete-btn" data-id="' + item.id + '">'
+                +         '<svg class="leb-pl-action-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>'
+                +         'Delete'
+                +     '</button>'
+                + '</div>'
+                + '</div>';
         }).join('');
     }
 
@@ -172,20 +172,20 @@
         let html = '';
 
         // Prev
-        html += '<button class="leb-prop-mgmt-page-btn" data-page="' + (page - 1) + '"' + (page <= 1 ? ' disabled' : '') + '>&laquo;</button>';
+        html += '<button class="leb-pl-page-btn" data-page="' + (page - 1) + '"' + (page <= 1 ? ' disabled' : '') + '><svg class="leb-pl-page-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>';
 
-        // Page numbers (show max 7 with ellipsis)
+        // Page numbers
         const range = buildRange(page, totalPages);
         range.forEach(function (p) {
             if (p === '...') {
-                html += '<span class="leb-prop-mgmt-page-btn" style="pointer-events:none;border:none;">…</span>';
+                html += '<span class="leb-pl-page-btn" style="pointer-events:none;border:none;background:transparent;">…</span>';
             } else {
-                html += '<button class="leb-prop-mgmt-page-btn' + (p === page ? ' leb-prop-mgmt-page-btn--active' : '') + '" data-page="' + p + '">' + p + '</button>';
+                html += '<button class="leb-pl-page-btn' + (p === page ? ' leb-pl-page-btn-active' : '') + '" data-page="' + p + '">' + p + '</button>';
             }
         });
 
         // Next
-        html += '<button class="leb-prop-mgmt-page-btn" data-page="' + (page + 1) + '"' + (page >= totalPages ? ' disabled' : '') + '>&raquo;</button>';
+        html += '<button class="leb-pl-page-btn" data-page="' + (page + 1) + '"' + (page >= totalPages ? ' disabled' : '') + '><svg class="leb-pl-page-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>';
 
         DOM.paginationCtrl.innerHTML = html;
     }
@@ -223,10 +223,10 @@
     function bindEvents() {
         // Status tabs
         DOM.statusTabs.addEventListener('click', function (e) {
-            const tab = e.target.closest('.leb-prop-mgmt-tab');
+            const tab = e.target.closest('.status');
             if (!tab) return;
-            DOM.statusTabs.querySelectorAll('.leb-prop-mgmt-tab').forEach(function (t) { t.classList.remove('leb-prop-mgmt-tab--active'); });
-            tab.classList.add('leb-prop-mgmt-tab--active');
+            DOM.statusTabs.querySelectorAll('.status').forEach(function (t) { t.classList.remove('active'); });
+            tab.classList.add('active');
             lebState.status = tab.dataset.status || '';
             lebState.page = 1;
             fetchListings();
@@ -234,7 +234,16 @@
 
         // Search (debounced)
         let searchTimer;
+        const lebWrapper = document.getElementById('leb-pl-search-bar-wrapper');
+        const clearBtn = document.getElementById('leb-pl-search-clear-btn');
+        
+        function updateSearchClearBtn() {
+            if (DOM.searchInput.value.length > 0) clearBtn.classList.add('leb-pl-search-clear-visible');
+            else clearBtn.classList.remove('leb-pl-search-clear-visible');
+        }
+
         DOM.searchInput.addEventListener('input', function () {
+            updateSearchClearBtn();
             clearTimeout(searchTimer);
             searchTimer = setTimeout(function () {
                 lebState.search = DOM.searchInput.value.trim();
@@ -242,144 +251,165 @@
                 fetchListings();
             }, 350);
         });
+        
+        DOM.searchInput.addEventListener('focus', function () { if(lebWrapper) lebWrapper.classList.add('leb-pl-search-focused'); });
+        DOM.searchInput.addEventListener('blur', function () { if(lebWrapper) lebWrapper.classList.remove('leb-pl-search-focused'); });
+        clearBtn.addEventListener('click', function() {
+            DOM.searchInput.value = '';
+            updateSearchClearBtn();
+            lebState.search = '';
+            lebState.page = 1;
+            fetchListings();
+        });
 
         // Select all checkbox
         DOM.selectAll.addEventListener('change', function () {
             const checkboxes = DOM.body.querySelectorAll('.leb-prop-row-check');
             checkboxes.forEach(function (cb) {
                 cb.checked = DOM.selectAll.checked;
-                const id = parseInt(cb.value, 10);
-                DOM.selectAll.checked ? lebState.selected.add(id) : lebState.selected.delete(id);
-                cb.closest('tr').classList.toggle('leb-prop-mgmt-table__tr--selected', DOM.selectAll.checked);
+                const card = cb.closest('.leb-pl-t-datas');
+                if (cb.checked) {
+                    lebState.selected.add(parseInt(cb.value, 10));
+                    if (card) card.classList.add('selected');
+                } else {
+                    lebState.selected.delete(parseInt(cb.value, 10));
+                    if (card) card.classList.remove('selected');
+                }
             });
             syncBulkBar();
         });
 
-        // Row checkbox delegation
+        // Individual ROW checkbox
         DOM.body.addEventListener('change', function (e) {
-            if (!e.target.classList.contains('leb-prop-row-check')) return;
-            const id = parseInt(e.target.value, 10);
-            e.target.checked ? lebState.selected.add(id) : lebState.selected.delete(id);
-            e.target.closest('tr').classList.toggle('leb-prop-mgmt-table__tr--selected', e.target.checked);
-            syncBulkBar();
-            // Sync "select all" state
-            const allChecks = DOM.body.querySelectorAll('.leb-prop-row-check');
-            DOM.selectAll.checked = allChecks.length > 0 && lebState.selected.size === allChecks.length;
+            if (e.target.classList.contains('leb-prop-row-check')) {
+                const id = parseInt(e.target.value, 10);
+                const card = e.target.closest('.leb-pl-t-datas');
+                if (e.target.checked) {
+                    lebState.selected.add(id);
+                    if (card) card.classList.add('selected');
+                } else {
+                    lebState.selected.delete(id);
+                    if (card) card.classList.remove('selected');
+                }
+                syncBulkBar();
+                updateSelectAllState();
+            }
         });
 
-        // Single delete delegation
+        // Pagination clicks
+        DOM.paginationCtrl.addEventListener('click', function (e) {
+            const btn = e.target.closest('.leb-pl-page-btn');
+            if (!btn || btn.disabled) return;
+            const p = parseInt(btn.dataset.page, 10);
+            if (p && p !== lebState.page) {
+                lebState.page = p;
+                fetchListings();
+            }
+        });
+
+        // Delete SINGLE
         DOM.body.addEventListener('click', function (e) {
             const btn = e.target.closest('.leb-prop-delete-btn');
             if (!btn) return;
             const id = parseInt(btn.dataset.id, 10);
-            LEB_Confirmation.show({
-                title:   'Delete Property',
-                message: 'Are you sure you want to delete this property? This action cannot be undone.',
-                confirmText: 'Delete',
-                type: 'danger',
-                onConfirm: function () { deleteSingle(id); },
+            if (!id) return;
+
+            LEB_Confirm.show('Are you sure you want to delete this property?', function () {
+                performAJAXAction('leb_listing_delete_listings', [id], 'Property deleted successfully.', function () {
+                    // if it's the last item on the page, go back one page if possible
+                    if (DOM.body.children.length === 1 && lebState.page > 1) {
+                        lebState.page--;
+                    }
+                    fetchListings();
+                });
             });
         });
 
-        // Pagination delegation
-        DOM.paginationCtrl.addEventListener('click', function (e) {
-            const btn = e.target.closest('.leb-prop-mgmt-page-btn');
-            if (!btn || btn.disabled) return;
-            const p = parseInt(btn.dataset.page, 10);
-            if (isNaN(p) || p < 1) return;
-            lebState.page = p;
-            fetchListings();
-            // Scroll table into view
-            document.querySelector('.leb-prop-mgmt-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-
-        // Bulk actions
-        document.getElementById('leb-prop-bulk-publish')?.addEventListener('click', function () { bulkStatus('published'); });
-        document.getElementById('leb-prop-bulk-draft')?.addEventListener('click',   function () { bulkStatus('draft'); });
-        document.getElementById('leb-prop-bulk-delete')?.addEventListener('click',  function () {
-            LEB_Confirmation.show({
-                title:   'Bulk Delete',
-                message: 'Delete ' + lebState.selected.size + ' selected properties? This cannot be undone.',
-                confirmText: 'Delete All',
-                type: 'danger',
-                onConfirm: bulkDelete,
-            });
-        });
+        // Bulk Actions
+        document.getElementById('leb-prop-bulk-publish').addEventListener('click', function() { doBulk('published'); });
+        document.getElementById('leb-prop-bulk-draft').addEventListener('click',   function() { doBulk('draft'); });
+        document.getElementById('leb-prop-bulk-delete').addEventListener('click',  function() { doBulk('delete'); });
     }
 
-    /* ═══════════════════════════════════════════════════════════
-     * SINGLE + BULK ACTIONS
-     * ═══════════════════════════════════════════════════════════ */
-    function deleteSingle(id) {
-        jQuery.post(LEB_Ajax.ajax_url, {
-            action: 'leb_listing_delete_listing',
-            nonce:  LEB_Ajax.nonce,
-            id:     id,
-        }, function (res) {
-            if (res.success) {
-                LEB_Toaster.success(res.data.message);
-                fetchListings();
-            } else {
-                LEB_Toaster.error(res.data?.message || 'Delete failed.');
-            }
-        });
-    }
+    function doBulk(actionType) {
+        if (!lebState.selected.size) return;
+        const ids = Array.from(lebState.selected);
+        let action = '';
+        let confirmMsg = '';
+        let successMsg = '';
 
-    function bulkDelete() {
-        jQuery.post(LEB_Ajax.ajax_url, {
-            action: 'leb_listing_bulk_delete',
-            nonce:  LEB_Ajax.nonce,
-            ids:    Array.from(lebState.selected),
-        }, function (res) {
-            if (res.success) {
-                LEB_Toaster.success(res.data.message);
-                fetchListings();
-            } else {
-                LEB_Toaster.error(res.data?.message || 'Bulk delete failed.');
-            }
-        });
-    }
-
-    function bulkStatus(status) {
-        jQuery.post(LEB_Ajax.ajax_url, {
-            action: 'leb_listing_bulk_status',
-            nonce:  LEB_Ajax.nonce,
-            ids:    Array.from(lebState.selected),
-            status: status,
-        }, function (res) {
-            if (res.success) {
-                LEB_Toaster.success(res.data.message);
-                fetchListings();
-            } else {
-                LEB_Toaster.error(res.data?.message || 'Status update failed.');
-            }
-        });
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-     * UI HELPERS
-     * ═══════════════════════════════════════════════════════════ */
-    function showLoading(show) {
-        if (show) {
-            DOM.loading.style.display = '';
-            DOM.table.style.display = 'none';
-            DOM.empty.style.display = 'none';
+        if (actionType === 'delete') {
+            action = 'leb_listing_delete_listings';
+            confirmMsg = 'Delete ' + ids.length + ' selected propert' + (ids.length > 1 ? 'ies' : 'y') + '?';
+            successMsg = 'Properties deleted.';
         } else {
-            DOM.loading.style.display = 'none';
+            action = 'leb_listing_bulk_status';
+            confirmMsg = 'Mark ' + ids.length + ' propert' + (ids.length > 1 ? 'ies' : 'y') + ' as ' + actionType + '?';
+            successMsg = 'Properties updated.';
         }
+
+        LEB_Confirm.show(confirmMsg, function () {
+            performAJAXAction(action, ids, successMsg, function () {
+                lebState.selected.clear();
+                if (actionType === 'delete' && DOM.body.children.length === ids.length && lebState.page > 1) {
+                    lebState.page--;
+                }
+                fetchListings();
+            }, (actionType !== 'delete' ? actionType : null));
+        });
     }
 
+    /* ═══════════════════════════════════════════════════════════
+     * UTILS
+     * ═══════════════════════════════════════════════════════════ */
     function syncBulkBar() {
         const count = lebState.selected.size;
         DOM.selectedCount.textContent = count;
-        DOM.bulkBar.style.display = count > 0 ? '' : 'none';
+        DOM.bulkBar.style.display = count > 0 ? 'flex' : 'none';
+        if (count === 0 && DOM.selectAll) DOM.selectAll.checked = false;
     }
 
-    /** Minimal HTML-entity escaper for XSS prevention. */
+    function updateSelectAllState() {
+        if (!DOM.selectAll) return;
+        const checkboxes = DOM.body.querySelectorAll('.leb-prop-row-check');
+        if (!checkboxes.length) {
+            DOM.selectAll.checked = false;
+            return;
+        }
+        let allChecked = true;
+        checkboxes.forEach(function (cb) { if (!cb.checked) allChecked = false; });
+        DOM.selectAll.checked = allChecked;
+    }
+
+    function showLoading(show) {
+        DOM.loading.style.display = show ? '' : 'none';
+        if (show) {
+            DOM.table.style.display = 'none';
+            DOM.empty.style.display = 'none';
+        }
+    }
+
+    function performAJAXAction(action, ids, successMsg, onSuccess, newStatus) {
+        const data = { action: action, nonce: LEB_Ajax.nonce, ids: ids };
+        if (newStatus) data.status = newStatus;
+
+        jQuery.post(LEB_Ajax.ajax_url, data, function (res) {
+            if (res.success) {
+                LEB_Toaster.success(successMsg);
+                if (typeof onSuccess === 'function') onSuccess();
+            } else {
+                LEB_Toaster.error(res.data?.message || 'Action failed.');
+            }
+        }).fail(function () {
+            LEB_Toaster.error('Network error during action.');
+        });
+    }
+
+    // Basic XSS escape
+    const divMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
     function escHtml(str) {
         if (!str) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-        return String(str).replace(/[&<>"']/g, function (c) { return map[c]; });
+        return String(str).replace(/[&<>"']/g, function (s) { return divMap[s]; });
     }
 
 })();

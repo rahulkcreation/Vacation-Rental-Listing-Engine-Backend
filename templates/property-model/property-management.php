@@ -18,99 +18,101 @@ if ( ! defined( 'ABSPATH' ) ) {
 $add_new_url = admin_url( 'admin.php?page=leb-properties&leb_action=add' );
 ?>
 
-<div class="leb-prop-mgmt-wrap">
+<div class="leb-pl-bg-decoration">
+    <div class="leb-pl-bg-orb-1"></div>
+    <div class="leb-pl-bg-orb-2"></div>
+</div>
 
-    <!-- ─── Page Header ──────────────────────────────────────── -->
-    <div class="leb-prop-mgmt-header">
-        <div class="leb-prop-mgmt-header__left">
-            <h1 class="leb-prop-mgmt-title">Property Management</h1>
-            <p class="leb-prop-mgmt-subtitle">Create, manage, and organise your vacation rental listings.</p>
-        </div>
-        <div class="leb-prop-mgmt-header__right">
-            <a href="<?php echo esc_url( $add_new_url ); ?>" class="leb-prop-mgmt-btn leb-prop-mgmt-btn--primary" id="leb-prop-add-new-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add New Property
-            </a>
+<div class="leb-pl-main-container">
+
+    <div class="leb-pl-header-section">
+        <div class="leb-pl-header-top">
+            <div class="leb-pl-header-left">
+                <div class="leb-pl-header-icon-box">
+                    <svg class="leb-pl-header-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"></path>
+                        <path d="M2 22v-4a2 2 0 0 1 2-2h2"></path>
+                        <path d="M18 16h2a2 2 0 0 1 2 2v4"></path>
+                        <line x1="10" y1="6" x2="10" y2="6.01"></line>
+                        <line x1="14" y1="6" x2="14" y2="6.01"></line>
+                        <line x1="10" y1="10" x2="10" y2="10.01"></line>
+                        <line x1="14" y1="10" x2="14" y2="10.01"></line>
+                        <line x1="10" y1="14" x2="10" y2="14.01"></line>
+                        <line x1="14" y1="14" x2="14" y2="14.01"></line>
+                        <line x1="2" y1="22" x2="22" y2="22"></line>
+                    </svg>
+                </div>
+                <h1 class="leb-pl-page-title">Manage Property</h1>
+            </div>
+
+            <div class="leb-pl-header-right">
+                <a href="<?php echo esc_url( $add_new_url ); ?>" class="add-type-btn">Add New Property</a>
+            </div>
         </div>
     </div>
 
-    <!-- ─── Toolbar: Tabs + Search ───────────────────────────── -->
-    <div class="leb-prop-mgmt-toolbar">
-        <div class="leb-prop-mgmt-tabs" id="leb-prop-status-tabs">
-            <button class="leb-prop-mgmt-tab leb-prop-mgmt-tab--active" data-status="">All <span class="leb-prop-mgmt-tab__count" id="leb-prop-count-all">0</span></button>
-            <button class="leb-prop-mgmt-tab" data-status="published">Published <span class="leb-prop-mgmt-tab__count" id="leb-prop-count-published">0</span></button>
-            <button class="leb-prop-mgmt-tab" data-status="draft">Draft <span class="leb-prop-mgmt-tab__count" id="leb-prop-count-draft">0</span></button>
-            <button class="leb-prop-mgmt-tab" data-status="pending">Pending <span class="leb-prop-mgmt-tab__count" id="leb-prop-count-pending">0</span></button>
-            <button class="leb-prop-mgmt-tab" data-status="rejected">Rejected <span class="leb-prop-mgmt-tab__count" id="leb-prop-count-rejected">0</span></button>
-        </div>
-        <div class="leb-prop-mgmt-search">
-            <svg class="leb-prop-mgmt-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="leb-prop-mgmt-search__input" id="leb-prop-search-input" placeholder="Search by title or host…" autocomplete="off">
+    <!-- Bulk Actions -->
+    <div class="leb-pl-bulk-actions leb-pl-bulk-bar" id="leb-prop-bulk-bar" style="display:none;">
+        <span class="leb-pl-bulk-count"><span id="leb-prop-selected-count">0</span> selected</span>
+        <div class="leb-pl-bulk-btn-group">
+            <button class="leb-pl-data-btn leb-pl-btn-publish" id="leb-prop-bulk-publish">Publish</button>
+            <button class="leb-pl-data-btn leb-pl-btn-draft" id="leb-prop-bulk-draft">Draft</button>
+            <button class="leb-pl-data-btn leb-pl-btn-delete" id="leb-prop-bulk-delete">Delete</button>
         </div>
     </div>
 
-    <!-- ─── Bulk Actions Bar (hidden until items selected) ──── -->
-    <div class="leb-prop-mgmt-bulk-bar" id="leb-prop-bulk-bar" style="display:none;">
-        <span class="leb-prop-mgmt-bulk-bar__count"><span id="leb-prop-selected-count">0</span> selected</span>
-        <div class="leb-prop-mgmt-bulk-bar__actions">
-            <button class="leb-prop-mgmt-btn leb-prop-mgmt-btn--sm leb-prop-mgmt-btn--outline" id="leb-prop-bulk-publish" title="Publish Selected">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                Publish
-            </button>
-            <button class="leb-prop-mgmt-btn leb-prop-mgmt-btn--sm leb-prop-mgmt-btn--outline" id="leb-prop-bulk-draft" title="Set as Draft">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Draft
-            </button>
-            <button class="leb-prop-mgmt-btn leb-prop-mgmt-btn--sm leb-prop-mgmt-btn--danger" id="leb-prop-bulk-delete" title="Delete Selected">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                Delete
+    <div class="leb-pl-search-section">
+        <div class="leb-pl-search-bar-wrapper" id="leb-pl-search-bar-wrapper">
+            <span class="leb-pl-search-icon">
+                <svg class="leb-pl-search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </span>
+            <input type="text" class="leb-pl-search-input" placeholder="Search by title or host…" id="leb-prop-search-input" autocomplete="off">
+            <button class="leb-pl-search-clear-btn" id="leb-pl-search-clear-btn">
+                <svg class="leb-pl-search-clear-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
             </button>
         </div>
     </div>
 
-    <!-- ─── Data Table ───────────────────────────────────────── -->
-    <div class="leb-prop-mgmt-table-wrap">
-        <table class="leb-prop-mgmt-table" id="leb-prop-table">
-            <thead>
-                <tr>
-                    <th class="leb-prop-mgmt-table__th leb-prop-mgmt-table__th--check">
-                        <input type="checkbox" id="leb-prop-select-all" class="leb-prop-mgmt-checkbox" title="Select all">
-                    </th>
-                    <th class="leb-prop-mgmt-table__th">Property</th>
-                    <th class="leb-prop-mgmt-table__th">Type</th>
-                    <th class="leb-prop-mgmt-table__th">Location</th>
-                    <th class="leb-prop-mgmt-table__th">Price</th>
-                    <th class="leb-prop-mgmt-table__th">Host</th>
-                    <th class="leb-prop-mgmt-table__th">Status</th>
-                    <th class="leb-prop-mgmt-table__th leb-prop-mgmt-table__th--actions">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="leb-prop-table-body">
+    <div class="leb-pl-status" id="leb-prop-status-tabs">
+        <div class="status active" data-status="">All <span id="leb-prop-count-all">0</span></div>
+        <div class="status" data-status="published">Published <span id="leb-prop-count-published">0</span></div>
+        <div class="status" data-status="pending">Pending <span id="leb-prop-count-pending">0</span></div>
+        <div class="status" data-status="draft">Draft <span id="leb-prop-count-draft">0</span></div>
+        <div class="status" data-status="rejected">Rejected <span id="leb-prop-count-rejected">0</span></div>
+    </div>
+
+    <div class="leb-prop-state-box" id="leb-prop-loading" style="display:none;">
+        <p class="leb-prop-state-text">Loading properties...</p>
+    </div>
+
+    <div class="leb-prop-state-box leb-prop-empty-state" id="leb-prop-empty-state" style="display:none;">
+        <svg class="leb-prop-empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <h3 class="leb-prop-empty-title">No properties found</h3>
+        <p class="leb-prop-state-text">Try adjusting your search or filter, or add a new property.</p>
+    </div>
+
+    <div class="leb-pl-table-section" id="leb-prop-table">
+        <div class="leb-pl-table-scroll">
+            <div class="leb-pl-table-select-all-bar">
+                <input type="checkbox" id="leb-prop-select-all" class="leb-prop-select-all-cb" title="Select all"> 
+                <label for="leb-prop-select-all" class="leb-pl-data-label leb-prop-select-all-label">Select All</label>
+            </div>
+            <div class="leb-pl-table-mobile" id="leb-prop-table-body">
                 <!-- Rows injected by JS -->
-            </tbody>
-        </table>
-
-        <!-- Empty state (shown via JS) -->
-        <div class="leb-prop-mgmt-empty" id="leb-prop-empty-state" style="display:none;">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--leb-text-muted)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            <h3>No properties found</h3>
-            <p>Try adjusting your search or filter, or add a new property.</p>
+            </div>
         </div>
 
-        <!-- Loading skeleton (shown via JS) -->
-        <div class="leb-prop-mgmt-loading" id="leb-prop-loading" style="display:none;">
-            <div class="leb-prop-mgmt-spinner"></div>
-            <span>Loading properties…</span>
-        </div>
-    </div>
-
-    <!-- ─── Pagination ───────────────────────────────────────── -->
-    <div class="leb-prop-mgmt-pagination" id="leb-prop-pagination">
-        <div class="leb-prop-mgmt-pagination__info" id="leb-prop-pagination-info">
-            <!-- e.g. "Showing 1–10 of 42" -->
-        </div>
-        <div class="leb-prop-mgmt-pagination__controls" id="leb-prop-pagination-controls">
-            <!-- Page buttons injected by JS -->
+        <div class="leb-pl-pagination-bar" id="leb-prop-pagination">
+            <span class="leb-pl-pagination-text" id="leb-prop-pagination-info">Showing 0-0 of 0</span>
+            <div class="leb-pl-pagination-controls" id="leb-prop-pagination-controls">
+                <!-- Page buttons injected by JS -->
+            </div>
         </div>
     </div>
 

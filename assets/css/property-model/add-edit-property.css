@@ -1,581 +1,927 @@
 /**
  * add-edit-property.css
  *
- * Styles for the Add / Edit Property form screen.
- * All classes are uniquely scoped to .leb-prop-form-* to avoid conflicts.
+ * Premium Add / Edit Property form styles.
+ * All classes are scoped with leb-aep- prefix to prevent conflicts.
+ * All colours reference global.css variables — no hardcoded values.
  *
  * @package ListingEngineBackend
  */
 
-/* ─── Wrapper ─────────────────────────────────────────────── */
-.leb-prop-form-wrap {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 0 24px 40px;
+/* ══════════════════════════════════════════════════════════════
+   WRAPPER
+══════════════════════════════════════════════════════════════ */
+.leb-aep-wrap {
+    max-width: 960px;
+    width: 96%;
+    margin: 2rem auto;
+    background: var(--leb-white);
+    border-radius: 16px;
+    box-shadow: var(--leb-card-shadow);
     font-family: var(--leb-font-family);
-    color: var(--leb-secondary-color);
+    color: var(--leb-text-color);
 }
 
-/* ─── Top Bar ─────────────────────────────────────────────── */
-.leb-prop-form-topbar {
+
+
+form#propertyForm {
+    padding: 1rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NAV BAR (sticky)
+══════════════════════════════════════════════════════════════ */
+.leb-aep-nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 16px 0 24px;
-    flex-wrap: wrap;
-    border-bottom: 1.5px solid var(--leb-border-default);
+    gap: 12px;
+    padding: 14px 0;
     margin-bottom: 28px;
+    border-bottom: 1px solid var(--leb-border-default);
+    background: var(--leb-white);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.leb-prop-form-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--leb-text-muted);
-    text-decoration: none;
-    transition: color 0.2s;
-}
-.leb-prop-form-back:hover {
-    color: var(--leb-primary-color);
-}
-
-.leb-prop-form-topbar__title {
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0;
-    flex: 1;
-    text-align: center;
-}
-
-.leb-prop-form-topbar__actions {
+.leb-aep-nav__left {
     display: flex;
+    align-items: center;
     gap: 10px;
 }
 
-/* ─── Buttons ──────────────────────────────────────────────── */
-.leb-prop-form-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 22px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    white-space: nowrap;
-    font-family: var(--leb-font-family);
-}
-
-.leb-prop-form-btn--primary {
-    background: var(--leb-primary-color);
-    color: var(--white);
-    box-shadow: 0 2px 8px var(--leb-primary-glow);
-}
-.leb-prop-form-btn--primary:hover {
-    background: var(--leb-primary-dark);
-    box-shadow: 0 4px 16px var(--leb-primary-glow);
-    transform: translateY(-1px);
-}
-
-.leb-prop-form-btn--outline {
-    background: transparent;
-    border: 1.5px solid var(--leb-border-default);
-    color: var(--leb-secondary-color);
-}
-.leb-prop-form-btn--outline:hover {
-    border-color: var(--leb-primary-color);
-    color: var(--leb-primary-color);
-    background: var(--leb-primary-light-bg);
-}
-
-.leb-prop-form-btn--full {
-    width: 100%;
-    justify-content: center;
-}
-
-.leb-prop-form-btn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-/* ─── Grid Layout (2 columns) ─────────────────────────────── */
-.leb-prop-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 28px;
-    align-items: start;
-}
-
-.leb-prop-form-col--main {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-.leb-prop-form-col--side {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-/* ─── Card ────────────────────────────────────────────────── */
-.leb-prop-form-card {
-    background: var(--leb-white);
-    border: 1px solid var(--leb-border-color);
-    box-shadow: var(--leb-card-shadow);
-    border-radius: 16px;
-    padding: 28px;
-}
-.leb-prop-form-card__title {
-    margin: 0 0 6px;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--leb-secondary-color);
-}
-.leb-prop-form-card__desc {
-    margin: 0 0 18px;
-    font-size: 13px;
-    color: var(--leb-text-muted);
-}
-
-/* ─── Form Fields ─────────────────────────────────────────── */
-.leb-prop-form-field {
-    margin-bottom: 18px;
-}
-.leb-prop-form-field:last-child {
-    margin-bottom: 0;
-}
-
-.leb-prop-form-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--leb-secondary-color);
-    margin-bottom: 6px;
-}
-.leb-prop-form-req {
-    color: var(--leb-error-color);
-}
-
-.leb-prop-form-input,
-.leb-prop-form-textarea,
-.leb-prop-form-select {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid var(--leb-border-default);
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: var(--leb-font-family);
-    color: var(--leb-secondary-color);
-    background: var(--leb-white);
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box;
-}
-.leb-prop-form-input:focus,
-.leb-prop-form-textarea:focus,
-.leb-prop-form-select:focus {
-    border-color: var(--leb-primary-color);
-    box-shadow: var(--leb-focus-shadow);
-}
-.leb-prop-form-input::placeholder,
-.leb-prop-form-textarea::placeholder {
-    color: var(--leb-text-muted);
-}
-.leb-prop-form-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-.leb-prop-form-input.leb-prop-form-input--error,
-.leb-prop-form-textarea.leb-prop-form-textarea--error {
-    border-color: var(--leb-error-color);
-}
-
-/* Select wrapper (for chevron) */
-.leb-prop-form-select-wrap {
-    position: relative;
-}
-.leb-prop-form-select-wrap::after {
-    content: '';
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid var(--leb-text-muted);
-    border-bottom: 2px solid var(--leb-text-muted);
-    transform: translateY(-60%) rotate(45deg);
-    pointer-events: none;
-}
-.leb-prop-form-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    padding-right: 36px;
-}
-
-/* Row layout for steppers */
-.leb-prop-form-row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-.leb-prop-form-row--4 > .leb-prop-form-field {
-    flex: 1;
-    min-width: 120px;
-}
-
-/* ─── Stepper ─────────────────────────────────────────────── */
-.leb-prop-form-stepper {
-    display: flex;
-    align-items: center;
-    border: 1.5px solid var(--leb-border-default);
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--leb-white);
-}
-.leb-prop-form-stepper__btn {
+.leb-aep-back-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
     border: none;
-    background: var(--leb-bg-light);
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--leb-secondary-color);
-    transition: background 0.15s;
-    font-family: var(--leb-font-family);
-}
-.leb-prop-form-stepper__btn:hover {
-    background: var(--leb-primary-light-bg);
-    color: var(--leb-primary-color);
-}
-.leb-prop-form-stepper__value {
-    flex: 1;
-    border: none;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 8px 4px;
-    outline: none;
-    -moz-appearance: textfield;
-    appearance: textfield;
-    font-family: var(--leb-font-family);
-    color: var(--leb-secondary-color);
     background: transparent;
-}
-.leb-prop-form-stepper__value::-webkit-inner-spin-button,
-.leb-prop-form-stepper__value::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+    cursor: pointer;
+    color: var(--leb-primary-color);
+    transition: background 0.2s ease;
+    text-decoration: none;
 }
 
-/* ─── Image Grid ──────────────────────────────────────────── */
-.leb-prop-form-images {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-    min-height: 30px;
+.leb-aep-back-btn:hover {
+    background: var(--leb-primary-light-bg);
 }
-.leb-prop-form-image-item {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 1;
-    border: 2px solid var(--leb-border-default);
-    cursor: grab;
-    transition: box-shadow 0.2s;
+
+.leb-aep-back-btn svg {
+    width: 20px;
+    height: 20px;
 }
-.leb-prop-form-image-item:last-child {
+
+.leb-aep-nav__heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--leb-secondary-color);
+}
+
+
+
+/* ══════════════════════════════════════════════════════════════
+   SHARED SECTION WRAPPER
+══════════════════════════════════════════════════════════════ */
+.leb-aep-section {
+    margin-bottom: 26px;
+}
+
+.leb-aep-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--leb-text-muted);
+    margin-bottom: 7px;
+}
+
+.leb-aep-req {
+    color: var(--leb-error-color);
+    margin-left: 2px;
+}
+
+.leb-aep-label-hint {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--leb-text-muted);
+    margin-left: 4px;
+}
+
+.leb-aep-section-heading {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--leb-secondary-color);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--leb-border-default);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TEXT / TEXTAREA INPUTS
+══════════════════════════════════════════════════════════════ */
+.leb-aep-input,
+.leb-aep-textarea {
+    width: 100%;
+    padding: 8px 16px !important;
+    font-size: 15px;
+    font-family: var(--leb-font-family);
+    color: var(--leb-text-color) !important;
+    background: var(--leb-white);
+    border: 1px solid var(--leb-border-default) !important;
+    border-radius: 10px !important;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.leb-aep-input::placeholder,
+.leb-aep-textarea::placeholder {
+    color: var(--leb-text-muted);
+    opacity: 0.6;
+}
+
+.leb-aep-input:focus,
+.leb-aep-textarea:focus {
     border-color: var(--leb-primary-color);
+    box-shadow: var(--leb-focus-shadow);
 }
-.leb-prop-form-image-item:hover {
+
+.leb-aep-input.error,
+.leb-aep-textarea.error {
+    border-color: var(--leb-error-color);
+    background: var(--leb-error-light-bg);
+}
+
+.leb-aep-input.success,
+.leb-aep-textarea.success {
+    border-color: var(--leb-success-color);
+    background: var(--leb-success-light-bg);
+}
+
+.leb-aep-textarea {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   IMAGE UPLOAD AREA
+══════════════════════════════════════════════════════════════ */
+.leb-aep-upload-area {
+    border: 2px dashed var(--leb-border-default);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    position: relative;
+    user-select: none;
+}
+
+.leb-aep-upload-area:hover,
+.leb-aep-upload-area.drag-over {
+    border-color: var(--leb-primary-color);
+    background: var(--leb-primary-light-bg);
+}
+
+.leb-aep-upload-area.drag-over {
+    transform: scale(1.01);
+}
+
+.leb-aep-upload-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    color: var(--leb-text-muted);
+}
+
+.leb-aep-upload-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.leb-aep-upload-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--leb-text-color);
+    margin-bottom: 4px;
+}
+
+.leb-aep-upload-subtext {
+    font-size: 13px;
+    color: var(--leb-text-muted);
+}
+
+/* Image preview grid */
+.leb-aep-image-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+    .leb-aep-image-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .leb-aep-image-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.leb-aep-image-item {
+    position: relative;
+    aspect-ratio: 16/10;
+    border-radius: 10px;
+    border: 1px solid var(--leb-border-default);
+    overflow: hidden;
+    cursor: grab;
+    transition: box-shadow 0.2s ease;
+}
+
+.leb-aep-image-item:hover {
     box-shadow: var(--leb-card-shadow);
 }
-.leb-prop-form-image-item.leb-prop-form-image-item--dragging {
-    opacity: 0.5;
-}
-.leb-prop-form-image-item img {
+
+.leb-aep-image-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
-.leb-prop-form-image-item__badge {
+
+/* Cover badge on first image */
+.leb-aep-image-item:first-child::after {
+    content: "\2605 Cover";
     position: absolute;
-    top: 6px;
+    bottom: 6px;
     left: 6px;
-    background: var(--leb-primary-color);
+    background: var(--leb-success-color);
     color: var(--leb-white);
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 600;
     padding: 2px 8px;
-    border-radius: 6px;
+    border-radius: 20px;
 }
-.leb-prop-form-image-remove {
+
+.leb-aep-image-remove {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 24px;
-    height: 24px;
+    top: 5px;
+    right: 5px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background: var(--leb-overlay-dark);
+    background: var(--leb-error-color);
     border: none;
+    color: var(--leb-white);
+    font-size: 16px;
+    line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-.leb-prop-form-image-item:hover .leb-prop-form-image-remove {
-    opacity: 1;
-}
-.leb-prop-form-image-remove svg {
-    stroke: var(--leb-white);
+    padding: 0;
+    transition: transform 0.15s ease;
 }
 
-/* ─── Amenities Grid ──────────────────────────────────────── */
-.leb-prop-form-amenities {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
+.leb-aep-image-remove:hover {
+    transform: scale(1.15);
 }
-.leb-prop-form-amenity-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border: 1.5px solid var(--leb-border-default);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
+
+/* ══════════════════════════════════════════════════════════════
+   PROPERTY DETAILS GRID
+══════════════════════════════════════════════════════════════ */
+.leb-aep-details-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 900px) {
+    .leb-aep-details-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .leb-aep-details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .leb-aep-details-grid .leb-aep-detail-field:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+.leb-aep-detail-label {
+    display: block;
     font-size: 13px;
     font-weight: 500;
-}
-.leb-prop-form-amenity-item:hover {
-    border-color: var(--leb-primary-color);
-    background: var(--leb-primary-light-bg);
-}
-.leb-prop-form-amenity-item--selected {
-    border-color: var(--leb-primary-color);
-    background: var(--leb-primary-light-bg);
-    color: var(--leb-primary-color);
-    font-weight: 600;
-}
-.leb-prop-form-amenity-item img {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-.leb-prop-form-amenity-check {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--leb-primary-color);
-    flex-shrink: 0;
-}
-.leb-prop-form-amenities-loading {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 20px;
-    color: var(--leb-text-muted);
-    font-size: 13px;
-}
-
-/* ─── Status Radio Group ──────────────────────────────────── */
-.leb-prop-form-status-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-.leb-prop-form-status-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border: 1.5px solid var(--leb-border-default);
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-    text-transform: capitalize;
-}
-.leb-prop-form-status-option:hover {
-    border-color: var(--leb-primary-color);
-}
-.leb-prop-form-status-option input[type="radio"] {
-    accent-color: var(--leb-primary-color);
-    width: 16px;
-    height: 16px;
-}
-
-/* ─── Calendar ────────────────────────────────────────────── */
-.leb-prop-form-calendar {
-    margin-bottom: 16px;
-}
-.leb-prop-form-calendar__nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-}
-.leb-prop-form-calendar__arrow {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1.5px solid var(--leb-border-default);
-    background: var(--leb-white);
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--leb-font-family);
-    color: var(--leb-secondary-color);
-}
-.leb-prop-form-calendar__arrow:hover {
-    border-color: var(--leb-primary-color);
-    color: var(--leb-primary-color);
-}
-.leb-prop-form-calendar__month {
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.leb-prop-form-calendar__head {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-size: 11px;
-    font-weight: 600;
     color: var(--leb-text-muted);
     margin-bottom: 6px;
 }
 
-.leb-prop-form-calendar__grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+.leb-aep-detail-input {
+    width: 100%;
+    padding: 6px 14px !important;
+    font-size: 15px;
+    font-family: var(--leb-font-family);
+    color: var(--leb-text-color) !important;
+    background: var(--leb-white);
+    border: 1px solid var(--leb-border-default) !important;
+    border-radius: 8px !important;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -moz-appearance: textfield;
 }
-.leb-prop-form-cal-day {
+
+.leb-aep-detail-input::-webkit-inner-spin-button,
+.leb-aep-detail-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.leb-aep-detail-input:focus {
+    border-color: var(--leb-primary-color);
+    box-shadow: var(--leb-focus-shadow);
+}
+
+.leb-aep-detail-input.error {
+    border-color: var(--leb-error-color);
+    background: var(--leb-error-light-bg);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CUSTOM SELECT DROPDOWNS
+══════════════════════════════════════════════════════════════ */
+.leb-aep-dropdowns-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* Amenities spans full 2 columns */
+.leb-aep-select-wrap--full {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 600px) {
+    .leb-aep-dropdowns-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .leb-aep-select-wrap--full {
+        grid-column: 1;
+    }
+}
+
+.leb-aep-select-wrap {
+    position: relative;
+}
+
+
+.leb-aep-select-trigger {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: var(--leb-font-family);
+    color: var(--leb-text-color);
+    background: var(--leb-white);
+    border: 1px solid var(--leb-border-default);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 46px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.leb-aep-select-trigger:focus,
+.leb-aep-select-trigger.open {
+    border-color: var(--leb-primary-color);
+    box-shadow: var(--leb-focus-shadow);
+    outline: none;
+}
+
+.leb-aep-select-arrow {
+    width: 16px;
+    height: 16px;
+    color: var(--leb-primary-color);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.leb-aep-select-trigger.open .leb-aep-select-arrow {
+    transform: rotate(180deg);
+}
+
+.leb-aep-placeholder {
+    color: var(--leb-text-muted);
+    opacity: 0.7;
+}
+
+/* Tags container (amenities multi) */
+.leb-aep-selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    flex: 1;
+    min-width: 0;
+}
+
+.leb-aep-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-color);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.leb-aep-tag-remove {
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    color: var(--leb-primary-color);
+    transition: opacity 0.15s;
+}
+
+.leb-aep-tag-remove:hover {
+    opacity: 0.7;
+}
+
+/* Single selected text */
+.leb-aep-selected-single {
+    font-size: 15px;
+    color: var(--leb-text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Dropdown panel */
+.leb-aep-select-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--leb-white);
+    border: 1px solid var(--leb-border-default);
+    border-radius: 10px;
+    box-shadow: var(--leb-card-shadow);
+    z-index: 60;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+    scrollbar-width: thin;
+}
+
+.leb-aep-select-dropdown.open {
+    display: block;
+}
+
+.leb-aep-select-loading {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--leb-text-muted);
+    text-align: center;
+}
+
+/* Option rows */
+.leb-aep-select-option {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s ease;
+}
+
+.leb-aep-select-option:hover {
+    background: var(--leb-primary-light-bg);
+}
+
+.leb-aep-select-option.selected {
+    color: var(--leb-primary-color);
+    font-weight: 600;
+}
+
+/* Checkbox (multi-select) */
+.leb-aep-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--leb-border-default);
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 34px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: none;
-    background: transparent;
-    color: var(--leb-secondary-color);
-    font-family: var(--leb-font-family);
-}
-.leb-prop-form-cal-day:hover {
-    background: var(--leb-bg-light);
-}
-.leb-prop-form-cal-day--today {
-    font-weight: 700;
-    border: 1.5px solid var(--leb-primary-color);
-}
-.leb-prop-form-cal-day--blocked {
-    background: var(--leb-error-color);
-    color: var(--leb-white);
-    border-radius: 8px;
-}
-.leb-prop-form-cal-day--blocked:hover {
-    background: var(--leb-primary-dark);
-}
-.leb-prop-form-cal-day--empty {
-    pointer-events: none;
-}
-.leb-prop-form-cal-day--past {
-    opacity: 0.35;
-    pointer-events: none;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+    font-size: 12px;
 }
 
-/* Blocked date chips */
-.leb-prop-form-blocked-list {
+.leb-aep-select-option.selected .leb-aep-checkbox {
+    background: var(--leb-primary-color);
+    border-color: var(--leb-primary-color);
+    color: var(--leb-white);
+}
+
+/* Single-select option highlight */
+.leb-aep-single-option.selected {
+    background: var(--leb-primary-light-bg);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BLOCKED DATES CALENDAR
+══════════════════════════════════════════════════════════════ */
+.leb-aep-calendar-wrap {
+    background: var(--leb-white);
+    border: 1px solid var(--leb-border-default);
+    border-radius: 14px;
+    box-shadow: var(--leb-card-shadow);
+    padding: 20px 24px;
+}
+
+/* Desktop nav */
+.leb-aep-cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.leb-aep-cal-nav-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--leb-secondary-color);
+    min-width: 220px;
+    text-align: center;
+}
+
+.leb-aep-cal-nav-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--leb-border-default);
+    background: var(--leb-white);
+    color: var(--leb-primary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.leb-aep-cal-nav-btn:hover {
+    background: var(--leb-primary-light-bg);
+    border-color: var(--leb-primary-color);
+}
+
+/* Mobile nav */
+.leb-aep-cal-nav-mobile {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.leb-aep-cal-mobile-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--leb-secondary-color);
+}
+
+@media (max-width: 991px) {
+    .leb-aep-cal-nav {
+        display: none;
+    }
+
+    .leb-aep-cal-nav-mobile {
+        display: flex;
+    }
+
+    .leb-aep-cal-months {
+        position: relative;
+        overflow: hidden;
+    }
+}
+
+@media (min-width: 992px) {
+    .leb-aep-cal-nav-mobile {
+        display: none !important;
+    }
+}
+
+/* Months wrapper */
+.leb-aep-cal-months {
+    display: flex;
+    gap: 24px;
+}
+
+/* Individual month */
+.leb-aep-cal-month {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (max-width: 991px) {
+    .leb-aep-cal-month {
+        flex: none;
+        width: 100%;
+        opacity: 0;
+        transform: translateX(30px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .leb-aep-cal-month.active {
+        opacity: 1;
+        transform: translateX(0);
+        position: relative;
+    }
+}
+
+.leb-aep-cal-month-header {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--leb-secondary-color);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--leb-border-default);
+}
+
+/* Day names row */
+.leb-aep-cal-day-names {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+
+.leb-aep-cal-day-name {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--leb-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 0;
+}
+
+/* Days grid */
+.leb-aep-cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.leb-aep-cal-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    color: var(--leb-text-color);
+    user-select: none;
+    position: relative;
+}
+
+.leb-aep-cal-day:hover:not(.leb-aep-cal-day--disabled):not(.leb-aep-cal-day--empty) {
+    background: var(--leb-primary-light-bg);
+}
+
+.leb-aep-cal-day--today {
+    font-weight: 700;
+    border: 2px solid var(--leb-primary-color);
+}
+
+.leb-aep-cal-day--selected {
+    background: var(--leb-primary-color);
+    color: var(--leb-white);
+    font-weight: 600;
+}
+
+.leb-aep-cal-day--today.leb-aep-cal-day--selected {
+    border-color: var(--leb-primary-dark);
+}
+
+.leb-aep-cal-day--disabled {
+    color: var(--leb-text-muted);
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.leb-aep-cal-day--empty {
+    cursor: default;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SELECTED DATES SUMMARY
+══════════════════════════════════════════════════════════════ */
+.leb-aep-dates-summary {
+    display: none;
+    /* shown by JS */
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--leb-border-default);
+}
+
+.leb-aep-dates-count {
+    font-size: 14px;
+    color: var(--leb-text-muted);
+    margin-bottom: 10px;
+}
+
+.leb-aep-dates-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
+    align-items: center;
 }
-.leb-prop-form-blocked-chip {
+
+.leb-aep-date-chip {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 12px;
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-color);
+    border-radius: 20px;
+    font-size: 13px;
     font-weight: 500;
-    background: var(--leb-error-light-bg);
-    color: var(--leb-error-color);
-    border: 1px solid var(--leb-border-color);
 }
-.leb-prop-form-blocked-chip__remove {
+
+.leb-aep-chip-remove {
     cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--leb-primary-color);
+    margin-left: 2px;
+    transition: opacity 0.15s;
+}
+
+.leb-aep-chip-remove:hover {
+    opacity: 0.7;
+}
+
+.leb-aep-clear-all-btn {
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--leb-error-color);
+    background: var(--leb-error-light-bg);
     border: none;
-    background: none;
-    padding: 0;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--leb-font-family);
+    transition: background 0.15s ease;
+}
+
+.leb-aep-clear-all-btn:hover {
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-dark);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STATUS DROPDOWN OPTIONS
+══════════════════════════════════════════════════════════════ */
+.leb-aep-status-option {
+    padding: 11px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
     display: flex;
-    color: inherit;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s ease;
 }
 
-/* ─── Responsive ──────────────────────────────────────────── */
-@media (max-width: 1024px) {
-    .leb-prop-form-grid {
-        grid-template-columns: 1fr;
-    }
-    .leb-prop-form-col--side {
-        order: -1;
-    }
+.leb-aep-status-option:hover {
+    background: var(--leb-primary-light-bg);
 }
 
-@media (max-width: 768px) {
-    .leb-prop-form-wrap {
-        padding: 0 12px 30px;
-    }
-    .leb-prop-form-topbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .leb-prop-form-topbar__title {
-        text-align: left;
-    }
-    .leb-prop-form-topbar__actions {
-        width: 100%;
-    }
-    .leb-prop-form-topbar__actions .leb-prop-form-btn {
-        flex: 1;
-        justify-content: center;
-    }
-    .leb-prop-form-row--4 > .leb-prop-form-field {
-        min-width: 100%;
-    }
-    .leb-prop-form-amenities {
-        grid-template-columns: 1fr 1fr;
-    }
+.leb-aep-status-option.selected {
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-color);
 }
 
-@media (max-width: 480px) {
-    .leb-prop-form-amenities {
-        grid-template-columns: 1fr;
-    }
-    .leb-prop-form-images {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+.leb-aep-status-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+}
+
+.leb-aep-status-dot {
+    font-size: 16px;
+}
+
+.leb-aep-status-dot--pending {
+    color: var(--leb-warning-color);
+}
+
+.leb-aep-status-dot--published {
+    color: var(--leb-success-color);
+}
+
+.leb-aep-status-dot--rejected {
+    color: var(--leb-error-color);
+}
+
+.leb-aep-status-dot--draft {
+    color: var(--leb-text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUBMIT BUTTON
+══════════════════════════════════════════════════════════════ */
+.leb-aep-submit-btn {
+    width: 100%;
+    padding: 16px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: var(--leb-font-family);
+    color: var(--leb-white);
+    background: linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px var(--leb-primary-glow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 52px;
+}
+
+.leb-aep-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--leb-primary-glow);
+}
+
+.leb-aep-submit-btn:active {
+    transform: scale(0.98) translateY(0);
+    box-shadow: 0 2px 10px var(--leb-primary-glow);
+}
+
+.leb-aep-submit-btn:focus-visible {
+    outline: 2px solid var(--leb-primary-color);
+    outline-offset: 3px;
+}
+
+.leb-aep-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════════════════════════ */
+.leb-aep-select-dropdown::-webkit-scrollbar {
+    width: 5px;
+}
+
+.leb-aep-select-dropdown::-webkit-scrollbar-track {
+    background: var(--leb-border-default);
+    border-radius: 3px;
+}
+
+.leb-aep-select-dropdown::-webkit-scrollbar-thumb {
+    background: var(--leb-text-muted);
+    border-radius: 3px;
+}
+
+.leb-aep-select-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--leb-secondary-color);
+}
+
+@media (width <=991px) {
+    .leb-aep-cal-month-header {
+        display: none;
     }
 }
