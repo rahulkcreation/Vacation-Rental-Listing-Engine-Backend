@@ -85,6 +85,35 @@ function leb_get_amenities_schema() {
 ) {$charset_collate};";
 }
 
+/**
+ * Returns the CREATE TABLE SQL for the `{prefix}ls_location` table.
+ *
+ * Columns:
+ *   id         – Primary key.
+ *   name       – Location name.
+ *   slug       – Unique URL-friendly slug.
+ *   svg_path   – JSON string containing 'path' and 'attachment_id'.
+ *   updated_at – Updated timestamp.
+ *
+ * @return string SQL statement.
+ */
+function leb_get_locations_schema() {
+    global $wpdb;
+
+    $table_name      = $wpdb->prefix . 'ls_location';
+    $charset_collate = $wpdb->get_charset_collate();
+
+    return "CREATE TABLE {$table_name} (
+  id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  slug varchar(255) NOT NULL,
+  svg_path varchar(2048) DEFAULT NULL,
+  updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (id),
+  UNIQUE KEY slug (slug)
+) {$charset_collate};";
+}
+
 // ─────────────────────────────────────────────────────────────
 
 /**

@@ -1,0 +1,289 @@
+/* ==========================================================================
+   add-edit-location.css
+   Scoped to #leb-loc-add-edit and .leb-ae-loc-* classnames.
+   Zero conflict with any other LEB module.
+   All colors referenced from global.css design tokens.
+   ========================================================================== */
+
+/* ── Page Wrapper ─────────────────────────────────────────────── */
+#leb-loc-add-edit {
+    max-width: 560px;
+    margin: 2rem auto;
+    width: 95%;
+}
+
+/* ── Card ───────────────────────────────────────────────────────── */
+.leb-ae-loc-card {
+    background: var(--leb-white);
+    border: 1px solid var(--leb-border-default);
+    border-radius: 16px;
+    box-shadow: var(--leb-card-shadow);
+    padding: 30px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ── Card Header ────────────────────────────────────────────────── */
+.leb-ae-loc-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--leb-border-default);
+}
+
+.leb-ae-loc-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--leb-bg-light);
+    color: var(--leb-secondary-color);
+    border: 1px solid var(--leb-border-default);
+    transition: background 0.18s ease, transform 0.12s ease;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+.leb-ae-loc-back-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--leb-secondary-color);
+    flex-shrink: 0;
+}
+
+.leb-ae-loc-back-btn:hover {
+    background: var(--leb-primary-light-bg);
+    border-color: var(--leb-primary-color);
+    transform: translateX(-2px);
+    text-decoration: none;
+    color: var(--leb-primary-color);
+}
+
+.leb-ae-loc-back-btn:hover svg { stroke: var(--leb-primary-color); }
+
+.leb-ae-loc-card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--leb-secondary-color);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* ── Field Wrapper ──────────────────────────────────────────────── */
+.leb-ae-loc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.leb-ae-loc-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--leb-secondary-color);
+    letter-spacing: 0.01em;
+}
+
+/* ── Text Input ─────────────────────────────────────────────────── */
+.leb-ae-loc-input {
+    width: 100%;
+    padding: 8px 14px !important;
+    border: 2px solid var(--leb-border-default) !important;
+    border-radius: 10px !important;
+    background: var(--leb-white);
+    color: var(--leb-secondary-color) !important;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.leb-ae-loc-input:focus {
+    border-color: var(--leb-primary-color);
+    box-shadow: var(--leb-focus-shadow);
+}
+
+/* ── SVG Upload Area ────────────────────────────────────────────── */
+.leb-ae-loc-svg-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.leb-ae-loc-svg-preview-box {
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
+    border: 2px dashed var(--leb-border-default);
+    background: var(--leb-bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.leb-ae-loc-svg-preview-box:hover {
+    border-color: var(--leb-primary-color);
+}
+
+.leb-ae-loc-svg-preview-box img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.leb-ae-loc-svg-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--leb-text-muted);
+    font-size: 0.73rem;
+    text-align: center;
+    padding: 8px;
+}
+
+.leb-ae-loc-svg-placeholder svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--leb-text-muted);
+    opacity: 0.7;
+}
+
+/* ── SVG Action Buttons ─────────────────────────────────────────── */
+.leb-ae-loc-svg-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.leb-ae-loc-svg-select-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-color);
+    border: none;
+    border-radius: 9px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.leb-ae-loc-svg-select-btn:hover {
+    background: var(--leb-primary-light-bg);
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+}
+
+.leb-ae-loc-svg-select-btn svg {
+    width: 15px;
+    height: 15px;
+    stroke: var(--leb-primary-color);
+    flex-shrink: 0;
+}
+
+.leb-ae-loc-svg-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    background: var(--leb-error-light-bg);
+    color: var(--leb-error-color);
+    border: none;
+    border-radius: 9px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.leb-ae-loc-svg-remove-btn:hover {
+    background: var(--leb-error-light-bg);
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+}
+
+.leb-ae-loc-svg-remove-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--leb-error-color);
+    flex-shrink: 0;
+}
+
+/* ── SVG usage hint ─────────────────────────────────────────────── */
+.leb-ae-loc-svg-hint {
+    font-size: 0.78rem;
+    color: var(--leb-text-muted);
+    margin: 0;
+    font-style: italic;
+}
+
+/* ── Submit Button ──────────────────────────────────────────────── */
+.leb-ae-loc-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 24px;
+    background: var(--leb-primary-color);
+    color: var(--leb-white);
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    box-shadow: 0 3px 12px var(--leb-primary-glow);
+    letter-spacing: 0.01em;
+}
+
+.leb-ae-loc-submit-btn:hover:not(:disabled) {
+    opacity: 0.92;
+    box-shadow: 0 5px 18px var(--leb-primary-glow);
+    transform: translateY(-1px);
+}
+
+.leb-ae-loc-submit-btn:disabled {
+    opacity: 0.65;
+    cursor: default;
+    transform: none;
+}
+
+/* Loading state – spinner replaces text */
+.leb-ae-loc-btn-spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--leb-white-alpha-40);
+    border-top-color: var(--leb-white);
+    border-radius: 50%;
+    animation: lebAeLocSpin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+.leb-ae-loc-submit-btn.leb-loading .leb-ae-loc-btn-spinner {
+    display: inline-block;
+}
+
+.leb-ae-loc-submit-btn.leb-loading .leb-ae-loc-btn-label {
+    opacity: 0.7;
+}
+
+@keyframes lebAeLocSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media ( max-width: 520px ) {
+    .leb-ae-loc-card { padding: 20px 18px 24px; }
+    .leb-ae-loc-card-title { font-size: 1.05rem; }
+}

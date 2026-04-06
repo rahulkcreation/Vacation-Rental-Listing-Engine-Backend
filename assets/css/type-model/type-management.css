@@ -1,102 +1,3 @@
-/* ─────────────────────────────────────────────────────────
-   Global Reset & Shared LEB Components
-───────────────────────────────────────────────────────── */
-
-.leb-loading-overlay {
-    position:    absolute;
-    inset:       0;
-    z-index:     10;
-    display:     flex;
-    align-items:     center;
-    justify-content: center;
-    background:  var(--leb-overlay-bg);
-    border-radius: inherit;
-}
-
-.leb-spinner {
-    width:  28px;
-    height: 28px;
-    border: 3px solid var(--leb-border-default);
-    border-top-color: var(--leb-primary-color);
-    border-radius: 50%;
-    animation: lebSpin 0.7s linear infinite;
-}
-
-@keyframes lebSpin {
-    to { transform: rotate(360deg); }
-}
-
-.leb-empty-state {
-    display:         flex;
-    flex-direction:  column;
-    align-items:     center;
-    justify-content: center;
-    padding:         3rem 1.5rem;
-    text-align:      center;
-    color:           var(--leb-text-muted);
-    gap:             12px;
-}
-
-.leb-empty-state__icon {
-    width:  48px;
-    height: 48px;
-    opacity: 0.4;
-}
-
-.leb-empty-state__title {
-    font-size:   0.9375rem;
-    font-weight: 600;
-    color:       var(--leb-secondary-color);
-    margin:      0;
-}
-
-.leb-empty-state__subtitle {
-    font-size: 0.8125rem;
-    margin:    0;
-}
-
-.leb-badge {
-    display:       inline-flex;
-    align-items:   center;
-    gap:           5px;
-    padding:       3px 12px;
-    border-radius: 100rem;
-    font-size:     0.75rem;
-    font-weight:   600;
-    border:        1px solid transparent;
-    line-height:   1.6;
-}
-
-.leb-badge--success {
-    background-color: var(--leb-success-light-bg);
-    color:            var(--leb-success-color);
-    border-color:     var(--leb-success-color);
-}
-
-.leb-badge--warning {
-    background-color: var(--leb-warning-light-bg);
-    color:            var(--leb-warning-color);
-    border-color:     var(--leb-warning-color);
-}
-
-.leb-badge--error {
-    background-color: var(--leb-error-light-bg);
-    color:            var(--leb-error-color);
-    border-color:     var(--leb-error-color);
-}
-
-.leb-sr-only {
-    position: absolute;
-    width:    1px;
-    height:   1px;
-    padding:  0;
-    margin:   -1px;
-    overflow: hidden;
-    clip:     rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border:   0;
-}
-
 /* ── Type Management – List Screen ──────────────────────────────
    Scoped to #leb-type-list to prevent conflicts with other templates.
 ─────────────────────────────────────────────────────────────── */
@@ -399,10 +300,10 @@
 }
 
 #leb-type-list .leb-s-no {
-    padding: 5px;
+    padding: 8px;
     border-radius: 100rem;
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     display: flex;
     justify-content: center;
     align-items: center;

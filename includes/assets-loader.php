@@ -101,13 +101,22 @@ function leb_enqueue_global_styles() {
  * and localized LEB_Ajax data are available before inline template scripts execute.
  */
 function leb_enqueue_toaster_assets() {
-    // Toast Notification system.
-    wp_register_style( 'leb-toaster',  LEB_PLUGIN_URL . 'assets/css/leb-toaster.css', [], LEB_VERSION );
-    wp_register_script( 'leb-toaster', LEB_PLUGIN_URL . 'assets/js/leb-toaster.js',   [], LEB_VERSION, false );
+    // 1. Shared Global Styles (Tokens & Utility Components)
+    wp_register_style( 'leb-global-css', LEB_PLUGIN_URL . 'assets/global.css', [], LEB_VERSION );
+    wp_register_style( 'leb-shared-css', LEB_PLUGIN_URL . 'assets/css/leb-shared.css', [], LEB_VERSION );
+    wp_enqueue_style( 'leb-global-css' );
+    wp_enqueue_style( 'leb-shared-css' );
+
+    // 2. Global JS
+    wp_register_script( 'leb-global-js', LEB_PLUGIN_URL . 'assets/global.js', [], LEB_VERSION, true );
 
     // Confirmation Modal system.
     wp_register_style( 'leb-confirmation',  LEB_PLUGIN_URL . 'assets/css/leb-confirmation.css', [], LEB_VERSION );
     wp_register_script( 'leb-confirmation', LEB_PLUGIN_URL . 'assets/js/leb-confirmation.js',   [], LEB_VERSION, false );
+
+    // Toast Notification system.
+    wp_register_style( 'leb-toaster',  LEB_PLUGIN_URL . 'assets/css/leb-toaster.css', [], LEB_VERSION );
+    wp_register_script( 'leb-toaster', LEB_PLUGIN_URL . 'assets/js/leb-toaster.js',   [], LEB_VERSION, false );
 
     wp_enqueue_style( 'leb-toaster' );
     wp_enqueue_script( 'leb-toaster' );
@@ -146,18 +155,29 @@ function leb_enqueue_admin_assets( string $hook_suffix ) {
         $css_file        = 'database-page.css';
     }
     // Robust matching for Amenities list / Add-Edit pages.
-    elseif ( false !== strpos( $hook_suffix, 'leb-amenities' ) ) {
-        $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
-        if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
-            $template_handle = 'leb-add-edit-amenity';
-            $css_file        = 'amenity-model/add-edit-amenity.css';
-            $js_file         = 'amenity-model/add-edit-amenity.js';
-            // WP Media Library is required for the SVG picker.
-            wp_enqueue_media();
+    elseif (strpos($hook_suffix, 'leb-amenities') !== false) {
+        // -- Amenity Management (List or Add/Edit) --
+        $leb_action = isset($_GET['leb_action']) ? sanitize_text_field(wp_unslash($_GET['leb_action'])) : 'list';
+        if (in_array($leb_action, ['add', 'edit'], true)) {
+            // Add / Edit Amenity
+            wp_enqueue_style('leb-amenity-add-edit', LEB_PLUGIN_URL . 'assets/css/amenity-model/add-edit-amenity.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/amenity-model/add-edit-amenity.css'));
+            wp_enqueue_script('leb-amenity-add-edit', LEB_PLUGIN_URL . 'assets/js/amenity-model/add-edit-amenity.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/amenity-model/add-edit-amenity.js'), true);
         } else {
-            $template_handle = 'leb-amenity-management';
-            $css_file        = 'amenity-model/amenity-management.css';
-            $js_file         = 'amenity-model/amenity-management.js';
+            // Amenity List
+            wp_enqueue_style('leb-amenity-management', LEB_PLUGIN_URL . 'assets/css/amenity-model/amenity-management.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/amenity-model/amenity-management.css'));
+            wp_enqueue_script('leb-amenity-management', LEB_PLUGIN_URL . 'assets/js/amenity-model/amenity-management.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/amenity-model/amenity-management.js'), true);
+        }
+    } elseif (strpos($hook_suffix, 'leb-locations') !== false) {
+        // -- Location Management (List or Add/Edit) --
+        $leb_action = isset($_GET['leb_action']) ? sanitize_text_field(wp_unslash($_GET['leb_action'])) : 'list';
+        if (in_array($leb_action, ['add', 'edit'], true)) {
+            // Add / Edit Location
+            wp_enqueue_style('leb-loc-add-edit', LEB_PLUGIN_URL . 'assets/css/location-model/add-edit-location.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/location-model/add-edit-location.css'));
+            wp_enqueue_script('leb-loc-add-edit', LEB_PLUGIN_URL . 'assets/js/location-model/add-edit-location.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/location-model/add-edit-location.js'), true);
+        } else {
+            // Location List
+            wp_enqueue_style('leb-loc-management', LEB_PLUGIN_URL . 'assets/css/location-model/location-management.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/location-model/location-management.css'));
+            wp_enqueue_script('leb-loc-management', LEB_PLUGIN_URL . 'assets/js/location-model/location-management.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/location-model/location-management.js'), true);
         }
     }
 

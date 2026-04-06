@@ -75,6 +75,16 @@ function leb_register_admin_menus() {
         'leb-amenities',
         'leb_render_amenity_management_page'
     );
+
+    // Sub-menu 4: Locations.
+    add_submenu_page(
+        'leb-types',
+        __( 'Manage Locations', 'listing-engine-backend' ),
+        __( 'Locations', 'listing-engine-backend' ),
+        'manage_options',
+        'leb-locations',
+        'leb_render_location_management_page'
+    );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -125,6 +135,23 @@ function leb_render_amenity_management_page() {
         require_once LEB_TEMPLATES_PATH . 'amenity-model/add-edit-amenity.php';
     } else {
         require_once LEB_TEMPLATES_PATH . 'amenity-model/amenity-management.php';
+    }
+}
+
+/**
+ * Render the Location Management screen.
+ */
+function leb_render_location_management_page() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'listing-engine-backend' ) );
+    }
+
+    $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : 'list';
+
+    if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
+        require_once LEB_TEMPLATES_PATH . 'location-model/add-edit-location.php';
+    } else {
+        require_once LEB_TEMPLATES_PATH . 'location-model/location-management.php';
     }
 }
 
@@ -190,7 +217,15 @@ add_action( 'wp_ajax_leb_amen_get_amenity',         'leb_ajax_amen_get_amenity' 
 add_action( 'wp_ajax_leb_amen_delete_amenity',       'leb_ajax_amen_delete_amenity' );
 
 // -- Amenities: Bulk delete --
-add_action( 'wp_ajax_leb_amen_bulk_delete_amenities','leb_ajax_amen_bulk_delete_amenities' );
+add_action( 'wp_ajax_leb_amen_bulk_delete_amenities', 'leb_ajax_amen_bulk_delete_amenities' );
+
+// ── Location AJAX Hooks ────────────────────────────────────────
+add_action( 'wp_ajax_leb_loc_get_locations',        'leb_ajax_loc_get_locations' );
+add_action( 'wp_ajax_leb_loc_create_location',       'leb_ajax_loc_create_location' );
+add_action( 'wp_ajax_leb_loc_update_location',       'leb_ajax_loc_update_location' );
+add_action( 'wp_ajax_leb_loc_get_location',          'leb_ajax_loc_get_location' );
+add_action( 'wp_ajax_leb_loc_delete_location',       'leb_ajax_loc_delete_location' );
+add_action( 'wp_ajax_leb_loc_bulk_delete_locations', 'leb_ajax_loc_bulk_delete_locations' );
 
 /**
  * AJAX: Return paginated / searched list of types.
@@ -385,6 +420,13 @@ function leb_ajax_db_status() {
                 'exists'        => $amen_status['exists'],
                 'rows_complete' => $amen_status['rows_complete'],
             ],
+            [
+                'key'           => 'ls_location',
+                'title'         => __( 'Locations Table', 'listing-engine-backend' ),
+                'table_name'    => $wpdb->prefix . 'ls_location',
+                'exists'        => leb_check_table_status( $wpdb->prefix . 'ls_location' )['exists'],
+                'rows_complete' => leb_check_table_status( $wpdb->prefix . 'ls_location' )['rows_complete'],
+            ],
         ],
     ] );
 }
@@ -408,6 +450,8 @@ function leb_ajax_db_create_repair() {
         $result = $handler->create_or_repair_types_table();
     } elseif ( $table_key === 'ls_ameneties' ) {
         $result = $handler->create_or_repair_amenities_table();
+    } elseif ( $table_key === 'ls_location' ) {
+        $result = $handler->create_or_repair_locations_table();
     } else {
         wp_send_json_error( [ 'message' => __( 'Unknown table key.', 'listing-engine-backend' ) ] );
     }
@@ -721,6 +765,164 @@ function leb_amen_validate_svg_attachment( int $attachment_id ) {
     }
 
     return true;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Location AJAX Handlers
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * AJAX: Return paginated / searched list of locations.
+ */
+function leb_ajax_loc_get_locations() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [ 'message' => 'Unauthorized' ] );
+
+    $search   = isset( $_POST['search'] )   ? sanitize_text_field( wp_unslash( $_POST['search'] ) ) : '';
+    $page     = isset( $_POST['page'] )     ? absint( $_POST['page'] ) : 1;
+    $per_page = isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : 10;
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->get_locations( $search, $page, $per_page );
+
+    if ( ! empty( $result['items'] ) ) {
+        foreach ( $result['items'] as &$item ) {
+            if ( ! empty( $item['svg_path'] ) ) {
+                $decoded = json_decode( $item['svg_path'], true );
+                if ( is_array( $decoded ) && isset( $decoded['path'] ) ) {
+                    $item['svg_path']      = $decoded['path'];
+                    $item['attachment_id'] = $decoded['attachment_id'] ?? 0;
+                }
+            }
+        }
+    }
+    wp_send_json_success( $result );
+}
+
+/**
+ * AJAX: Create a new location entry.
+ */
+function leb_ajax_loc_create_location() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [ 'message' => 'Unauthorized' ] );
+
+    $name          = isset( $_POST['name'] )          ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+    $slug          = isset( $_POST['slug'] )          ? sanitize_title( wp_unslash( $_POST['slug'] ) )      : '';
+    $svg_path      = isset( $_POST['svg_path'] )      ? esc_url_raw( wp_unslash( $_POST['svg_path'] ) )     : '';
+    $attachment_id = isset( $_POST['attachment_id'] ) ? absint( $_POST['attachment_id'] )                   : 0;
+
+    if ( empty( $name ) || empty( $slug ) ) wp_send_json_error( [ 'message' => 'Name and Slug are required.' ] );
+    if ( empty( $svg_path ) && empty( $attachment_id ) ) wp_send_json_error( [ 'message' => 'SVG Icon is required.' ] );
+
+    // Validate SVG attachment if one was provided.
+    if ( $attachment_id ) {
+        $svg_validation = leb_amen_validate_svg_attachment( $attachment_id );
+        if ( is_wp_error( $svg_validation ) ) {
+            wp_send_json_error( [ 'message' => $svg_validation->get_error_message() ] );
+        }
+    }
+
+    $svg_data = wp_json_encode( [ 'path' => $svg_path, 'attachment_id' => $attachment_id ] );
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->create_location( $name, $slug, $svg_data );
+
+    if ( is_wp_error( $result ) ) wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    wp_send_json_success( [ 'message' => 'Location created successfully.', 'id' => $result ] );
+}
+
+/**
+ * AJAX: Update an existing location entry.
+ */
+function leb_ajax_loc_update_location() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [ 'message' => 'Unauthorized' ] );
+
+    $id            = isset( $_POST['id'] )            ? absint( $_POST['id'] )                             : 0;
+    $name          = isset( $_POST['name'] )          ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+    $slug          = isset( $_POST['slug'] )          ? sanitize_title( wp_unslash( $_POST['slug'] ) )      : '';
+    $svg_path      = isset( $_POST['svg_path'] )      ? esc_url_raw( wp_unslash( $_POST['svg_path'] ) )     : '';
+    $attachment_id = isset( $_POST['attachment_id'] ) ? absint( $_POST['attachment_id'] )                   : 0;
+
+    if ( ! $id || empty( $name ) || empty( $slug ) ) wp_send_json_error( [ 'message' => 'ID, Name, and Slug are required.' ] );
+    if ( empty( $svg_path ) && empty( $attachment_id ) ) wp_send_json_error( [ 'message' => 'SVG Icon is required.' ] );
+
+    // Validate new SVG attachment if a new one was selected.
+    if ( $attachment_id ) {
+        $svg_validation = leb_amen_validate_svg_attachment( $attachment_id );
+        if ( is_wp_error( $svg_validation ) ) {
+            wp_send_json_error( [ 'message' => $svg_validation->get_error_message() ] );
+        }
+    }
+
+    $svg_data = wp_json_encode( [ 'path' => $svg_path, 'attachment_id' => $attachment_id ] );
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->update_location( $id, $name, $slug, $svg_data );
+
+    if ( is_wp_error( $result ) ) wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    wp_send_json_success( [ 'message' => 'Location updated successfully.' ] );
+}
+
+/**
+ * AJAX: Get a single location row.
+ */
+function leb_ajax_loc_get_location() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [ 'message' => 'Unauthorized' ] );
+
+    $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+    if ( ! $id ) wp_send_json_error( [ 'message' => 'Invalid ID' ] );
+
+    $handler  = new LEB_Database_Handler();
+    $location = $handler->get_location_by_id( $id );
+
+    if ( ! $location ) wp_send_json_error( [ 'message' => 'Location not found' ] );
+
+    if ( ! empty( $location['svg_path'] ) ) {
+        $decoded = json_decode( $location['svg_path'], true );
+        if ( is_array( $decoded ) ) {
+            $location['svg_path']      = $decoded['path'] ?? '';
+            $location['attachment_id'] = $decoded['attachment_id'] ?? 0;
+        }
+    }
+    wp_send_json_success( [ 'location' => $location ] );
+}
+
+/**
+ * AJAX: Delete single location.
+ */
+function leb_ajax_loc_delete_location() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [ 'message' => 'Unauthorized' ] );
+
+    $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+    if ( ! $id ) wp_send_json_error( [ 'message' => 'Invalid ID' ] );
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->delete_location( $id );
+
+    if ( is_wp_error( $result ) ) wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    wp_send_json_success( [ 'message' => 'Location deleted successfully.' ] );
+}
+
+/**
+ * AJAX: Bulk delete locations.
+ */
+function leb_ajax_loc_bulk_delete_locations() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( [ 'message' => 'Unauthorized' ] );
+
+    $ids = isset( $_POST['ids'] ) ? (array) $_POST['ids'] : [];
+    $ids = array_filter( array_map( 'absint', $ids ) );
+
+    if ( empty( $ids ) ) wp_send_json_error( [ 'message' => 'No valid IDs provided.' ] );
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->delete_locations( $ids );
+
+    if ( is_wp_error( $result ) ) wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    wp_send_json_success( [ 'message' => sprintf( '%d locations deleted successfully.', count( $ids ) ) ] );
 }
 
 /**

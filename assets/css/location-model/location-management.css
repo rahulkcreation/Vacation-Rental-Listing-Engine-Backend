@@ -1,8 +1,8 @@
-/* ── Amenity Management – List Screen ──────────────────────────────
-   Scoped to #leb-amen-list to prevent conflicts with other templates.
+/* ── Location Management – List Screen ──────────────────────────────
+   Scoped to #leb-loc-list to prevent conflicts with other templates.
 ─────────────────────────────────────────────────────────────── */
 
-#leb-amen-list {
+#leb-loc-list {
    font-family: var(--leb-font-family);
     color: var(--leb-text-color);
     max-width: 1200px;
@@ -11,7 +11,7 @@
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
-#leb-amen-list .leb-am-header {
+#leb-loc-list .leb-loc-header {
     display:          flex;
     align-items:      center;
     justify-content:  space-between;
@@ -25,7 +25,7 @@
 }
 
 /* ── Bulk Actions Bar ───────────────────────────────────────── */
-#leb-amen-list .leb-am-bulk-actions {
+#leb-loc-list .leb-loc-bulk-actions {
     display:          none; /* Hidden by default */
     align-items:      center;
     justify-content:  space-between;
@@ -38,7 +38,7 @@
     animation:        lebFadeIn 0.3s ease;
 }
 
-#leb-amen-list .leb-am-bulk-actions.leb-active {
+#leb-loc-list .leb-loc-bulk-actions.leb-active {
     display: flex;
 }
 
@@ -47,7 +47,7 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
-#leb-amen-list .leb-am-bulk-info {
+#leb-loc-list .leb-loc-bulk-info {
     display:     flex;
     align-items: center;
     gap:         12px;
@@ -55,7 +55,14 @@
     font-weight: 500;
 }
 
-#leb-amen-list .leb-am-bulk-delete-btn {
+#leb-loc-list .leb-loc-checkbox {
+    width:              16px !important;
+    height:             16px !important;
+    cursor:             pointer;
+    accent-color:       var(--leb-primary-color);
+}
+
+#leb-loc-list .leb-loc-bulk-delete-btn {
     background:    var(--leb-error-color);
     color:         var(--leb-white);
     border:        none;
@@ -70,22 +77,22 @@
     gap:           6px;
 }
 
-#leb-amen-list .leb-am-bulk-delete-btn:hover {
+#leb-loc-list .leb-loc-bulk-delete-btn:hover {
     background: #d00120;
 }
 
-#leb-amen-list .leb-am-bulk-delete-btn svg {
+#leb-loc-list .leb-loc-bulk-delete-btn svg {
     width:  16px;
     height: 16px;
 }
 
-#leb-amen-list .leb-am-header-left {
+#leb-loc-list .leb-loc-header-left {
     display:     flex;
     align-items: center;
     gap:         14px;
 }
 
-#leb-amen-list .leb-am-icon-box {
+#leb-loc-list .leb-loc-icon-box {
     width:         48px;
     height:        48px;
     background:    linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
@@ -97,13 +104,13 @@
     flex-shrink:   0;
 }
 
-#leb-amen-list .leb-am-icon-box svg {
+#leb-loc-list .leb-loc-icon-box svg {
     width:  24px;
     height: 24px;
     color:  var(--leb-white);
 }
 
-#leb-amen-list .leb-am-page-title {
+#leb-loc-list .leb-loc-page-title {
     font-size:      1.7rem;
     font-weight:    700;
     color:          var(--leb-secondary-color);
@@ -112,11 +119,11 @@
     margin:         0;
 }
 
-#leb-amen-list .leb-am-header-right {
+#leb-loc-list .leb-loc-header-right {
     display: flex;
 }
 
-#leb-amen-list .leb-am-add-btn {
+#leb-loc-list .leb-loc-add-btn {
     display:          inline-flex;
     align-items:      center;
     gap:              6px;
@@ -134,19 +141,19 @@
     text-decoration:  none;
 }
 
-#leb-amen-list .leb-am-add-btn:hover {
+#leb-loc-list .leb-loc-add-btn:hover {
     opacity:   0.9;
     transform: translateY(-1px);
 }
 
-#leb-amen-list .leb-am-add-btn svg {
+#leb-loc-list .leb-loc-add-btn svg {
     width:  16px;
     height: 16px;
     flex-shrink: 0;
 }
 
 /* ── Search Bar ─────────────────────────────────────────────── */
-#leb-amen-list .leb-am-search-wrap {
+#leb-loc-list .leb-loc-search-wrap {
     display:          flex;
     align-items:      center;
     gap:              10px;
@@ -159,11 +166,11 @@
     transition:       border-color 0.25s ease;
 }
 
-#leb-amen-list .leb-am-search-wrap.leb-am-search-focused {
+#leb-loc-list .leb-loc-search-wrap.leb-loc-search-focused {
     border-color: var(--leb-primary-color);
 }
 
-#leb-amen-list .leb-am-search-icon {
+#leb-loc-list .leb-loc-search-icon {
     width:       20px;
     height:      20px;
     flex-shrink: 0;
@@ -171,11 +178,11 @@
     transition:  color 0.25s ease;
 }
 
-#leb-amen-list .leb-am-search-wrap.leb-am-search-focused .leb-am-search-icon {
+#leb-loc-list .leb-loc-search-wrap.leb-loc-search-focused .leb-loc-search-icon {
     color: var(--leb-primary-color);
 }
 
-#leb-amen-list .leb-am-search-input {
+#leb-loc-list .leb-loc-search-input {
     flex:        1;
     border:      none;
     outline:     none;
@@ -186,11 +193,11 @@
     padding:     8px 0;
 }
 
-#leb-amen-list .leb-am-search-input::placeholder {
+#leb-loc-list .leb-loc-search-input::placeholder {
     color: var(--leb-text-muted);
 }
 
-#leb-amen-list .leb-am-search-clear {
+#leb-loc-list .leb-loc-search-clear {
     display:       none;
     align-items:   center;
     justify-content: center;
@@ -205,21 +212,21 @@
     transition:    background-color 0.15s ease;
 }
 
-#leb-amen-list .leb-am-search-clear:hover {
+#leb-loc-list .leb-loc-search-clear:hover {
     background-color: var(--leb-border-default);
 }
 
-#leb-amen-list .leb-am-search-clear svg {
+#leb-loc-list .leb-loc-search-clear svg {
     width:  16px;
     height: 16px;
 }
 
-#leb-amen-list .leb-am-search-clear.leb-am-clear-visible {
+#leb-loc-list .leb-loc-search-clear.leb-loc-clear-visible {
     display: flex;
 }
 
 /* ── Table Section ──────────────────────────────────────────── */
-#leb-amen-list .leb-am-table-wrap {
+#leb-loc-list .leb-loc-table-wrap {
     background:    var(--leb-white);
     border-radius: 18px;
     box-shadow:    var(--leb-card-shadow);
@@ -230,7 +237,7 @@
 }
 
 /* Cards list container */
-#leb-amen-list .leb-am-cards-list {
+#leb-loc-list .leb-loc-cards-list {
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -238,7 +245,7 @@
 }
 
 /* Individual card row */
-#leb-amen-list .leb-am-card {
+#leb-loc-list .leb-loc-card {
     margin:        6px;
     padding:       12px 16px;
     border:        1px solid var(--leb-border-color);
@@ -251,7 +258,7 @@
 }
 
 /* Checkbox Styling */
-#leb-amen-list .leb-am-checkbox-wrap {
+#leb-loc-list .leb-loc-checkbox-wrap {
     position:  absolute;
     left:      15px;
     top:       15px;
@@ -259,22 +266,7 @@
     align-items: center;
 }
 
-#leb-amen-list input[type="checkbox"].leb-am-checkbox {
-    width:              16px !important;
-    height:             16px !important;
-    cursor:             pointer;
-    accent-color:       var(--leb-primary-color);
-    border:             2px solid var(--leb-border-default);
-    border-radius:      4px;
-    transition:         all 0.2s ease;
-}
-
-#leb-amen-list input[type=checkbox]:checked:before {
-    width: 1.2rem !important;
-    height: 1.2rem !important;
-}
-
-#leb-amen-list .leb-am-card-row {
+#leb-loc-list .leb-loc-card-row {
     display:         flex;
     flex-direction:  row;
     justify-content: space-between;
@@ -283,7 +275,7 @@
     gap:             12px;
 }
 
-#leb-amen-list .leb-am-card-label {
+#leb-loc-list .leb-loc-card-label {
     font-size:   0.75rem;
     font-weight: 600;
     color:       var(--leb-text-muted);
@@ -291,7 +283,7 @@
     min-width:   70px;
 }
 
-#leb-amen-list .leb-am-card-value {
+#leb-loc-list .leb-loc-card-value {
     font-size:   0.8125rem;
     font-weight: 400;
     color:       var(--leb-text-color);
@@ -299,11 +291,11 @@
     word-break:  break-all;
 }
 
-#leb-amen-list .leb-am-s-no {
-    padding: 8px;
+#leb-loc-list .leb-loc-s-no {
+    padding: 5px;
     border-radius: 100rem;
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -312,13 +304,13 @@
 }
 
 /* SVG icon inside card */
-#leb-amen-list .leb-am-svg-cell {
+#leb-loc-list .leb-loc-svg-cell {
     display: flex;
     justify-content: flex-end;
     align-items: center;
 }
 
-#leb-amen-list .leb-am-svg-preview {
+#leb-loc-list .leb-loc-svg-preview {
     width: 24px;
     height: 24px;
     object-fit: contain;
@@ -328,13 +320,13 @@
     background: var(--leb-bg-light);
 }
 
-#leb-amen-list .leb-am-svg-none {
+#leb-loc-list .leb-loc-svg-none {
     font-size: 0.85rem;
     color: var(--leb-text-muted);
 }
 
 /* Card action row */
-#leb-amen-list .leb-am-card-actions {
+#leb-loc-list .leb-loc-card-actions {
     margin-top:  6px;
     padding-top: 8px;
     border-top:  1px solid var(--leb-border-color);
@@ -343,7 +335,7 @@
     gap:         8px;
 }
 
-#leb-amen-list .leb-am-edit-btn {
+#leb-loc-list .leb-loc-edit-btn {
     display:       inline-flex;
     align-items:   center;
     gap:           5px;
@@ -360,17 +352,17 @@
     text-decoration: none;
 }
 
-#leb-amen-list .leb-am-edit-btn:hover {
+#leb-loc-list .leb-loc-edit-btn:hover {
     opacity: 0.85;
 }
 
-#leb-amen-list .leb-am-edit-btn svg,
-#leb-amen-list .leb-am-delete-btn svg {
+#leb-loc-list .leb-loc-edit-btn svg,
+#leb-loc-list .leb-loc-delete-btn svg {
     width:  14px;
     height: 14px;
 }
 
-#leb-amen-list .leb-am-delete-btn {
+#leb-loc-list .leb-loc-delete-btn {
     display:       inline-flex;
     align-items:   center;
     gap:           5px;
@@ -387,13 +379,13 @@
     text-decoration: none;
 }
 
-#leb-amen-list .leb-am-delete-btn:hover {
+#leb-loc-list .leb-loc-delete-btn:hover {
     background: var(--leb-error-color);
     color:      var(--leb-white);
 }
 
 /* ── Pagination Bar ─────────────────────────────────────────── */
-#leb-amen-list .leb-am-pagination {
+#leb-loc-list .leb-loc-pagination {
     display:         flex;
     align-items:     center;
     justify-content: space-between;
@@ -403,18 +395,18 @@
     border-top:      1px solid var(--leb-border-color);
 }
 
-#leb-amen-list .leb-am-pagination-text {
+#leb-loc-list .leb-loc-pagination-text {
     font-size: 0.8125rem;
     color:     var(--leb-text-muted);
 }
 
-#leb-amen-list .leb-am-page-controls {
+#leb-loc-list .leb-loc-page-controls {
     display:     flex;
     align-items: center;
     gap:         4px;
 }
 
-#leb-amen-list .leb-am-pg-btn {
+#leb-loc-list .leb-loc-pg-btn {
     display:         flex;
     align-items:     center;
     justify-content: center;
@@ -431,38 +423,38 @@
     transition:      all 0.15s ease;
 }
 
-#leb-amen-list .leb-am-pg-btn:hover:not(:disabled) {
+#leb-loc-list .leb-loc-pg-btn:hover:not(:disabled) {
     border-color: var(--leb-primary-color);
     color:        var(--leb-primary-color);
 }
 
-#leb-amen-list .leb-am-pg-btn.leb-am-pg-active {
+#leb-loc-list .leb-loc-pg-btn.leb-loc-pg-active {
     background:   var(--leb-primary-color);
     border-color: var(--leb-primary-color);
     color:        var(--leb-white);
 }
 
-#leb-amen-list .leb-am-pg-btn:disabled {
+#leb-loc-list .leb-loc-pg-btn:disabled {
     opacity: 0.4;
     cursor:  not-allowed;
 }
 
-#leb-amen-list .leb-am-pg-btn svg {
+#leb-loc-list .leb-loc-pg-btn svg {
     width:  16px;
     height: 16px;
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 480px) {
-    #leb-amen-list .leb-am-page-title {
+    #leb-loc-list .leb-loc-page-title {
         font-size: 1.4rem;
     }
 
-    #leb-amen-list .leb-am-header-right {
+    #leb-loc-list .leb-loc-header-right {
         flex-grow: 1;
     }
 
-    #leb-amen-list .leb-am-add-btn {
+    #leb-loc-list .leb-loc-add-btn {
         width:           100%;
         justify-content: center;
     }

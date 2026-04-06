@@ -28,19 +28,20 @@ class LEB_Database_Handler {
     private string $types_table;
 
     /**
-     * The fully-qualified name of the ls_ameneties table.
+     * The fully-qualified name of the ls_location table.
      *
      * @var string
      */
-    private string $amenities_table;
+    private string $locations_table;
 
     /**
-     * Constructor – resolves both table names with the WP prefix.
+     * Constructor – resolves table names with the WP prefix.
      */
     public function __construct() {
         global $wpdb;
         $this->types_table     = $wpdb->prefix . 'ls_types';
         $this->amenities_table = $wpdb->prefix . 'ls_ameneties';
+        $this->locations_table = $wpdb->prefix . 'ls_location';
     }
 
     // ─────────────────────────────────────────────────────────
@@ -604,5 +605,188 @@ class LEB_Database_Handler {
         }
 
         return true;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Locations – Table Maintenance
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Create or repair the ls_location table.
+     *
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function create_or_repair_locations_table() {
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+        $sql    = leb_get_locations_schema();
+        $result = dbDelta( $sql );
+
+        $status = leb_check_table_status( $this->locations_table );
+
+        if ( ! $status['exists'] ) {
+            return new WP_Error(
+                'leb_loc_table_create_failed',
+                __( 'Locations table could not be created. Check database permissions.', 'listing-engine-backend' )
+            );
+        }
+
+        return true;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Locations – Read Operations
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Retrieve a paginated, optionally searched list of locations.
+     */
+    public function get_locations( string $search = '', int $page = 1, int $per_page = 10 ): array {
+        global $wpdb;
+        $offset = ( $page - 1 ) * $per_page;
+
+        if ( ! empty( $search ) ) {
+            $like = '%' . $wpdb->esc_like( $search ) . '%';
+            $items = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM `{$this->locations_table}` WHERE name LIKE %s OR slug LIKE %s ORDER BY id DESC LIMIT %d OFFSET %d",
+                    $like, $like, $per_page, $offset
+                ),
+                ARRAY_A
+            );
+            $total = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$this->locations_table}` WHERE name LIKE %s OR slug LIKE %s",
+                    $like, $like
+                )
+            );
+        } else {
+            $items = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM `{$this->locations_table}` ORDER BY id DESC LIMIT %d OFFSET %d",
+                    $per_page, $offset
+                ),
+                ARRAY_A
+            );
+            $total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$this->locations_table}`" );
+        }
+
+        return [ 'items' => $items ?: [], 'total' => $total ];
+    }
+
+    /**
+     * Get single location by ID.
+     */
+    public function get_location_by_id( int $id ): ?array {
+        global $wpdb;
+        $row = $wpdb->get_row(
+            $wpdb->prepare( "SELECT * FROM `{$this->locations_table}` WHERE id = %d", $id ),
+            ARRAY_A
+        );
+        return $row ?: null;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Locations – Write Operations
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Create location.
+     */
+    public function create_location( string $name, string $slug, string $svg_path = '' ) {
+        global $wpdb;
+        $name = sanitize_text_field( $name );
+        $slug = sanitize_title( $slug );
+
+        if ( $this->location_slug_exists( $slug ) ) {
+            return new WP_Error( 'leb_loc_duplicate_slug', __( 'A location with this slug already exists.', 'listing-engine-backend' ) );
+        }
+
+        $inserted = $wpdb->insert(
+            $this->locations_table,
+            [
+                'name'       => $name,
+                'slug'       => $slug,
+                'svg_path'   => wp_unslash( $svg_path ),
+                'updated_at' => current_time( 'mysql' ),
+            ],
+            [ '%s', '%s', '%s', '%s' ]
+        );
+
+        if ( false === $inserted ) {
+            return new WP_Error( 'leb_loc_insert_failed', __( 'Failed to create the location.', 'listing-engine-backend' ) );
+        }
+        return (int) $wpdb->insert_id;
+    }
+
+    /**
+     * Update location.
+     */
+    public function update_location( int $id, string $name, string $slug, string $svg_path = '' ) {
+        global $wpdb;
+        $name = sanitize_text_field( $name );
+        $slug = sanitize_title( $slug );
+
+        if ( $this->location_slug_exists( $slug, $id ) ) {
+            return new WP_Error( 'leb_loc_duplicate_slug', __( 'A location with this slug already exists.', 'listing-engine-backend' ) );
+        }
+
+        $updated = $wpdb->update(
+            $this->locations_table,
+            [
+                'name'       => $name,
+                'slug'       => $slug,
+                'svg_path'   => wp_unslash( $svg_path ),
+                'updated_at' => current_time( 'mysql' ),
+            ],
+            [ 'id' => $id ],
+            [ '%s', '%s', '%s', '%s' ],
+            [ '%d' ]
+        );
+
+        if ( false === $updated ) {
+            return new WP_Error( 'leb_loc_update_failed', __( 'Failed to update location.', 'listing-engine-backend' ) );
+        }
+        return true;
+    }
+
+    /**
+     * Delete single location.
+     */
+    public function delete_location( int $id ) {
+        global $wpdb;
+        $deleted = $wpdb->delete( $this->locations_table, [ 'id' => $id ], [ '%d' ] );
+        if ( false === $deleted ) {
+            return new WP_Error( 'leb_loc_delete_failed', __( 'Failed to delete the location.', 'listing-engine-backend' ) );
+        }
+        return true;
+    }
+
+    /**
+     * Bulk delete locations.
+     */
+    public function delete_locations( array $ids ) {
+        global $wpdb;
+        if ( empty( $ids ) ) return true;
+        $ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+        $query   = $wpdb->prepare( "DELETE FROM `{$this->locations_table}` WHERE id IN ($ids_placeholder)", $ids );
+        $deleted = $wpdb->query( $query );
+        if ( false === $deleted ) {
+            return new WP_Error( 'leb_loc_bulk_delete_failed', __( 'Failed to delete locations.', 'listing-engine-backend' ) );
+        }
+        return true;
+    }
+
+    /**
+     * Helper: check if location slug exists.
+     */
+    private function location_slug_exists( string $slug, ?int $exclude_id = null ): bool {
+        global $wpdb;
+        if ( $exclude_id ) {
+            $count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$this->locations_table}` WHERE slug = %s AND id != %d", $slug, $exclude_id ) );
+        } else {
+            $count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$this->locations_table}` WHERE slug = %s", $slug ) );
+        }
+        return (bool) $count;
     }
 }
