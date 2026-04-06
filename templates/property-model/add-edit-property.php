@@ -71,7 +71,7 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
                     </svg>
                 </div>
                 <div class="leb-aep-upload-text">Click to upload or drag &amp; drop</div>
-                <div class="leb-aep-upload-subtext">PNG, JPG, WEBP · Max 1MB each · Exact 1200x800px</div>
+                <div class="leb-aep-upload-subtext">JPG, WEBP, AVIF · Min 5, Max 10 images · Max 1MB each</div>
             </div>
             <div class="leb-aep-image-grid" id="imagePreviewGrid"></div>
         </div>

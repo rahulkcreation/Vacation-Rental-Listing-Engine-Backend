@@ -360,14 +360,17 @@
                 const imgSizeInBytes = att.filesizeInBytes || att.fileLength || 0;
                 
                 const isSizeOk  = imgSizeInBytes <= sizeLimit && imgSizeInBytes > 0;
-                const isDimOk   = (parseInt(att.width) === 1200 && parseInt(att.height) === 800);
+                // Accept JPEG, WebP, and AVIF
+                const allowedMimes = ['image/jpeg', 'image/webp', 'image/avif'];
+                const allowedSubtypes = ['jpeg', 'jpg', 'webp', 'avif'];
+                const isFormatOk = allowedMimes.includes(att.mime) || allowedSubtypes.includes(att.subtype);
 
-                if (!isSizeOk || !isDimOk) {
+                if (!isSizeOk || !isFormatOk) {
                     rejectedCount++;
                     if (!isSizeOk) {
                         errorMsg = 'Image file size must be 1MB or less.';
-                    } else if (!isDimOk) {
-                        errorMsg = 'Image dimensions must be exactly 1200x800px.';
+                    } else if (!isFormatOk) {
+                        errorMsg = 'Only JPEG, WebP, and AVIF formats are accepted.';
                     }
                     return;
                 }
@@ -381,7 +384,7 @@
 
             if (rejectedCount > 0) {
                 const finalMsg = rejectedCount > 1 
-                    ? rejectedCount + ' images rejected due to invalid size or dimensions.'
+                    ? rejectedCount + ' images rejected due to invalid size or format.'
                     : 'Image rejected: ' + errorMsg;
                 LEB_Toaster.show(finalMsg, 'error');
             }
@@ -686,89 +689,128 @@
     /* ══════════════════════════════════════════════════════════════
        FORM SUBMIT
     ══════════════════════════════════════════════════════════════ */
+    /**
+     * Show an inline error message for a field.
+     */
+    function showFieldError(id, message) {
+        const el = $(id);
+        if (!el) return;
+
+        // For common triggers/containers, we apply error to the main target
+        const trigger = (id === 'locationTrigger' || id === 'propertyTypeTrigger' || id === 'amenitiesTrigger' || id === 'statusTrigger' || id === 'uploadArea') 
+                      ? el : null;
+        const target = trigger || el;
+
+        if (target) {
+            target.classList.add('error');
+            // Check if error message already exists
+            let msg = target.parentNode.querySelector('.leb-aep-error-msg');
+            if (!msg) {
+                msg = document.createElement('span');
+                msg.className = 'leb-aep-error-msg';
+                target.parentNode.appendChild(msg);
+            }
+            msg.textContent = message;
+        }
+    }
+
+    /**
+     * Clear all inline error messages and error states.
+     */
+    function clearFieldErrors() {
+        const errors = document.querySelectorAll('.leb-aep-error-msg');
+        errors.forEach(el => el.remove());
+        const errorFields = document.querySelectorAll('.error');
+        errorFields.forEach(el => el.classList.remove('error'));
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       FORM SUBMISSION
+    ══════════════════════════════════════════════════════════════ */
     function bindFormSubmit() {
+        if (!DOM.form) return;
+
         DOM.form.addEventListener('submit', function (e) {
             e.preventDefault();
+            clearFieldErrors();
 
-            /* ── Validation ─────────────────────────────────── */
             let valid = true;
+            let firstError = null;
 
             const title = DOM.title ? DOM.title.value.trim() : '';
             if (!title) {
-                if (DOM.title) DOM.title.classList.add('error');
-                LEB_Toaster.show('Property title is required.', 'error');
+                showFieldError('propertyTitle', 'Property title is required.');
                 valid = false;
-            } else {
-                if (DOM.title) DOM.title.classList.remove('error');
+                if (!firstError) firstError = DOM.title;
             }
 
             const desc = DOM.description ? DOM.description.value.trim() : '';
             if (!desc) {
-                if (DOM.description) DOM.description.classList.add('error');
-                LEB_Toaster.show('Description is required.', 'error');
+                showFieldError('propertyDescription', 'Description is required.');
                 valid = false;
-            } else {
-                if (DOM.description) DOM.description.classList.remove('error');
+                if (!firstError) firstError = DOM.description;
             }
 
             if (!state.typeId) {
-                if (DOM.typeTrigger) DOM.typeTrigger.classList.add('error');
-                LEB_Toaster.show('Please select a property type.', 'error');
+                showFieldError('propertyTypeTrigger', 'Please select a property type.');
                 valid = false;
-            } else {
-                if (DOM.typeTrigger) DOM.typeTrigger.classList.remove('error');
+                if (!firstError) firstError = DOM.typeTrigger;
             }
 
             if (!state.locationId) {
-                if (DOM.locTrigger) DOM.locTrigger.classList.add('error');
-                LEB_Toaster.show('Please select a location.', 'error');
+                showFieldError('locationTrigger', 'Please select a location.');
                 valid = false;
-            } else {
-                if (DOM.locTrigger) DOM.locTrigger.classList.remove('error');
+                if (!firstError) firstError = DOM.locTrigger;
             }
 
             if (state.amenityIds.size === 0) {
-                if (DOM.amenTrigger) DOM.amenTrigger.classList.add('error');
-                LEB_Toaster.show('Please select at least one amenity.', 'error');
+                showFieldError('amenitiesTrigger', 'Please select at least one amenity.');
                 valid = false;
-            } else {
-                if (DOM.amenTrigger) DOM.amenTrigger.classList.remove('error');
+                if (!firstError) firstError = DOM.amenTrigger;
             }
 
-            if (state.images.length === 0) {
-                LEB_Toaster.show('Please add at least one property image (1200x800).', 'error');
+            if (state.images.length < 5) {
+                showFieldError('uploadArea', 'Please add at least 5 property images.');
                 valid = false;
+                if (!firstError) firstError = DOM.uploadArea;
+            } else if (state.images.length > 10) {
+                showFieldError('uploadArea', 'Maximum 10 images allowed.');
+                valid = false;
+                if (!firstError) firstError = DOM.uploadArea;
             }
 
             const guests = DOM.guests ? parseInt(DOM.guests.value, 10) : 0;
             if (!guests || guests < 1) {
-                if (DOM.guests) DOM.guests.classList.add('error');
-                LEB_Toaster.show('Number of guests must be at least 1.', 'error');
+                showFieldError('guests', 'Number of guests must be at least 1.');
                 valid = false;
-            } else {
-                if (DOM.guests) DOM.guests.classList.remove('error');
+                if (!firstError) firstError = DOM.guests;
             }
 
             ['bedrooms', 'beds', 'bathrooms'].forEach(id => {
                 const el = DOM[id];
-                if (el && (!el.value || parseInt(el.value, 10) < 0)) {
-                    el.classList.add('error');
+                const val = el ? parseInt(el.value, 10) : -1;
+                if (el && (isNaN(val) || val < 0)) {
+                    showFieldError(id, (id.charAt(0).toUpperCase() + id.slice(1)) + ' is required (0 or more).');
                     valid = false;
-                } else if (el) {
-                    el.classList.remove('error');
+                    if (!firstError) firstError = el;
                 }
             });
 
             const price = DOM.price ? parseFloat(DOM.price.value) : 0;
-            if (!price || price <= 0) {
-                if (DOM.price) DOM.price.classList.add('error');
-                LEB_Toaster.show('Please enter a valid price per night.', 'error');
+            if (isNaN(price) || price <= 0) {
+                showFieldError('pricePerNight', 'Please enter a valid price per night.');
                 valid = false;
-            } else {
-                if (DOM.price) DOM.price.classList.remove('error');
+                if (!firstError) firstError = DOM.price;
             }
 
-            if (!valid) return;
+            if (!valid) {
+                LEB_Toaster.show('Please fix the errors before submitting.', 'error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+                return;
+            }
 
             /* ── Disable button ─────────────────────────────── */
             DOM.submitBtn.disabled = true;
@@ -792,18 +834,13 @@
                 type:        state.typeId,
                 location:    state.locationId,
                 status:      state.status,
-                /* PHP expects amenities as a JSON-encoded string */
                 amenities:   JSON.stringify(Array.from(state.amenityIds)),
-                /* PHP handler key is 'images' (JSON stringified) */
                 images:      JSON.stringify(state.images),
-                /* PHP handler key is 'dates' (not 'blocked_dates') */
                 dates:       JSON.stringify(Array.from(state.blockedDates)),
             };
 
-            /* Add ID only for update */
             if (isEdit) { payload.id = state.id; }
 
-            /* ── AJAX call ──────────────────────────────────── */
             jQuery.post(LEB_Ajax.ajax_url, payload, function (res) {
                 DOM.submitBtn.disabled    = false;
                 DOM.submitBtn.textContent = isEdit ? 'Update Listing' : 'Publish Listing';
@@ -813,19 +850,14 @@
                         res.data.message || (isEdit ? 'Property updated successfully!' : 'Property created successfully!'),
                         'success'
                     );
-                    /* After create, update state.id with the new listing's ID */
                     if (!isEdit && res.data.id) { state.id = res.data.id; }
 
-                    /* Redirect back to the list after a short delay */
                     setTimeout(function () {
                         window.location.href = LEB_Ajax.manage_url ||
                             (window.location.href.split('?')[0] + '?page=leb-properties');
                     }, 900);
                 } else {
-                    LEB_Toaster.show(
-                        (res.data && res.data.message) ? res.data.message : 'Error saving property.',
-                        'error'
-                    );
+                    LEB_Toaster.show((res.data && res.data.message) ? res.data.message : 'Error saving property.', 'error');
                 }
             }).fail(function () {
                 DOM.submitBtn.disabled    = false;
@@ -848,6 +880,9 @@
     }
 
     const triggerAutosave = debounce(function () {
+        // ONLY trigger if this is a NEW listing (id 0)
+        if (state.id !== 0) return;
+
         const title = DOM.title ? DOM.title.value.trim() : '';
         if (!title) return; // Don't autosave without a title
 
@@ -856,8 +891,7 @@
             DOM.autosaveStatus.style.opacity = '1';
         }
 
-        const isEdit = state.id > 0;
-        const action = isEdit ? 'leb_listing_update_listing' : 'leb_listing_create_listing';
+        const action = 'leb_listing_create_listing';
 
         const payload = {
             action:      action,
@@ -871,17 +905,15 @@
             price:       DOM.price      ? DOM.price.value      : 0,
             type:        state.typeId,
             location:    state.locationId,
-            status:      state.status,
+            status:      'draft', // Force draft mode for autosave
             amenities:   JSON.stringify(Array.from(state.amenityIds)),
             images:      JSON.stringify(state.images),
             dates:       JSON.stringify(Array.from(state.blockedDates)),
         };
 
-        if (isEdit) payload.id = state.id;
-
         jQuery.post(LEB_Ajax.ajax_url, payload, function (res) {
             if (res.success) {
-                if (!isEdit && res.data.id) {
+                if (res.data.id) {
                     state.id = res.data.id;
                     // Update URL so refresh doesn't create new
                     const newUrl = window.location.href.split('&id=')[0] + '&id=' + state.id;
@@ -889,7 +921,7 @@
                 }
                 if (DOM.autosaveStatus) {
                     const now = new Date();
-                    DOM.autosaveStatus.textContent = 'Saved at ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+                    DOM.autosaveStatus.textContent = 'Saved as Draft at ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
                     setTimeout(() => { if (DOM.autosaveStatus) DOM.autosaveStatus.style.opacity = '0.6'; }, 2000);
                 }
             }

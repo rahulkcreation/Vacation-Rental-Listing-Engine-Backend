@@ -177,7 +177,32 @@ form#propertyForm {
 .leb-aep-select-trigger.error {
     border-color: var(--leb-error-color) !important;
     background: var(--leb-error-light-bg) !important;
+}
+
+.error {
     margin: 0px !important;
+}
+
+.leb-aep-error-msg {
+    color: var(--leb-error-color);
+    font-size: 12px;
+    font-weight: 500;
+    margin: 4px 0 12px 2px;
+    display: block;
+    line-height: 1.4;
+    animation: fadeInError 0.2s ease-in-out;
+}
+
+@keyframes fadeInError {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .leb-aep-input.success,

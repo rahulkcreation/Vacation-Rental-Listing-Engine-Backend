@@ -1438,11 +1438,30 @@ function leb_validate_listing_images($images)
     if (! is_array($images) || empty($images)) {
         return new WP_Error('invalid_images', __('Please select at least one property image.', 'listing-engine-backend'));
     }
+    
+    // Check quantity (Min 5, Max 10)
+    $count = count($images);
+    if ($count < 5) {
+        return new WP_Error('too_few_images', __('You must upload at least 5 images.', 'listing-engine-backend'));
+    }
+    if ($count > 10) {
+        return new WP_Error('too_many_images', __('You can upload a maximum of 10 images.', 'listing-engine-backend'));
+    }
 
     foreach ($images as $img) {
         $id = isset($img['id']) ? absint($img['id']) : 0;
         if (! $id) {
             continue;
+        }
+
+        // Check supported formats (JPEG, Webp, AVIF)
+        $mime = get_post_mime_type($id);
+        $allowed_mimes = ['image/jpeg', 'image/webp', 'image/avif'];
+        if (! in_array($mime, $allowed_mimes, true)) {
+            return new WP_Error(
+                'invalid_format',
+                sprintf(__('Image "%s" must be in JPEG, WebP, or AVIF format (current format: %s).', 'listing-engine-backend'), get_the_title($id), $mime)
+            );
         }
 
         // Check file size
@@ -1453,24 +1472,6 @@ function leb_validate_listing_images($images)
                 return new WP_Error(
                     'image_too_large',
                     sprintf(__('Image "%s" exceeds 1MB limit.', 'listing-engine-backend'), get_the_title($id))
-                );
-            }
-        }
-
-        // Check dimensions
-        $meta = wp_get_attachment_metadata($id);
-        if ($meta) {
-            $w = isset($meta['width']) ? absint($meta['width']) : 0;
-            $h = isset($meta['height']) ? absint($meta['height']) : 0;
-            if ($w !== 1200 || $h !== 800) {
-                return new WP_Error(
-                    'invalid_dimensions',
-                    sprintf(
-                        __('Image "%s" must be exactly 1200x800px (Actual: %dx%d).', 'listing-engine-backend'),
-                        get_the_title($id),
-                        $w,
-                        $h
-                    )
                 );
             }
         }
