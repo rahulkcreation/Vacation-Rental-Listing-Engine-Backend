@@ -1,0 +1,579 @@
+/**
+ * add-edit-property.css
+ *
+ * Styles for the Add / Edit Property form screen.
+ * All classes are uniquely scoped to .leb-prop-form-* to avoid conflicts.
+ *
+ * @package ListingEngineBackend
+ */
+
+/* ─── Wrapper ─────────────────────────────────────────────── */
+.leb-prop-form-wrap {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+    font-family: var(--leb-font-primary, 'Inter', sans-serif);
+    color: var(--leb-text-primary, #1e293b);
+}
+
+/* ─── Top Bar ─────────────────────────────────────────────── */
+.leb-prop-form-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0 24px;
+    flex-wrap: wrap;
+    border-bottom: 1.5px solid var(--leb-border, #e2e8f0);
+    margin-bottom: 28px;
+}
+
+.leb-prop-form-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--leb-text-muted, #94a3b8);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.leb-prop-form-back:hover {
+    color: var(--leb-primary, #6366f1);
+}
+
+.leb-prop-form-topbar__title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.leb-prop-form-topbar__actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ─── Buttons ──────────────────────────────────────────────── */
+.leb-prop-form-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.leb-prop-form-btn--primary {
+    background: var(--leb-primary, #6366f1);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+.leb-prop-form-btn--primary:hover {
+    background: var(--leb-primary-hover, #4f46e5);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+    transform: translateY(-1px);
+}
+
+.leb-prop-form-btn--outline {
+    background: transparent;
+    border: 1.5px solid var(--leb-border, #e2e8f0);
+    color: var(--leb-text-primary, #1e293b);
+}
+.leb-prop-form-btn--outline:hover {
+    border-color: var(--leb-primary, #6366f1);
+    color: var(--leb-primary, #6366f1);
+    background: var(--leb-primary-light, #eef2ff);
+}
+
+.leb-prop-form-btn--full {
+    width: 100%;
+    justify-content: center;
+}
+
+.leb-prop-form-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ─── Grid Layout (2 columns) ─────────────────────────────── */
+.leb-prop-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    align-items: start;
+}
+
+.leb-prop-form-col--main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.leb-prop-form-col--side {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ─── Card ────────────────────────────────────────────────── */
+.leb-prop-form-card {
+    background: #ffffff;
+    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border-radius: 14px;
+    padding: 24px;
+}
+.leb-prop-form-card__title {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--leb-text-primary, #1e293b);
+}
+.leb-prop-form-card__desc {
+    margin: 0 0 18px;
+    font-size: 13px;
+    color: var(--leb-text-muted, #94a3b8);
+}
+
+/* ─── Form Fields ─────────────────────────────────────────── */
+.leb-prop-form-field {
+    margin-bottom: 18px;
+}
+.leb-prop-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.leb-prop-form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--leb-text-primary, #1e293b);
+    margin-bottom: 6px;
+}
+.leb-prop-form-req {
+    color: var(--leb-danger, #ef4444);
+}
+
+.leb-prop-form-input,
+.leb-prop-form-textarea,
+.leb-prop-form-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--leb-text-primary, #1e293b);
+    background: #ffffff;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+.leb-prop-form-input:focus,
+.leb-prop-form-textarea:focus,
+.leb-prop-form-select:focus {
+    border-color: var(--leb-primary, #6366f1);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+.leb-prop-form-input::placeholder,
+.leb-prop-form-textarea::placeholder {
+    color: var(--leb-text-muted, #94a3b8);
+}
+.leb-prop-form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+.leb-prop-form-input.leb-prop-form-input--error,
+.leb-prop-form-textarea.leb-prop-form-textarea--error {
+    border-color: var(--leb-danger, #ef4444);
+}
+
+/* Select wrapper (for chevron) */
+.leb-prop-form-select-wrap {
+    position: relative;
+}
+.leb-prop-form-select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--leb-text-muted, #94a3b8);
+    border-bottom: 2px solid var(--leb-text-muted, #94a3b8);
+    transform: translateY(-60%) rotate(45deg);
+    pointer-events: none;
+}
+.leb-prop-form-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 36px;
+}
+
+/* Row layout for steppers */
+.leb-prop-form-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.leb-prop-form-row--4 > .leb-prop-form-field {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* ─── Stepper ─────────────────────────────────────────────── */
+.leb-prop-form-stepper {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+}
+.leb-prop-form-stepper__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--leb-bg-secondary, #f8fafc);
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--leb-text-primary, #1e293b);
+    transition: background 0.15s;
+    font-family: inherit;
+}
+.leb-prop-form-stepper__btn:hover {
+    background: var(--leb-primary-light, #eef2ff);
+    color: var(--leb-primary, #6366f1);
+}
+.leb-prop-form-stepper__value {
+    flex: 1;
+    border: none;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 4px;
+    outline: none;
+    -moz-appearance: textfield;
+    font-family: inherit;
+    color: var(--leb-text-primary, #1e293b);
+    background: transparent;
+}
+.leb-prop-form-stepper__value::-webkit-inner-spin-button,
+.leb-prop-form-stepper__value::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ─── Image Grid ──────────────────────────────────────────── */
+.leb-prop-form-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+    min-height: 30px;
+}
+.leb-prop-form-image-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    border: 2px solid var(--leb-border, #e2e8f0);
+    cursor: grab;
+    transition: box-shadow 0.2s;
+}
+.leb-prop-form-image-item:first-child {
+    border-color: var(--leb-primary, #6366f1);
+}
+.leb-prop-form-image-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.leb-prop-form-image-item.leb-prop-form-image-item--dragging {
+    opacity: 0.5;
+}
+.leb-prop-form-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.leb-prop-form-image-item__badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: var(--leb-primary, #6366f1);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+.leb-prop-form-image-remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.55);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.leb-prop-form-image-item:hover .leb-prop-form-image-remove {
+    opacity: 1;
+}
+.leb-prop-form-image-remove svg {
+    stroke: #fff;
+}
+
+/* ─── Amenities Grid ──────────────────────────────────────── */
+.leb-prop-form-amenities {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+}
+.leb-prop-form-amenity-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    font-weight: 500;
+}
+.leb-prop-form-amenity-item:hover {
+    border-color: var(--leb-primary, #6366f1);
+    background: var(--leb-primary-light, #eef2ff);
+}
+.leb-prop-form-amenity-item--selected {
+    border-color: var(--leb-primary, #6366f1);
+    background: var(--leb-primary-light, #eef2ff);
+    color: var(--leb-primary, #6366f1);
+    font-weight: 600;
+}
+.leb-prop-form-amenity-item img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.leb-prop-form-amenity-check {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--leb-primary, #6366f1);
+    flex-shrink: 0;
+}
+.leb-prop-form-amenities-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: var(--leb-text-muted, #94a3b8);
+    font-size: 13px;
+}
+
+/* ─── Status Radio Group ──────────────────────────────────── */
+.leb-prop-form-status-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.leb-prop-form-status-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-transform: capitalize;
+}
+.leb-prop-form-status-option:hover {
+    border-color: var(--leb-primary, #6366f1);
+}
+.leb-prop-form-status-option input[type="radio"] {
+    accent-color: var(--leb-primary, #6366f1);
+    width: 16px;
+    height: 16px;
+}
+
+/* ─── Calendar ────────────────────────────────────────────── */
+.leb-prop-form-calendar {
+    margin-bottom: 16px;
+}
+.leb-prop-form-calendar__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.leb-prop-form-calendar__arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1.5px solid var(--leb-border, #e2e8f0);
+    background: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    color: var(--leb-text-primary, #1e293b);
+}
+.leb-prop-form-calendar__arrow:hover {
+    border-color: var(--leb-primary, #6366f1);
+    color: var(--leb-primary, #6366f1);
+}
+.leb-prop-form-calendar__month {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.leb-prop-form-calendar__head {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--leb-text-muted, #94a3b8);
+    margin-bottom: 6px;
+}
+
+.leb-prop-form-calendar__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+.leb-prop-form-cal-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    background: transparent;
+    color: var(--leb-text-primary, #1e293b);
+    font-family: inherit;
+}
+.leb-prop-form-cal-day:hover {
+    background: var(--leb-bg-hover, #f1f5f9);
+}
+.leb-prop-form-cal-day--today {
+    font-weight: 700;
+    border: 1.5px solid var(--leb-primary, #6366f1);
+}
+.leb-prop-form-cal-day--blocked {
+    background: var(--leb-danger, #ef4444);
+    color: #ffffff;
+    border-radius: 8px;
+}
+.leb-prop-form-cal-day--blocked:hover {
+    background: #dc2626;
+}
+.leb-prop-form-cal-day--empty {
+    pointer-events: none;
+}
+.leb-prop-form-cal-day--past {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+/* Blocked date chips */
+.leb-prop-form-blocked-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.leb-prop-form-blocked-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    background: #fef2f2;
+    color: var(--leb-danger, #ef4444);
+    border: 1px solid #fecaca;
+}
+.leb-prop-form-blocked-chip__remove {
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    display: flex;
+    color: inherit;
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .leb-prop-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .leb-prop-form-col--side {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .leb-prop-form-wrap {
+        padding: 0 12px 30px;
+    }
+    .leb-prop-form-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .leb-prop-form-topbar__title {
+        text-align: left;
+    }
+    .leb-prop-form-topbar__actions {
+        width: 100%;
+    }
+    .leb-prop-form-topbar__actions .leb-prop-form-btn {
+        flex: 1;
+        justify-content: center;
+    }
+    .leb-prop-form-row--4 > .leb-prop-form-field {
+        min-width: 100%;
+    }
+    .leb-prop-form-amenities {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .leb-prop-form-amenities {
+        grid-template-columns: 1fr;
+    }
+    .leb-prop-form-images {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+}

@@ -85,6 +85,16 @@ function leb_register_admin_menus() {
         'leb-locations',
         'leb_render_location_management_page'
     );
+
+    // Sub-menu 5: Properties.
+    add_submenu_page(
+        'leb-types',
+        __( 'Manage Properties', 'listing-engine-backend' ),
+        __( 'Properties', 'listing-engine-backend' ),
+        'manage_options',
+        'leb-properties',
+        'leb_render_property_management_page'
+    );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -152,6 +162,24 @@ function leb_render_location_management_page() {
         require_once LEB_TEMPLATES_PATH . 'location-model/add-edit-location.php';
     } else {
         require_once LEB_TEMPLATES_PATH . 'location-model/location-management.php';
+    }
+}
+
+/**
+ * Render the Property Management screen.
+ * Dispatches to list or add/edit template based on the ?leb_action query parameter.
+ */
+function leb_render_property_management_page() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'listing-engine-backend' ) );
+    }
+
+    $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : 'list';
+
+    if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
+        require_once LEB_TEMPLATES_PATH . 'property-model/add-edit-property.php';
+    } else {
+        require_once LEB_TEMPLATES_PATH . 'property-model/property-management.php';
     }
 }
 
@@ -226,6 +254,18 @@ add_action( 'wp_ajax_leb_loc_update_location',       'leb_ajax_loc_update_locati
 add_action( 'wp_ajax_leb_loc_get_location',          'leb_ajax_loc_get_location' );
 add_action( 'wp_ajax_leb_loc_delete_location',       'leb_ajax_loc_delete_location' );
 add_action( 'wp_ajax_leb_loc_bulk_delete_locations', 'leb_ajax_loc_bulk_delete_locations' );
+
+// ── Property Listing AJAX Hooks ─────────────────────────────────
+add_action( 'wp_ajax_leb_listing_get_listings',       'leb_ajax_listing_get_listings' );
+add_action( 'wp_ajax_leb_listing_get_listing',        'leb_ajax_listing_get_listing' );
+add_action( 'wp_ajax_leb_listing_create_listing',     'leb_ajax_listing_create_listing' );
+add_action( 'wp_ajax_leb_listing_update_listing',     'leb_ajax_listing_update_listing' );
+add_action( 'wp_ajax_leb_listing_delete_listing',     'leb_ajax_listing_delete_listing' );
+add_action( 'wp_ajax_leb_listing_bulk_delete',        'leb_ajax_listing_bulk_delete' );
+add_action( 'wp_ajax_leb_listing_bulk_status',        'leb_ajax_listing_bulk_status' );
+add_action( 'wp_ajax_leb_listing_get_amenities_all',  'leb_ajax_listing_get_amenities_all' );
+add_action( 'wp_ajax_leb_listing_get_locations_all',  'leb_ajax_listing_get_locations_all' );
+add_action( 'wp_ajax_leb_listing_get_types_all',      'leb_ajax_listing_get_types_all' );
 
 /**
  * AJAX: Return paginated / searched list of types.
@@ -955,6 +995,269 @@ function leb_ajax_loc_bulk_delete_locations() {
 
     if ( is_wp_error( $result ) ) wp_send_json_error( [ 'message' => $result->get_error_message() ] );
     wp_send_json_success( [ 'message' => sprintf( '%d locations deleted successfully.', count( $ids ) ) ] );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Property Listing AJAX Handlers
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * AJAX: Return paginated, searched, and status-filtered list of property listings.
+ * Includes status tab counts for the filter bar.
+ */
+function leb_ajax_listing_get_listings() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $search   = isset( $_POST['search'] )   ? sanitize_text_field( wp_unslash( $_POST['search'] ) ) : '';
+    $page     = isset( $_POST['page'] )     ? absint( $_POST['page'] )     : 1;
+    $per_page = isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : 10;
+    $status   = isset( $_POST['status'] )   ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->get_listings( $search, $page, $per_page, $status );
+    $counts  = $handler->get_status_counts();
+
+    $result['status_counts'] = $counts;
+
+    wp_send_json_success( $result );
+}
+
+/**
+ * AJAX: Get a single listing with all related data for the edit form.
+ */
+function leb_ajax_listing_get_listing() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+    if ( ! $id ) {
+        wp_send_json_error( [ 'message' => __( 'Invalid ID.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $listing = $handler->get_listing_by_id( $id );
+
+    if ( ! $listing ) {
+        wp_send_json_error( [ 'message' => __( 'Listing not found.', 'listing-engine-backend' ) ] );
+    }
+
+    wp_send_json_success( [ 'listing' => $listing ] );
+}
+
+/**
+ * AJAX: Create a new property listing.
+ */
+function leb_ajax_listing_create_listing() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $title = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+    if ( empty( $title ) ) {
+        wp_send_json_error( [ 'message' => __( 'Property title is required.', 'listing-engine-backend' ) ] );
+    }
+
+    $data = [
+        'user_id'     => get_current_user_id(),
+        'title'       => $title,
+        'description' => isset( $_POST['description'] ) ? wp_kses_post( wp_unslash( $_POST['description'] ) ) : '',
+        'guests'      => isset( $_POST['guests'] )      ? absint( $_POST['guests'] )      : 0,
+        'bedroom'     => isset( $_POST['bedroom'] )     ? absint( $_POST['bedroom'] )     : 0,
+        'bed'         => isset( $_POST['bed'] )         ? absint( $_POST['bed'] )         : 0,
+        'bathroom'    => isset( $_POST['bathroom'] )    ? absint( $_POST['bathroom'] )    : 0,
+        'price'       => isset( $_POST['price'] )       ? absint( $_POST['price'] )       : 0,
+        'type'        => isset( $_POST['type'] )        ? sanitize_text_field( wp_unslash( $_POST['type'] ) )     : '',
+        'location'    => isset( $_POST['location'] )    ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : '',
+        'ameneties'   => isset( $_POST['ameneties'] )   ? sanitize_text_field( wp_unslash( $_POST['ameneties'] ) ) : '',
+        'status'      => isset( $_POST['status'] )      ? sanitize_text_field( wp_unslash( $_POST['status'] ) )  : 'draft',
+        'images'      => isset( $_POST['images'] )      ? wp_unslash( $_POST['images'] )  : '[]',
+        'dates'       => isset( $_POST['dates'] )       ? wp_unslash( $_POST['dates'] )   : '[]',
+    ];
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->create_listing( $data );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [
+        'message' => __( 'Property created successfully!', 'listing-engine-backend' ),
+        'id'      => $result,
+    ] );
+}
+
+/**
+ * AJAX: Update an existing property listing.
+ */
+function leb_ajax_listing_update_listing() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+    if ( ! $id ) {
+        wp_send_json_error( [ 'message' => __( 'Invalid ID.', 'listing-engine-backend' ) ] );
+    }
+
+    $data = [
+        'title'       => isset( $_POST['title'] )       ? sanitize_text_field( wp_unslash( $_POST['title'] ) )     : '',
+        'description' => isset( $_POST['description'] ) ? wp_kses_post( wp_unslash( $_POST['description'] ) )      : '',
+        'guests'      => isset( $_POST['guests'] )      ? absint( $_POST['guests'] )      : 0,
+        'bedroom'     => isset( $_POST['bedroom'] )     ? absint( $_POST['bedroom'] )     : 0,
+        'bed'         => isset( $_POST['bed'] )         ? absint( $_POST['bed'] )         : 0,
+        'bathroom'    => isset( $_POST['bathroom'] )    ? absint( $_POST['bathroom'] )    : 0,
+        'price'       => isset( $_POST['price'] )       ? absint( $_POST['price'] )       : 0,
+        'type'        => isset( $_POST['type'] )        ? sanitize_text_field( wp_unslash( $_POST['type'] ) )     : '',
+        'location'    => isset( $_POST['location'] )    ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : '',
+        'ameneties'   => isset( $_POST['ameneties'] )   ? sanitize_text_field( wp_unslash( $_POST['ameneties'] ) ) : '',
+        'status'      => isset( $_POST['status'] )      ? sanitize_text_field( wp_unslash( $_POST['status'] ) )  : 'draft',
+        'images'      => isset( $_POST['images'] )      ? wp_unslash( $_POST['images'] )  : '[]',
+        'dates'       => isset( $_POST['dates'] )       ? wp_unslash( $_POST['dates'] )   : '[]',
+    ];
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->update_listing( $id, $data );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => __( 'Property updated successfully!', 'listing-engine-backend' ) ] );
+}
+
+/**
+ * AJAX: Delete a single property listing.
+ */
+function leb_ajax_listing_delete_listing() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+    if ( ! $id ) {
+        wp_send_json_error( [ 'message' => __( 'Invalid ID.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->delete_listing( $id );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => __( 'Listing deleted successfully.', 'listing-engine-backend' ) ] );
+}
+
+/**
+ * AJAX: Bulk delete multiple property listings.
+ */
+function leb_ajax_listing_bulk_delete() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $ids = isset( $_POST['ids'] ) ? (array) $_POST['ids'] : [];
+    $ids = array_filter( array_map( 'absint', $ids ) );
+
+    if ( empty( $ids ) ) {
+        wp_send_json_error( [ 'message' => __( 'No valid IDs provided.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->delete_listings( $ids );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => sprintf( __( '%d listings deleted successfully.', 'listing-engine-backend' ), count( $ids ) ) ] );
+}
+
+/**
+ * AJAX: Bulk update status for multiple listings.
+ */
+function leb_ajax_listing_bulk_status() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $ids    = isset( $_POST['ids'] )    ? (array) $_POST['ids']    : [];
+    $status = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
+    $ids    = array_filter( array_map( 'absint', $ids ) );
+
+    if ( empty( $ids ) || empty( $status ) ) {
+        wp_send_json_error( [ 'message' => __( 'IDs and status are required.', 'listing-engine-backend' ) ] );
+    }
+
+    $valid_statuses = [ 'draft', 'pending', 'published', 'rejected' ];
+    if ( ! in_array( $status, $valid_statuses, true ) ) {
+        wp_send_json_error( [ 'message' => __( 'Invalid status value.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->update_listings_status( $ids, $status );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => sprintf( __( 'Status updated for %d listings.', 'listing-engine-backend' ), count( $ids ) ) ] );
+}
+
+/**
+ * AJAX: Return all amenities (unpaginated) for the property form checkbox picker.
+ */
+function leb_ajax_listing_get_amenities_all() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $items   = $handler->get_all_amenities();
+
+    wp_send_json_success( [ 'items' => $items ] );
+}
+
+/**
+ * AJAX: Return all locations (unpaginated) for the property form dropdown.
+ */
+function leb_ajax_listing_get_locations_all() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $items   = $handler->get_all_locations();
+
+    wp_send_json_success( [ 'items' => $items ] );
+}
+
+/**
+ * AJAX: Return all types (unpaginated) for the property form dropdown.
+ */
+function leb_ajax_listing_get_types_all() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $items   = $handler->get_all_types();
+
+    wp_send_json_success( [ 'items' => $items ] );
 }
 
 /**

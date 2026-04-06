@@ -895,4 +895,459 @@ class LEB_Database_Handler {
         }
         return true;
     }
+
+    // ─────────────────────────────────────────────────────────
+    // SECTION 3: PROPERTY LISTINGS CRUD
+    // (Listings, Images, Block Dates – Full CRUD)
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Retrieve a paginated, optionally searched/filtered list of property listings.
+     *
+     * Performs LEFT JOINs to:
+     *  - wp_ls_types  → to resolve type ID into display name.
+     *  - wp_users     → to resolve user_id into login username.
+     *  - wp_ls_img    → to fetch the first image for the thumbnail.
+     *
+     * @param string $search   Search term (matched against title).
+     * @param int    $page     1-based page number.
+     * @param int    $per_page Items per page.
+     * @param string $status   Optional status filter (pending, published, rejected, draft).
+     * @return array {
+     *     @type array $items  Rows from the database.
+     *     @type int   $total  Total row count matching the query.
+     * }
+     */
+    public function get_listings( string $search = '', int $page = 1, int $per_page = 10, string $status = '' ): array {
+        global $wpdb;
+
+        $offset = ( $page - 1 ) * $per_page;
+
+        // Base SELECT with JOINs for type name, username, and first image.
+        $base_select = "SELECT l.*, 
+            t.name AS type_name, 
+            u.user_login AS username,
+            img.image AS first_image
+            FROM `{$this->listings_table}` AS l
+            LEFT JOIN `{$this->types_table}` AS t ON l.type = t.id
+            LEFT JOIN `{$wpdb->users}` AS u ON l.user_id = u.ID
+            LEFT JOIN `{$this->ls_img_table}` AS img ON img.property_id = l.id";
+
+        $base_count = "SELECT COUNT(*) FROM `{$this->listings_table}` AS l";
+
+        // Build WHERE clauses.
+        $where_parts = [];
+        $where_vals  = [];
+
+        if ( ! empty( $status ) ) {
+            $where_parts[] = 'l.status = %s';
+            $where_vals[]  = $status;
+        }
+
+        if ( ! empty( $search ) ) {
+            $like          = '%' . $wpdb->esc_like( $search ) . '%';
+            $where_parts[] = 'l.title LIKE %s';
+            $where_vals[]  = $like;
+        }
+
+        $where_sql = '';
+        if ( ! empty( $where_parts ) ) {
+            $where_sql = ' WHERE ' . implode( ' AND ', $where_parts );
+        }
+
+        // Count total matching rows.
+        if ( ! empty( $where_vals ) ) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $total = (int) $wpdb->get_var( $wpdb->prepare( $base_count . $where_sql, $where_vals ) );
+        } else {
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $total = (int) $wpdb->get_var( $base_count . $where_sql );
+        }
+
+        // Fetch items with pagination.
+        $order_limit = ' GROUP BY l.id ORDER BY l.id DESC LIMIT %d OFFSET %d';
+        $query_vals  = array_merge( $where_vals, [ $per_page, $offset ] );
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $items = $wpdb->get_results(
+            $wpdb->prepare( $base_select . $where_sql . $order_limit, $query_vals ),
+            ARRAY_A
+        );
+
+        return [
+            'items' => $items ?: [],
+            'total' => $total,
+        ];
+    }
+
+    /**
+     * Retrieve a single listing by ID with all related data.
+     *
+     * Fetches:
+     *  - Main listing row with type name and username.
+     *  - Images from wp_ls_img.
+     *  - Blocked dates from wp_ls_block_date.
+     *  - Host info (email, mobile) from wp_users and wp_usermeta.
+     *
+     * @param int $id Row ID.
+     * @return array|null Full listing data, or null if not found.
+     */
+    public function get_listing_by_id( int $id ): ?array {
+        global $wpdb;
+
+        // Main listing with joins.
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT l.*, 
+                    t.name AS type_name, 
+                    u.user_login AS username,
+                    u.user_email AS user_email
+                FROM `{$this->listings_table}` AS l
+                LEFT JOIN `{$this->types_table}` AS t ON l.type = t.id
+                LEFT JOIN `{$wpdb->users}` AS u ON l.user_id = u.ID
+                WHERE l.id = %d",
+                $id
+            ),
+            ARRAY_A
+        );
+
+        if ( ! $row ) {
+            return null;
+        }
+
+        // Fetch images for this property.
+        $images_row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT image FROM `{$this->ls_img_table}` WHERE property_id = %d LIMIT 1",
+                $id
+            ),
+            ARRAY_A
+        );
+        $row['images'] = $images_row ? $images_row['image'] : '[]';
+
+        // Fetch blocked dates.
+        $dates_row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT dates FROM `{$this->ls_block_date_table}` WHERE property_id = %d LIMIT 1",
+                $id
+            ),
+            ARRAY_A
+        );
+        $row['blocked_dates'] = $dates_row ? $dates_row['dates'] : '[]';
+
+        // Fetch host mobile number from usermeta.
+        if ( ! empty( $row['user_id'] ) ) {
+            $mobile = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT meta_value FROM `{$wpdb->usermeta}` WHERE user_id = %d AND meta_key = 'mobile_number' LIMIT 1",
+                    $row['user_id']
+                )
+            );
+            $row['user_mobile'] = $mobile ?: '';
+        }
+
+        return $row;
+    }
+
+    /**
+     * Create a new property listing along with images and blocked dates.
+     *
+     * @param array $data {
+     *     @type int    $user_id     WordPress user ID.
+     *     @type string $title       Property title.
+     *     @type string $description Property description.
+     *     @type int    $guests      Number of guests.
+     *     @type int    $bedroom     Number of bedrooms.
+     *     @type int    $bed         Number of beds.
+     *     @type int    $bathroom    Number of bathrooms.
+     *     @type int    $price       Price per night.
+     *     @type int    $type        Type ID from ls_types.
+     *     @type int    $location    Location ID from ls_location.
+     *     @type string $ameneties   Comma-separated amenity IDs.
+     *     @type string $status      Listing status (draft, pending, published, rejected).
+     *     @type string $images      JSON array of image objects.
+     *     @type string $dates       JSON array of blocked date strings.
+     * }
+     * @return int|WP_Error Inserted listing ID on success, WP_Error on failure.
+     */
+    public function create_listing( array $data ) {
+        global $wpdb;
+
+        $inserted = $wpdb->insert(
+            $this->listings_table,
+            [
+                'user_id'     => absint( $data['user_id'] ?? 0 ),
+                'title'       => sanitize_text_field( $data['title'] ?? '' ),
+                'description' => wp_kses_post( $data['description'] ?? '' ),
+                'guests'      => absint( $data['guests'] ?? 0 ),
+                'bedroom'     => absint( $data['bedroom'] ?? 0 ),
+                'bed'         => absint( $data['bed'] ?? 0 ),
+                'bathroom'    => absint( $data['bathroom'] ?? 0 ),
+                'price'       => absint( $data['price'] ?? 0 ),
+                'type'        => sanitize_text_field( $data['type'] ?? '' ),
+                'location'    => sanitize_text_field( $data['location'] ?? '' ),
+                'ameneties'   => sanitize_text_field( $data['ameneties'] ?? '' ),
+                'status'      => sanitize_text_field( $data['status'] ?? 'draft' ),
+                'updated_at'  => current_time( 'mysql' ),
+            ],
+            [ '%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s' ]
+        );
+
+        if ( false === $inserted ) {
+            return new WP_Error( 'leb_listing_insert_failed', __( 'Failed to create the listing.', 'listing-engine-backend' ) );
+        }
+
+        $listing_id = (int) $wpdb->insert_id;
+
+        // Save images (single row per property).
+        $images_json = $data['images'] ?? '[]';
+        $wpdb->insert(
+            $this->ls_img_table,
+            [
+                'property_id' => $listing_id,
+                'image'       => $images_json,
+            ],
+            [ '%d', '%s' ]
+        );
+
+        // Save blocked dates (single row per property).
+        $dates_json = $data['dates'] ?? '[]';
+        if ( ! empty( $dates_json ) && '[]' !== $dates_json ) {
+            $wpdb->insert(
+                $this->ls_block_date_table,
+                [
+                    'property_id' => $listing_id,
+                    'dates'       => $dates_json,
+                    'created_at'  => current_time( 'mysql' ),
+                ],
+                [ '%d', '%s', '%s' ]
+            );
+        }
+
+        return $listing_id;
+    }
+
+    /**
+     * Update an existing property listing and its related data.
+     *
+     * @param int   $id   Listing ID to update.
+     * @param array $data Same structure as create_listing data.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function update_listing( int $id, array $data ) {
+        global $wpdb;
+
+        $updated = $wpdb->update(
+            $this->listings_table,
+            [
+                'title'       => sanitize_text_field( $data['title'] ?? '' ),
+                'description' => wp_kses_post( $data['description'] ?? '' ),
+                'guests'      => absint( $data['guests'] ?? 0 ),
+                'bedroom'     => absint( $data['bedroom'] ?? 0 ),
+                'bed'         => absint( $data['bed'] ?? 0 ),
+                'bathroom'    => absint( $data['bathroom'] ?? 0 ),
+                'price'       => absint( $data['price'] ?? 0 ),
+                'type'        => sanitize_text_field( $data['type'] ?? '' ),
+                'location'    => sanitize_text_field( $data['location'] ?? '' ),
+                'ameneties'   => sanitize_text_field( $data['ameneties'] ?? '' ),
+                'status'      => sanitize_text_field( $data['status'] ?? 'draft' ),
+                'updated_at'  => current_time( 'mysql' ),
+            ],
+            [ 'id' => $id ],
+            [ '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s' ],
+            [ '%d' ]
+        );
+
+        if ( false === $updated ) {
+            return new WP_Error( 'leb_listing_update_failed', __( 'Failed to update the listing.', 'listing-engine-backend' ) );
+        }
+
+        // Update images: delete existing row, insert fresh.
+        $images_json = $data['images'] ?? '[]';
+        $wpdb->delete( $this->ls_img_table, [ 'property_id' => $id ], [ '%d' ] );
+        $wpdb->insert(
+            $this->ls_img_table,
+            [
+                'property_id' => $id,
+                'image'       => $images_json,
+            ],
+            [ '%d', '%s' ]
+        );
+
+        // Update blocked dates: delete existing, insert fresh.
+        $dates_json = $data['dates'] ?? '[]';
+        $wpdb->delete( $this->ls_block_date_table, [ 'property_id' => $id ], [ '%d' ] );
+        if ( ! empty( $dates_json ) && '[]' !== $dates_json ) {
+            $wpdb->insert(
+                $this->ls_block_date_table,
+                [
+                    'property_id' => $id,
+                    'dates'       => $dates_json,
+                    'created_at'  => current_time( 'mysql' ),
+                ],
+                [ '%d', '%s', '%s' ]
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete a single property listing and all related data (images, block dates).
+     *
+     * @param int $id Listing ID.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function delete_listing( int $id ) {
+        global $wpdb;
+
+        // Cascade: remove related images and block dates first.
+        $wpdb->delete( $this->ls_img_table, [ 'property_id' => $id ], [ '%d' ] );
+        $wpdb->delete( $this->ls_block_date_table, [ 'property_id' => $id ], [ '%d' ] );
+
+        $deleted = $wpdb->delete( $this->listings_table, [ 'id' => $id ], [ '%d' ] );
+
+        if ( false === $deleted ) {
+            return new WP_Error( 'leb_listing_delete_failed', __( 'Failed to delete the listing.', 'listing-engine-backend' ) );
+        }
+
+        return true;
+    }
+
+    /**
+     * Bulk delete multiple property listings and all related data.
+     *
+     * @param array $ids Array of listing IDs.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function delete_listings( array $ids ) {
+        global $wpdb;
+
+        if ( empty( $ids ) ) {
+            return true;
+        }
+
+        $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+
+        // Cascade: remove related images and block dates.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $wpdb->query( $wpdb->prepare( "DELETE FROM `{$this->ls_img_table}` WHERE property_id IN ($placeholders)", $ids ) );
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $wpdb->query( $wpdb->prepare( "DELETE FROM `{$this->ls_block_date_table}` WHERE property_id IN ($placeholders)", $ids ) );
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $deleted = $wpdb->query( $wpdb->prepare( "DELETE FROM `{$this->listings_table}` WHERE id IN ($placeholders)", $ids ) );
+
+        if ( false === $deleted ) {
+            return new WP_Error( 'leb_listing_bulk_delete_failed', __( 'Failed to delete selected listings.', 'listing-engine-backend' ) );
+        }
+
+        return true;
+    }
+
+    /**
+     * Bulk update status for multiple listings.
+     *
+     * @param array  $ids    Array of listing IDs.
+     * @param string $status New status value.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function update_listings_status( array $ids, string $status ) {
+        global $wpdb;
+
+        if ( empty( $ids ) ) {
+            return true;
+        }
+
+        $status       = sanitize_text_field( $status );
+        $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+        $values       = array_merge( [ $status, current_time( 'mysql' ) ], $ids );
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $updated = $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE `{$this->listings_table}` SET status = %s, updated_at = %s WHERE id IN ($placeholders)",
+                $values
+            )
+        );
+
+        if ( false === $updated ) {
+            return new WP_Error( 'leb_listing_bulk_status_failed', __( 'Failed to update status for selected listings.', 'listing-engine-backend' ) );
+        }
+
+        return true;
+    }
+
+    /**
+     * Get listing counts grouped by status.
+     *
+     * @return array Associative array of status => count.
+     */
+    public function get_status_counts(): array {
+        global $wpdb;
+
+        $results = $wpdb->get_results(
+            "SELECT status, COUNT(*) as count FROM `{$this->listings_table}` GROUP BY status",
+            ARRAY_A
+        );
+
+        $counts = [
+            'pending'   => 0,
+            'published' => 0,
+            'rejected'  => 0,
+            'draft'     => 0,
+        ];
+
+        if ( $results ) {
+            foreach ( $results as $row ) {
+                if ( isset( $counts[ $row['status'] ] ) ) {
+                    $counts[ $row['status'] ] = (int) $row['count'];
+                }
+            }
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Fetch ALL amenities (no pagination) for the add/edit property form checkbox picker.
+     *
+     * @return array Array of amenity rows with id, name, svg_path.
+     */
+    public function get_all_amenities(): array {
+        global $wpdb;
+        $items = $wpdb->get_results(
+            "SELECT id, name, svg_path FROM `{$this->amenities_table}` ORDER BY name ASC",
+            ARRAY_A
+        );
+        return $items ?: [];
+    }
+
+    /**
+     * Fetch ALL locations (no pagination) for the add/edit property form dropdown.
+     *
+     * @return array Array of location rows with id, name.
+     */
+    public function get_all_locations(): array {
+        global $wpdb;
+        $items = $wpdb->get_results(
+            "SELECT id, name FROM `{$this->locations_table}` ORDER BY name ASC",
+            ARRAY_A
+        );
+        return $items ?: [];
+    }
+
+    /**
+     * Fetch ALL types (no pagination) for the add/edit property form dropdown.
+     *
+     * @return array Array of type rows with id, name.
+     */
+    public function get_all_types(): array {
+        global $wpdb;
+        $items = $wpdb->get_results(
+            "SELECT id, name FROM `{$this->types_table}` ORDER BY name ASC",
+            ARRAY_A
+        );
+        return $items ?: [];
+    }
 }

@@ -371,7 +371,7 @@
             box-shadow: var(--am-d-card-shadow);
             margin-bottom: 1rem;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             text-align: center;
             align-items: center;
         }
@@ -387,6 +387,11 @@
             .status {
                 font-size: 0.75rem;
             }
+
+            .leb-pl-status {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
         }
 
         .status span {
@@ -524,8 +529,9 @@
         <div class="leb-pl-status">
 
             <div class="status active">Pending <span>2</span></div>
-            <div class="status">Approved</div>
+            <div class="status">Published</div>
             <div class="status">Rejected</div>
+            <div class="status">Draft</div>
 
         </div>
 

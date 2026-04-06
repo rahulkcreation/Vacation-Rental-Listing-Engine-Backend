@@ -194,6 +194,25 @@ function leb_enqueue_admin_assets( string $hook_suffix ) {
             wp_enqueue_script('leb-loc-management', LEB_ASSETS_JS_URL . $js_path, ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/' . $js_path), true);
         }
     }
+    // ── 5. Property Management ──────────────────────────────────
+    // Matches the 'Properties' submenu. Handles List and Add/Edit.
+    // Hook pattern: 'leb-types_page_leb-properties'.
+    elseif ( false !== strpos( $hook_suffix, 'page_leb-properties' ) ) {
+        $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : 'list';
+        if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
+            // WordPress Media Library scripts for image picker.
+            wp_enqueue_media();
+            $css_path = 'property-model/add-edit-property.css';
+            $js_path  = 'property-model/add-edit-property.js';
+            wp_enqueue_style( 'leb-prop-add-edit', LEB_ASSETS_CSS_URL . $css_path, [ 'leb-global', 'leb-shared-css' ], filemtime( LEB_PLUGIN_DIR . 'assets/css/' . $css_path ) );
+            wp_enqueue_script( 'leb-prop-add-edit', LEB_ASSETS_JS_URL . $js_path, [ 'jquery' ], filemtime( LEB_PLUGIN_DIR . 'assets/js/' . $js_path ), true );
+        } else {
+            $css_path = 'property-model/property-management.css';
+            $js_path  = 'property-model/property-management.js';
+            wp_enqueue_style( 'leb-prop-management', LEB_ASSETS_CSS_URL . $css_path, [ 'leb-global', 'leb-shared-css' ], filemtime( LEB_PLUGIN_DIR . 'assets/css/' . $css_path ) );
+            wp_enqueue_script( 'leb-prop-management', LEB_ASSETS_JS_URL . $js_path, [ 'jquery' ], filemtime( LEB_PLUGIN_DIR . 'assets/js/' . $js_path ), true );
+        }
+    }
 
     // Assets are now enqueued directly within each block above for better isolation.
 }
@@ -235,10 +254,11 @@ function leb_is_leb_page( string $hook_suffix ): bool {
 
     // Match any hook that contains one of the LEB menu slugs.
     $leb_slug_patterns = [
-        'leb-types',      // Covers 'toplevel_page_leb-types' and the add/edit ?leb_action= variant.
-        'leb-database',   // Covers any hook suffix referencing the Database submenu.
-        'leb-amenities',  // Covers the new Amenities submenu and its add/edit form.
-        'leb-locations',  // Covers the new Locations submenu and its add/edit form.
+        'leb-types',       // Covers 'toplevel_page_leb-types' and the add/edit ?leb_action= variant.
+        'leb-database',    // Covers any hook suffix referencing the Database submenu.
+        'leb-amenities',   // Covers the new Amenities submenu and its add/edit form.
+        'leb-locations',   // Covers the new Locations submenu and its add/edit form.
+        'leb-properties',  // Covers the Properties submenu and its add/edit form.
     ];
 
     foreach ( $leb_slug_patterns as $pattern ) {

@@ -1,249 +1,364 @@
-**WordPress Plugin Development Prompt - "Listing Engine Backend"**
+---
+
+# **📋 COMPLETE PROJECT PROMPT: Property Management Admin Panel**
+
+## **🎯 PROJECT OVERVIEW**
+Build a fully responsive **Property Listing Management System** for WordPress admin panel with modular file architecture, real-time data handling, and intuitive UI/UX.
 
 ---
 
-## **Plugin Overview**
-Create a WordPress plugin named **"Listing Engine Backend"** with the following metadata:
-- **Plugin URI:** https://arttechfuzion.com
-- **Author:** Art-Tech Fuzion
-- **Naming Convention:** All functions, classes, hooks, and IDs must use the prefix `LEB` (e.g., `LEB_Database_Handler`, `leb_create_table`, `#leb-type-list`)
+## **🏗️ ARCHITECTURE & CODE STANDARDS**
+
+### **File Structure Requirements:**
+- **Each feature/function MUST be in separate independent files**
+- **ZERO dependencies between files** (fully modular)
+- **Future-proof design**: New features can be added without modifying existing code
+- **Comprehensive comments** in every code section explaining functionality
+- **No inline CSS or hardcoded colors** anywhere in the code
+
+### **Styling Guidelines:**
+- Use **ONLY `global.css`** for all styling
+- All colors must be defined as **CSS variables** in global.css
+- Font-family must come from global.css only
+- **Absolutely no inline styles**, no hardcoded color codes (including rgba, hex in HTML attributes, or box-shadow values directly in components)
+
+### **UI Reference:**
+- Replicate exact UI design from `/screen` folder (2 reference screens already provided)
+- Must be **fully responsive** (mobile, tablet, desktop compatible)
 
 ---
 
-## **Core Architecture & Folder Structure**
+## **📱 SCREEN 1: MAIN PROPERTY LISTING DASHBOARD**
 
-```
-listing-engine-backend/
-├── listing-engine-backend.php          # Main plugin file
-├── assets/
-│   ├── css/
-│   │   ├── global.css                  # Global styles with CSS variables
-│   │   ├── leb-toaster.css             # Toaster notification styles
-│   │   └── leb-admin.css               # Admin panel styles
-│   └── js/
-│       └── leb-toaster.js              # Toaster notification JS
-├── includes/
-│   ├── class-db-handler.php            # Database operations handler
-│   ├── db-schema.php                   # Table definitions & update logic
-│   └── assets-loader.php               # Centralized asset path management
-├── templates/
-│   ├── database-page.php               # Database management screen
-│   └── type-management.php             # Type CRUD interface
-└── screen-name/                        # UI reference images (provided by client)
-    ├── reference-1.png
-    └── reference-2.png
-```
+### **Header Section:**
+- **"Add New Property" button** → Opens Add/Edit Modal (detailed below)
 
----
+### **Search & Filter System:**
+1. **Search Bar**: 
+   - Real-time filtering capability
+   - Triggers filter **after 2 characters are typed** (not on first character)
+   
+2. **Status Filter Tabs** (click to filter):
+   - **Pending Tab** → Shows only properties with `"pending"` status
+   - **Published Tab** → Shows only properties with `"published"` status
+   - **Rejected Tab** → Shows only properties with `"rejected"` status
+   - **Draft Tab** → Shows only properties with `"draft"` status
 
-## **Database Management System**
+### **Property Data Table:**
 
-### **1. No Auto-Creation on Activation**
-- **DO NOT** create any database tables during plugin activation hook
-- Tables should only be created manually via the admin interface
+**Pagination Rules:**
+- Show **10 properties per page**
+- Pagination controls at bottom (Previous/Next buttons with page numbers)
 
-### **2. Database Sub-Menu Screen**
-Create a sub-menu item labeled **"Database"** under the main LEB menu with the following features:
+**Table Columns & Data Sources:**
 
-#### **UI Layout (Grid Block Design):**
-- Display each database table as a **separate grid block/card**
-- Each card must show:
-  - **Table Title:** Name of the table (e.g., "Types Table")
-  - **Status Indicators:**
-    - ✅ **Table Created** / ❌ **Table Not Created**
-    - ✅ **All Rows Present** / ⚠️ **Missing Rows** (if table exists but required default data is missing)
-  - **Action Buttons:**
-    - 🔄 **Refresh Button:** Re-checks current DB status (AJAX-based)
-    - ➕ **Create/Repair Button:** Triggers table creation or row insertion
+| Column # | Column Name | Data Source | Display Logic |
+|-----------|-------------|-------------|---------------|
+| 1 | Checkbox | - | For bulk selection |
+| 2 | Title | `wp_ls_listings.title` | **Truncate with ellipsis** if long (example: *"Jacuzzi Suite by Ridhi...."*)<br><br>⚠️ **IMPORTANT**: Define a variable at top of config file like `TITLE_MAX_LENGTH` so admin can easily change character limit in future without hunting through code |
+| 3 | Price | `wp_ls_listings.price` | Display as formatted currency |
+| 4 | Type | `wp_ls_listings.type` (contains ID) | **Join Query Required**: Take the ID value from this field → Go to `wp_ls_types` table → Match ID → Return the `name` value from that table<br><br>Example: If type = `2`, query wp_ls_types where id=2, return "Villa" |
+| 5 | User | `wp_ls_listings.user_id` (contains ID) | **Join Query Required**: Take user_id → Go to `wp_users` table → Match ID → Return format: **"username (ID)"**<br><br>Example: If user_id=1 and that user's login is "thesk", display: **"thesk (1)"** |
+| 6 | Date/Time | `wp_ls_listings.updated_at` | Format as readable date/time |
 
-#### **Backend Logic Flow:**
-```
-User clicks "Create/Repair" 
-    → AJAX request to class-db-handler.php 
-    → Handler calls db-schema.php functions 
-    → Executes CREATE TABLE IF NOT EXISTS 
-    → Checks for missing default rows 
-    → Inserts missing data 
-    → Returns success/error response 
-    → Shows toaster notification
-```
-
-### **3. db-schema.php Structure**
-Define the following table schema:
-
-**Table Name:** `wp_ls_types` (or `{prefix}ls_types`)
-
-| Column | Type | Constraints | Notes |
-|--------|------|-------------|-------|
-| `id` | BIGINT(20) | AUTO_INCREMENT, PRIMARY KEY | Unique identifier |
-| `name` | VARCHAR(255) | NOT NULL | Type name (stored lowercase) |
-| `slug` | VARCHAR(255) | NOT NULL, UNIQUE | URL-friendly slug (always lowercase) |
-| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last modification timestamp |
-
-**Required Functions in db-schema.php:**
-- `leb_get_types_schema()` – Returns CREATE TABLE SQL
-- `leb_get_default_type_rows()` – Returns array of default entries (if any)
-- `leb_check_table_status($table_name)` – Returns array with keys: `exists`, `rows_complete`
+### **Bulk Operations (Below Table):**
+- **Bulk Delete Button**: Delete all selected (checked) properties at once
+- **Bulk Status Change Dropdown**: Change status for all selected properties simultaneously (options: Draft, Pending, Published, Rejected)
 
 ---
 
-## **Admin Menu Structure**
+## **➕ SCREEN 2: ADD/EDIT PROPERTY MODAL**
 
-### **1. Main Menu**
-- **Menu Label:** "LEB"
-- **Position:** Near "Comments" menu (use appropriate position integer)
-- **Icon:** Use WordPress dashicon or custom SVG
+### **Modal Navigation:**
+- **Back Arrow (←)** at top-left → Closes modal and returns to main listing screen
 
-### **2. Sub-Menus:**
-1. **"Types"** (Primary management screen – see below)
-2. **"Database"** (DB management screen described above)
+### **Form Fields (Top to Bottom Order):**
 
-### **3. Plugins Page Integration**
-- Add a **"Settings" link** next to the **"Deactivate"** action on the installed plugins page
-- Clicking this link should redirect to the LEB plugin's main settings page
+#### **FIELD 1: Property Title**
+- Text input field
+- Saves to: `wp_ls_listings.title`
 
 ---
 
-## **Type Management System (CRUD)**
+#### **FIELD 2: Image Upload & Management Section**
 
-### **Screen: Types List View**
-
-**Layout Components (Top to Bottom):**
-1. **Page Heading:** "Manage Types" (or similar)
-2. **Action Bar (Right-aligned):**
-   - **[+ Add New Type]** Button – Opens add form (modal or new page)
-3. **Search Bar:**
-   - Real-time filtering functionality
-   - **Trigger:** Starts filtering after **2 characters** are typed
-   - Uses AJAX to fetch filtered results without page reload
-4. **Data Table/List:**
-   - Displays columns: ID, Name, Slug, Updated At, Actions
-   - **Pagination:** Show **10 items per page**
-   - Pagination controls at bottom (Previous, Page Numbers, Next)
-5. **Row Actions:**
-   - **Edit Button** (✏️) – Opens edit form pre-filled with current data
-
-### **Screen: Add/Edit Type Form**
-
-**Form Fields:**
-- **Type Name** (text input, required)
-- **Slug** (text input, auto-generated from name or manual entry)
-- **Submit Buttons:**
-  - **[Create Type]** (for new entries)
-  - **[Update Type]** (for existing entries)
+**Upload Source:** WordPress Media Gallery picker
 
 **Validation Rules:**
-- Both fields are required
-- **Slug must be converted to lowercase before saving** (use `sanitize_title()` or `strtolower()`)
-- Check for duplicate slugs before insert/update
-- Show validation errors via toaster notifications
+- ✅ **Minimum 5 images required** (cannot save with fewer)
+- ✅ **Maximum 10 images allowed** (cannot select more)
+- ✅ **Each image must be less than 1MB** in file size
+- Show error message if validation fails
 
-**CRUD Operations:**
-- **Create:** INSERT INTO `wp_ls_types`
-- **Read:** SELECT with pagination (LIMIT/OFFSET) and search (LIKE query)
-- **Update:** UPDATE `wp_ls_types` WHERE id = X
-- **Delete:** (Optional – soft delete recommended)
+**Preview Display:**
+- Show thumbnail previews of all selected images
+- Each preview must have:
+  - ❌ **Remove button (X icon)** → Removes that specific image from selection
+  - **Order number badge** showing position (1, 2, 3...)
+  - **Drag handle** (☰ grip icon) for reordering
 
----
+**⭐ DRAG-AND-DROP REORDERING FEATURE:**
+- Admin can **drag thumbnails** to rearrange image order
+- Visual feedback during drag (slight lift/shadow effect)
+- Drop target highlighting when dragging over valid position
+- **Real-time order update** as images are moved
+- Save the final arrangement order to database
 
-## **Styling & Asset Management**
+**Database Storage (CRITICAL):**
+- Table: **`wp_ls_img`**
+- **One property = ONE row only** (not multiple rows)
+- Column: `image` stores **JSON array** containing all images for that property
+- Column: `property_id` links to the property
 
-### **1. global.css (CSS Variables System)**
-```css
-:root {
-    /* Font Family */
-    --leb-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    
-    /* Color Palette */
-    --leb-primary-color: #2271b1;      /* WordPress blue-ish */
-    --leb-success-color: #00a32a;       /* Green for success states */
-    --leb-warning-color: #dba617;       /* Amber for warnings */
-    --leb-error-color: #d63638;         /* Red for errors */
-    --leb-text-color: #1d2327;          /* Dark text */
-    --leb-bg-light: #f6f7f7;            /* Light background */
-    --leb-border-color: #dcdcde;        /* Border gray */
-    
-    /* Spacing */
-    --leb-spacing-sm: 8px;
-    --leb-spacing-md: 16px;
-    --leb-spacing-lg: 24px;
-    
-    /* Border Radius */
-    --leb-radius: 4px;
-}
+**JSON Structure Example:**
+```json
+[
+  {
+    "id": 4567,
+    "path": "/uploads/2024/property-living-room.jpg",
+    "order": 0
+  },
+  {
+    "id": 4568,
+    "path": "/uploads/2024/property-bedroom.jpg",
+    "order": 1
+  },
+  {
+    "id": 4569,
+    "path": "/uploads/2024/property-pool.jpg",
+    "order": 2
+  }
+]
 ```
 
-**Strict Rules:**
-- ❌ **NO hardcoded color codes** in any PHP/HTML files
-- ❌ **NO inline styles** (style attributes)
-- ✅ **ONLY use CSS variables** from `global.css`
-- ✅ All components must inherit from variable system
-
-### **2. assets-loader.php (Centralized Path Manager)**
-This file must:
-- Define constants or functions for all asset paths:
-  - `LEB_PLUGIN_URL` – Full URL to plugin directory
-  - `LEB_ASSETS_CSS_URL` – Path to CSS folder
-  - `LEB_ASSETS_JS_URL` – Path to JS folder
-  - `LEB_TEMPLATES_PATH` – Path to templates folder
-- Provide enqueue functions:
-  - `leb_enqueue_global_styles()` – Loads global.css on all LEB pages
-  - `leb_enqueue_toaster_assets()` – Loads toaster CSS/JS when needed
-  - `leb_enqueue_admin_styles()` – Loads admin-specific CSS
-- Hook into `admin_enqueue_scripts` with proper page conditionals (only load on LEB pages)
-
-### **3. Toaster Notification System**
-**Separate Files:**
-- `assets/css/leb-toaster.css` – Styling for toast messages
-- `assets/js/leb-toaster.js` – JavaScript logic (auto-dismiss after 3 seconds, animation)
-
-**Features:**
-- Position: Top-right corner
-- Types: success, error, warning, info
-- Trigger via JavaScript function: `LEB_Toaster.show(message, type)`
-- Must work with WP AJAX responses
+Each object contains:
+- `id`: The WordPress media attachment ID
+- `path`: File path/URL to image
+- `order`: Integer representing sequence position (0, 1, 2... based on drag arrangement)
 
 ---
 
-## **Technical Requirements**
-
-### **WordPress Coding Standards:**
-- Follow WordPress coding standards (indentation, naming, etc.)
-- All database queries must use `$wpdb->prepare()` to prevent SQL injection
-- Use `check_ajax_referer()` for AJAX security
-- Implement `current_user_can('manage_options')` checks for admin pages
-- Internationalization ready: Use `__('string', 'listing-engine-backend')` for all user-facing strings
-
-### **Security:**
-- Nonce verification on all forms
-- Data sanitization: `sanitize_text_field()`, `sanitize_title()`, etc.
-- Output escaping: `esc_html()`, `esc_attr()`, `wp_kses()`
-
-### **Performance:**
-- Load CSS/JS only on LEB admin pages (don't bloat other areas)
-- Use WordPress transients for caching table status checks if needed
-- Optimize database queries with proper indexing
+#### **FIELD 3: Description**
+- Large textarea or rich text editor
+- Saves to: `wp_ls_listings.description`
 
 ---
 
-## **Deliverables Checklist**
+#### **FIELD 4: Property Details Grid**
+Arrange these fields in a clean grid layout (2x2 or similar):
 
-- [ ] Main plugin file with proper headers and activation/deactivation hooks
-- [ ] Complete folder structure as specified
-- [ ] `class-db-handler.php` with create/update methods
-- [ ] `db-schema.php` with `wp_ls_types` table definition
-- [ ] `assets-loader.php` with centralized path management
-- [ ] `global.css` with full CSS variable system
-- [ ] Toaster notification system (CSS + JS)
-- [ ] Database management page (grid layout with status cards)
-- [ ] Type list page with search, pagination, CRUD
-- [ ] Add/Edit type form with validation
-- [ ] Settings link on plugins page
-- [ ] Proper LEB prefixing throughout
-- [ ] All slugs stored in lowercase
-- [ ] No inline styles or hardcoded colors
-- [ ] UI matching provided reference images in `screen-name/` folder
+| Label | Database Column | Input Type |
+|-------|----------------|------------|
+| Guests | `wp_ls_listings.guests` | Number input |
+| Bedrooms | `wp_ls_listings.bedrooms` | Number input |
+| Beds | `wp_ls_listings.beds` | Number input |
+| Bathrooms | `wp_ls_listings.bathrooms` | Number input |
+| Price | `wp_ls_listings.price` | Number/currency input |
 
 ---
 
-**Note to Developer:** Refer to the UI mockup images located in the `screen-name/` folder for exact visual design implementation of the Type Management and Database screens. The design should follow modern WordPress admin aesthetics (Gutenberg-era clean UI).
+#### **FIELD 5: Amenities Selection**
+
+**Data Source:** Fetch all amenities from **`wp_ls_ameneties`** table ⚠️ (note spelling: a-m-e-n-e-t-e-y-s)
+
+**UI Format:**
+- Display as checkboxes or selectable cards/grid
+- Admin can select **multiple amenities**
+- Show amenity name
+
+**Database Storage:**
+- Saves to: **`wp_ls_listings.ameneties`** column
+- **Format: Comma-separated IDs in exact selection order**
+- Example: If admin selects Pool (ID=3), then WiFi (ID=1), then Parking (ID=4), store: **`"3,1,4"`**
+- ⚠️ **Must preserve the order** in which admin clicked/selected them
+
+---
+
+#### **FIELD 6: Location Dropdown**
+
+**Data Source:** Fetch options from **`wp_ls_location`** table
+
+**Display:** Dropdown/select menu showing location names
+
+**Database Storage:**
+- Saves to: **`wp_ls_listings.location`**
+- **Store ONLY the ID** (integer), not the name
+- Example: If "Goa" has ID=5, store value: `5`
+
+---
+
+#### **FIELD 7: Property Type Dropdown**
+
+**Data Source:** Fetch options from **`wp_ls_types`** table
+
+**Display:** Dropdown/select menu showing type names
+
+**Database Storage:**
+- Saves to: **`wp_ls_listings.type`**
+- **Store ONLY the ID** (integer), not the name
+- Example: If "Villa" has ID=2, store value: `2`
+
+---
+
+#### **FIELD 8: Calendar / Date Blocker**
+
+**Functionality:**
+- Interactive calendar widget displayed in modal
+- Admin can click on dates to select them as "blocked/unavailable"
+- Selected dates should be visually highlighted
+
+**Database Storage:**
+- Table: **`wp_ls_block_date`**
+- Columns:
+  - `property_id`: Links to the property
+  - `dates`: **JSON array** of date strings (format: YYYY-MM-DD)
+    - Example: `["2024-01-15", "2024-01-16", "2024-01-20"]`
+  - `created_at`: Timestamp of when this block was created (current date/time when admin saves it)
+
+---
+
+#### **FIELD 9: Host Information (READ-ONLY SECTION)**
+
+**⚠️ DISPLAY CONDITION:**
+- **Show this section ONLY when editing an existing property**
+- **HIDE completely when creating a new property** (this section shouldn't exist for new listings)
+
+**Purpose:** Display information about the property owner/host
+
+**Data Fetch Logic:**
+```
+Step 1: Get the current property's user_id from wp_ls_listings table
+
+Step 2: Using that user_id, query wp_users table to get:
+        - Username ← from user_login column
+        - Email    ← from user_email column  
+        - User ID  ← (already have it, but display for reference)
+
+Step 3: Using same user_id, query wp_usermeta table:
+        - WHERE user_id = [current user_id] 
+        - AND meta_key = 'mobile_number'
+        - Get mobile_number value from meta_value column
+```
+
+**Display Format:**
+```
+┌─────────────────────────────────────┐
+│  👤 HOST INFORMATION                │
+│  ─────────────────────────────────  │
+│  User:   thesk (ID: 1)             │
+│  Email:  thesk@example.com         │
+│  Mobile: +91-9876543210            │
+└─────────────────────────────────────┘
+```
+
+This entire section is **read-only** (no editable fields) - purely informational.
+
+---
+
+#### **FIELD 10: Status Dropdown**
+
+**Options:**
+- Draft
+- Pending
+- Published
+- Rejected
+
+**Saves to:** `wp_ls_listings.status`
+
+---
+
+#### **FIELD 11: Action Buttons (Bottom of Modal)**
+
+**Button text changes based on mode:**
+
+| Mode | Button Text | Behavior |
+|------|-------------|----------|
+| Creating NEW property | **"Create Listing"** | Inserts new record into database |
+| Editing EXISTING property | **"Update Listing"** | Updates existing record |
+
+---
+
+## **💾 SAVE / SUBMIT LOGIC & WORKFLOW**
+
+### **When Admin Clicks Create/Update Button:**
+
+**STEP 1: Client-Side Validation**
+- Check all required fields are filled
+- Verify minimum 5 images uploaded (and max 10)
+- Confirm each image file is under 1MB
+- Validate price is positive number
+- Check location and type are selected
+- ❌ **If any validation fails**: Show error message near the problematic field AND show a toaster notification with error details
+
+**STEP 2: Loading State**
+- Disable the submit button immediately (prevent double-clicks)
+- Show loading spinner/indicator with text like "Saving..." or "Creating Property..."
+- Keep modal open during this process
+
+**STEP 3: API Call (AJAX/Fetch)**
+- Send all form data to backend WordPress AJAX endpoint
+- Include all fields: title, description, price, guests, bedrooms, beds, bathrooms, type (ID), location (ID), ameneties (CSV string like "3,1,4"), status, images (JSON array), blocked dates (JSON array)
+
+**STEP 4A: Success Response**
+- Show **success toaster notification**: ✅ "Property created successfully!" or ✅ "Property updated successfully!"
+- Wait 1.5 seconds (auto-close delay)
+- Close modal automatically
+- Refresh/reload the main listing table to show updated data
+
+**STEP 4B: Error Response**
+- Show **error toaster notification**: ❌ "Error: [specific error message from server]"
+- Re-enable the submit button
+- Hide loading spinner
+- Allow admin to fix issues and retry
+
+---
+
+## **⚡ REAL-TIME AUTO-SAVE BEHAVIOR (Special Rule)**
+
+**For NEW Listings:**
+- As admin fills out the form, data can auto-save in real-time to database
+- **HOWEVER**, the status must remain as **"draft"** until explicitly published
+- Even if admin selects "Published" in dropdown, initial save keeps it draft
+- Final status applies only when clicking "Create Listing" button successfully
+
+**For EDITING Existing Listings:**
+- Original data is already fetched and pre-populated in form fields
+- Only track what fields have changed (dirty checking)
+- On "Update Listing" click, send only changed data (optimization) OR send full updated record
+
+---
+
+
+
+## **✅ FINAL CHECKLIST FOR DEVELOPER**
+
+Before starting development, confirm:
+
+- [ ] File structure is modular with zero inter-dependencies
+- [ ] All styling uses CSS variables from global.css only
+- [ ] Image upload validates: min 5, max 10, under 1MB each
+- [ ] Images are drag-reorderable with visual feedback
+- [ ] Images store as single JSON entry in `wp_ls_img` table (one row per property)
+- [ ] Amenities table name is `wp_ls_ameneties` (with 'e')
+- [ ] Amenities save as comma-separated IDs in selection order (e.g., "3,1,4")
+- [ ] Location saves as ID only (integer)
+- [ ] Type saves as ID only (integer)
+- [ ] Search triggers after 2 characters
+- [ ] Pagination shows 10 items per page
+- [ ] Bulk delete and bulk status change work
+- [ ] Title truncates based on configurable variable
+- [ ] Host info shows only in edit mode (hidden for new)
+- [ ] Host info fetches username, email, mobile via joins
+- [ ] Calendar blocks dates and saves as JSON
+- [ ] Form validates before submit with error messages
+- [ ] Loading spinner shows during save process
+- [ ] Toaster notifications for success/error
+- [ ] New listings default to "draft" status
+- [ ] Back arrow closes modal
+- [ ] All code has clear comments explaining functionality
+- [ ] UI matches provided reference screens
+- [ ] Fully responsive design (mobile/tablet/desktop)
+
+---
+
+**END OF PROMPT** ✅
