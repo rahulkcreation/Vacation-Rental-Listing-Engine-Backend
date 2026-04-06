@@ -147,8 +147,12 @@ var LEB_Toaster = ( function () {
 
     // ── Return Public Interface ─────────────────────────────────────
     return {
-        show: show,
-        hide: _hide,
+        show:    show,
+        hide:    _hide,
+        success: function ( m, d ) { show( m, 'success', d ); },
+        error:   function ( m, d ) { show( m, 'error',   d ); },
+        info:    function ( m, d ) { show( m, 'info',    d ); },
+        warning: function ( m, d ) { show( m, 'warning', d ); },
     };
 
 } )();

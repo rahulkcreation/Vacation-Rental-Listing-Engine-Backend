@@ -76,16 +76,16 @@
                 
                 // Show notification if no items found in search
                 if (lebPmState.search && (!res.data.items || res.data.items.length === 0)) {
-                    LEB_Toaster.info('No listings found for "' + lebPmState.search + '"');
+                    LEB_Toaster.show('No listings found for "' + lebPmState.search + '"', 'info');
                 }
             } else {
                 renderCards([]);
-                LEB_Toaster.error((res.data && res.data.message) || 'Failed to load listings.');
+                LEB_Toaster.show((res.data && res.data.message) || 'Failed to load listings.', 'error');
             }
         }).fail(function () {
             showLoading(false);
             renderCards([]);
-            LEB_Toaster.error('Network error. Please try again.');
+            LEB_Toaster.show('Network error. Please try again.', 'error');
         });
     }
 
@@ -489,13 +489,13 @@
 
         jQuery.post(LEB_Ajax.ajax_url, data, function (res) {
             if (res.success) {
-                LEB_Toaster.success(successMsg);
+                LEB_Toaster.show(successMsg, 'success');
                 if (typeof onSuccess === 'function') onSuccess();
             } else {
-                LEB_Toaster.error((res.data && res.data.message) || 'Action failed.');
+                LEB_Toaster.show((res.data && res.data.message) || 'Action failed.', 'error');
             }
         }).fail(function () {
-            LEB_Toaster.error('Network error during action.');
+            LEB_Toaster.show('Network error during action.', 'error');
         });
     }
 
