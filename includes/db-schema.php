@@ -137,7 +137,7 @@ function leb_get_listings_schema() {
         bed int(11) DEFAULT 0,
         bathroom int(11) DEFAULT 0,
         description longtext DEFAULT NULL,
-        price decimal(10,2) DEFAULT 0.00,
+        price bigint(20) DEFAULT 0,
         map longtext DEFAULT NULL,
         status varchar(50) DEFAULT 'draft',
         updated_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
