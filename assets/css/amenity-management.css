@@ -1,291 +1,423 @@
-/* ==========================================================================
-   amenity-management.css
-   Scoped to #leb-amen-list, .leb-wrap, and .leb-am-* classnames.
-   Zero conflict with type-management.css or any other LEB module.
-   All colors referenced from global.css design tokens – no hardcoded values.
-   ========================================================================== */
+/* ─────────────────────────────────────────────────────────
+   Global Reset & Shared LEB Components
+───────────────────────────────────────────────────────── */
 
-/* ── Page Wrapper ─────────────────────────────────────────────── */
+.leb-loading-overlay {
+    position:    absolute;
+    inset:       0;
+    z-index:     10;
+    display:     flex;
+    align-items:     center;
+    justify-content: center;
+    background:  var(--leb-overlay-bg);
+    border-radius: inherit;
+}
+
+.leb-spinner {
+    width:  28px;
+    height: 28px;
+    border: 3px solid var(--leb-border-default);
+    border-top-color: var(--leb-primary-color);
+    border-radius: 50%;
+    animation: lebSpinAmen 0.7s linear infinite;
+}
+
+@keyframes lebSpinAmen {
+    to { transform: rotate(360deg); }
+}
+
+.leb-empty-state {
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    justify-content: center;
+    padding:         3rem 1.5rem;
+    text-align:      center;
+    color:           var(--leb-text-muted);
+    gap:             12px;
+}
+
+.leb-empty-state__icon {
+    width:  48px;
+    height: 48px;
+    opacity: 0.4;
+}
+
+.leb-empty-state__title {
+    font-size:   0.9375rem;
+    font-weight: 600;
+    color:       var(--leb-secondary-color);
+    margin:      0;
+}
+
+.leb-empty-state__subtitle {
+    font-size: 0.8125rem;
+    margin:    0;
+}
+
+.leb-badge {
+    display:       inline-flex;
+    align-items:   center;
+    gap:           5px;
+    padding:       3px 12px;
+    border-radius: 100rem;
+    font-size:     0.75rem;
+    font-weight:   600;
+    border:        1px solid transparent;
+    line-height:   1.6;
+}
+
+.leb-badge--success {
+    background-color: var(--leb-success-light-bg);
+    color:            var(--leb-success-color);
+    border-color:     var(--leb-success-color);
+}
+
+.leb-badge--warning {
+    background-color: var(--leb-warning-light-bg);
+    color:            var(--leb-warning-color);
+    border-color:     var(--leb-warning-color);
+}
+
+.leb-badge--error {
+    background-color: var(--leb-error-light-bg);
+    color:            var(--leb-error-color);
+    border-color:     var(--leb-error-color);
+}
+
+.leb-sr-only {
+    position: absolute;
+    width:    1px;
+    height:   1px;
+    padding:  0;
+    margin:   -1px;
+    overflow: hidden;
+    clip:     rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border:   0;
+}
+
+/* ── Amenity Management – List Screen ──────────────────────────────
+   Scoped to #leb-amen-list to prevent conflicts with other templates.
+─────────────────────────────────────────────────────────────── */
+
 #leb-amen-list {
+   font-family: var(--leb-font-family);
+    color: var(--leb-text-color);
     max-width: 1200px;
     margin: 2rem auto;
     width: 95%;
 }
 
-/* ── Header ────────────────────────────────────────────────────── */
-.leb-am-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
+/* ── Header ─────────────────────────────────────────────────── */
+#leb-amen-list .leb-am-header {
+    display:          flex;
+    align-items:      center;
+    justify-content:  space-between;
+    flex-wrap:        wrap;
+    gap:              16px;
     background-color: var(--leb-white);
-    padding: 1rem 1.25rem;
-    border-radius: 14px;
-    box-shadow: var(--leb-card-shadow);
-    margin-bottom: 24px;
+    padding:          1rem 1.25rem;
+    border-radius:    14px;
+    box-shadow:       var(--leb-card-shadow);
+    margin-bottom:    24px;
 }
 
-.leb-am-header-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+/* ── Bulk Actions Bar ───────────────────────────────────────── */
+#leb-amen-list .leb-am-bulk-actions {
+    display:          none; /* Hidden by default */
+    align-items:      center;
+    justify-content:  space-between;
+    background-color: var(--leb-secondary-color);
+    color:            var(--leb-white);
+    padding:          12px 20px;
+    border-radius:    14px;
+    margin-bottom:    20px;
+    box-shadow:       0 10px 25px rgba(0, 0, 0, 0.1);
+    animation:        lebFadeIn 0.3s ease;
 }
 
-.leb-am-icon-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: var(--leb-primary-color);
-    flex-shrink: 0;
-}
-
-.leb-am-icon-box svg {
-    width: 22px;
-    height: 22px;
-    stroke: var(--leb-white);
-}
-
-.leb-am-page-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--leb-secondary-color);
-    margin: 0;
-    line-height: 1.2;
-}
-
-/* ── Add New Button ─────────────────────────────────────────────── */
-.leb-am-add-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 22px;
-    border-radius: 100rem;
-    background: var(--leb-primary-color);
-    color: var(--leb-white);
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
-    box-shadow: 0 2px 8px var(--leb-primary-glow);
-    cursor: pointer;
-    border: none;
-    white-space: nowrap;
-}
-
-.leb-am-add-btn svg {
-    width: 16px;
-    height: 16px;
-    stroke: var(--leb-white);
-    flex-shrink: 0;
-}
-
-.leb-am-add-btn:hover {
-    background: var(--leb-primary-dark);
-    box-shadow: 0 4px 14px var(--leb-primary-glow);
-    transform: translateY(-1px);
-    color: var(--leb-white);
-    text-decoration: none;
-}
-
-.leb-am-add-btn:active {
-    transform: translateY(0);
-}
-
-/* ── Search Bar ─────────────────────────────────────────────────── */
-.leb-am-search-wrap {
-    position: relative;
-    margin-bottom: 20px;
-    transition: max-width 0.25s ease;
-}
-
-.leb-am-search-wrap.leb-am-search-focused {
-    max-width: 560px;
-}
-
-.leb-am-search-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 17px;
-    height: 17px;
-    stroke: var(--leb-text-muted);
-    pointer-events: none;
-}
-
-.leb-am-search-input {
-    width: 100%;
-    padding: 8px 44px 8px 42px !important;
-    border: 2px solid var(--leb-border-default) !important;
-    border-radius: 10px !important;
-    background: var(--leb-white);
-    color: var(--leb-secondary-color) !important;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.leb-am-search-input:focus {
-    border-color: var(--leb-primary-color);
-    box-shadow: var(--leb-focus-shadow);
-}
-
-.leb-am-search-clear {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 4px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-    color: var(--leb-text-muted);
-}
-
-.leb-am-search-clear:hover {
-    color: var(--leb-secondary-color);
-}
-
-.leb-am-search-clear.leb-am-clear-visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.leb-am-search-clear svg {
-    width: 14px;
-    height: 14px;
-}
-
-/* ── Table Wrapper ──────────────────────────────────────────────── */
-.leb-am-table-wrap {
-    position: relative;
-    background: var(--leb-white);
-    border-radius: 14px;
-    border: 1px solid var(--leb-border-default);
-    overflow: hidden;
-    box-shadow: var(--leb-card-shadow);
-}
-
-/* ── Bulk Actions Bar ───────────────────────────────────────────── */
-.leb-am-bulk-actions {
-    display: none;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 20px;
-    background: var(--leb-primary-light-bg);
-    border-bottom: 1px solid var(--leb-border-color);
-}
-
-.leb-am-bulk-actions.leb-active {
+#leb-amen-list .leb-am-bulk-actions.leb-active {
     display: flex;
 }
 
-.leb-am-bulk-info {
-    display: flex;
+@keyframes lebFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+#leb-amen-list .leb-am-bulk-info {
+    display:     flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.88rem;
-    color: var(--leb-text-muted);
+    gap:         12px;
+    font-size:   0.875rem;
     font-weight: 500;
 }
 
-.leb-am-bulk-delete-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 16px;
-    background: var(--leb-error-color);
-    color: var(--leb-white);
-    border: none;
+#leb-amen-list .leb-am-bulk-delete-btn {
+    background:    var(--leb-error-color);
+    color:         var(--leb-white);
+    border:        none;
     border-radius: 8px;
-    font-size: 0.87rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    padding:       8px 16px;
+    font-size:     0.8125rem;
+    font-weight:   600;
+    cursor:        pointer;
+    transition:    background 0.2s ease;
+    display:       flex;
+    align-items:   center;
+    gap:           6px;
 }
 
-.leb-am-bulk-delete-btn:hover {
-    background: var(--leb-error-color);
-    filter: brightness(0.9);
+#leb-amen-list .leb-am-bulk-delete-btn:hover {
+    background: #d00120;
+}
+
+#leb-amen-list .leb-am-bulk-delete-btn svg {
+    width:  16px;
+    height: 16px;
+}
+
+#leb-amen-list .leb-am-header-left {
+    display:     flex;
+    align-items: center;
+    gap:         14px;
+}
+
+#leb-amen-list .leb-am-icon-box {
+    width:         48px;
+    height:        48px;
+    background:    linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
+    border-radius: 14px;
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    box-shadow:    0 6px 20px var(--leb-primary-glow);
+    flex-shrink:   0;
+}
+
+#leb-amen-list .leb-am-icon-box svg {
+    width:  24px;
+    height: 24px;
+    color:  var(--leb-white);
+}
+
+#leb-amen-list .leb-am-page-title {
+    font-size:      1.7rem;
+    font-weight:    700;
+    color:          var(--leb-secondary-color);
+    letter-spacing: -0.03em;
+    line-height:    1.2;
+    margin:         0;
+}
+
+#leb-amen-list .leb-am-header-right {
+    display: flex;
+}
+
+#leb-amen-list .leb-am-add-btn {
+    display:          inline-flex;
+    align-items:      center;
+    gap:              6px;
+    background-color: var(--leb-primary-color);
+    color:            var(--leb-white);
+    border:           none;
+    border-radius:    100rem;
+    padding:          0.55rem 1.1rem;
+    font-size:        0.8125rem;
+    font-weight:      600;
+    font-family:      var(--leb-font-family);
+    cursor:           pointer;
+    box-shadow:       0 4px 14px var(--leb-primary-glow);
+    transition:       transform 0.15s ease, opacity 0.15s ease;
+    text-decoration:  none;
+}
+
+#leb-amen-list .leb-am-add-btn:hover {
+    opacity:   0.9;
     transform: translateY(-1px);
 }
 
-.leb-am-bulk-delete-btn svg {
-    width: 15px;
-    height: 15px;
-    stroke: var(--leb-white);
+#leb-amen-list .leb-am-add-btn svg {
+    width:  16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
-/* ── Card rows (list view) ──────────────────────────────────────── */
-.leb-am-cards-list {
-    display: flex;
-    flex-direction: column;
+/* ── Search Bar ─────────────────────────────────────────────── */
+#leb-amen-list .leb-am-search-wrap {
+    display:          flex;
+    align-items:      center;
+    gap:              10px;
+    background-color: var(--leb-white);
+    border:           2px solid var(--leb-border-color);
+    border-radius:    14px;
+    padding:          6px 8px 6px 18px;
+    box-shadow:       var(--leb-card-shadow);
+    margin-bottom:    20px;
+    transition:       border-color 0.25s ease;
 }
 
-.leb-am-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--leb-border-default);
-    transition: background 0.15s ease;
-    flex-wrap: wrap;
+#leb-amen-list .leb-am-search-wrap.leb-am-search-focused {
+    border-color: var(--leb-primary-color);
 }
 
-.leb-am-card:last-child {
-    border-bottom: none;
+#leb-amen-list .leb-am-search-icon {
+    width:       20px;
+    height:      20px;
+    flex-shrink: 0;
+    color:       var(--leb-text-muted);
+    transition:  color 0.25s ease;
 }
 
-.leb-am-card:hover {
-    background: var(--leb-bg-light);
-}
-
-.leb-am-checkbox {
-    cursor: pointer;
-    accent-color: var(--leb-primary-color);
-}
-
-.leb-am-card-row {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 80px;
-    flex: 1;
-}
-
-.leb-am-card-label {
-    font-size: 0.73rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--leb-text-muted);
-}
-
-.leb-am-card-value {
-    font-size: 0.9rem;
-    color: var(--leb-secondary-color);
-    font-weight: 500;
-}
-
-.leb-am-s-no {
-    font-weight: 700;
+#leb-amen-list .leb-am-search-wrap.leb-am-search-focused .leb-am-search-icon {
     color: var(--leb-primary-color);
 }
 
-/* SVG icon inside card */
-.leb-am-svg-cell {
+#leb-amen-list .leb-am-search-input {
+    flex:        1;
+    border:      none;
+    outline:     none;
+    font-size:   0.9375rem;
+    font-family: var(--leb-font-family);
+    color:       var(--leb-text-color);
+    background:  transparent;
+    padding:     8px 0;
+}
+
+#leb-amen-list .leb-am-search-input::placeholder {
+    color: var(--leb-text-muted);
+}
+
+#leb-amen-list .leb-am-search-clear {
+    display:       none;
+    align-items:   center;
+    justify-content: center;
+    width:         32px;
+    height:        32px;
+    border:        none;
+    background:    var(--leb-bg-light);
+    border-radius: 6px;
+    color:         var(--leb-text-muted);
+    cursor:        pointer;
+    flex-shrink:   0;
+    transition:    background-color 0.15s ease;
+}
+
+#leb-amen-list .leb-am-search-clear:hover {
+    background-color: var(--leb-border-default);
+}
+
+#leb-amen-list .leb-am-search-clear svg {
+    width:  16px;
+    height: 16px;
+}
+
+#leb-amen-list .leb-am-search-clear.leb-am-clear-visible {
     display: flex;
+}
+
+/* ── Table Section ──────────────────────────────────────────── */
+#leb-amen-list .leb-am-table-wrap {
+    background:    var(--leb-white);
+    border-radius: 18px;
+    box-shadow:    var(--leb-card-shadow);
+    border:        1px solid var(--leb-border-color);
+    overflow:      hidden;
+    position:      relative;
+    min-height:    180px;
+}
+
+/* Cards list container */
+#leb-amen-list .leb-am-cards-list {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap:    0;
+}
+
+/* Individual card row */
+#leb-amen-list .leb-am-card {
+    margin:        6px;
+    padding:       12px 16px;
+    border:        1px solid var(--leb-border-color);
+    border-radius: 12px;
+    display:       flex;
+    flex-direction: column;
+    gap:           6px;
+    position:      relative;
+    padding-top:  35px; /* Spacing for checkbox */
+}
+
+/* Checkbox Styling */
+#leb-amen-list .leb-am-checkbox-wrap {
+    position:  absolute;
+    left:      15px;
+    top:       15px;
+    display:   flex;
     align-items: center;
 }
 
-.leb-am-svg-preview {
+#leb-amen-list input[type="checkbox"].leb-am-checkbox {
+    width:              16px !important;
+    height:             16px !important;
+    cursor:             pointer;
+    accent-color:       var(--leb-primary-color);
+    border:             2px solid var(--leb-border-default);
+    border-radius:      4px;
+    transition:         all 0.2s ease;
+}
+
+#leb-amen-list input[type=checkbox]:checked:before {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+}
+
+#leb-amen-list .leb-am-card-row {
+    display:         flex;
+    flex-direction:  row;
+    justify-content: space-between;
+    align-items:     center;
+    width:           100%;
+    gap:             12px;
+}
+
+#leb-amen-list .leb-am-card-label {
+    font-size:   0.75rem;
+    font-weight: 600;
+    color:       var(--leb-text-muted);
+    flex-shrink: 0;
+    min-width:   70px;
+}
+
+#leb-amen-list .leb-am-card-value {
+    font-size:   0.8125rem;
+    font-weight: 400;
+    color:       var(--leb-text-color);
+    text-align:  right;
+    word-break:  break-all;
+}
+
+#leb-amen-list .leb-am-s-no {
+    padding: 5px;
+    border-radius: 100rem;
+    width: 15px;
+    height: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--leb-primary-color);
+    color: var(--leb-white) !important;
+}
+
+/* SVG icon inside card */
+#leb-amen-list .leb-am-svg-cell {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+#leb-amen-list .leb-am-svg-preview {
     width: 24px;
     height: 24px;
     object-fit: contain;
@@ -295,215 +427,142 @@
     background: var(--leb-bg-light);
 }
 
-.leb-am-svg-none {
+#leb-amen-list .leb-am-svg-none {
     font-size: 0.85rem;
     color: var(--leb-text-muted);
 }
 
-/* ── Card Action Buttons ────────────────────────────────────────── */
-.leb-am-card-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-    margin-left: auto;
+/* Card action row */
+#leb-amen-list .leb-am-card-actions {
+    margin-top:  6px;
+    padding-top: 8px;
+    border-top:  1px solid var(--leb-border-color);
+    display:     flex;
+    justify-content: flex-end;
+    gap:         8px;
 }
 
-.leb-am-edit-btn,
-.leb-am-delete-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-size: 0.84rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.18s ease, transform 0.12s ease;
+#leb-amen-list .leb-am-edit-btn {
+    display:       inline-flex;
+    align-items:   center;
+    gap:           5px;
+    background:    var(--leb-primary-color);
+    color:         var(--leb-white);
+    border:        none;
+    border-radius: 100rem;
+    padding:       5px 18px;
+    font-size:     0.75rem;
+    font-weight:   600;
+    font-family:   var(--leb-font-family);
+    cursor:        pointer;
+    transition:    opacity 0.15s ease;
     text-decoration: none;
-    border: none;
 }
 
-.leb-am-edit-btn {
-    background: var(--leb-primary-light-bg);
-    color: var(--leb-primary-color);
+#leb-amen-list .leb-am-edit-btn:hover {
+    opacity: 0.85;
 }
 
-.leb-am-edit-btn:hover {
-    background: var(--leb-primary-light-bg);
-    filter: brightness(0.95);
-    color: var(--leb-primary-dark);
-    text-decoration: none;
-    transform: translateY(-1px);
-}
-
-.leb-am-edit-btn svg,
-.leb-am-delete-btn svg {
-    width: 14px;
+#leb-amen-list .leb-am-edit-btn svg,
+#leb-amen-list .leb-am-delete-btn svg {
+    width:  14px;
     height: 14px;
-    flex-shrink: 0;
 }
 
-.leb-am-delete-btn {
-    background: var(--leb-error-light-bg);
-    color: var(--leb-error-color);
+#leb-amen-list .leb-am-delete-btn {
+    display:       inline-flex;
+    align-items:   center;
+    gap:           5px;
+    background:    transparent;
+    color:         var(--leb-error-color);
+    border:        1px solid var(--leb-error-color);
+    border-radius: 100rem;
+    padding:       4px 18px;
+    font-size:     0.75rem;
+    font-weight:   600;
+    font-family:   var(--leb-font-family);
+    cursor:        pointer;
+    transition:    all 0.15s ease;
+    text-decoration: none;
 }
 
-.leb-am-delete-btn:hover {
-    background: var(--leb-error-light-bg);
-    filter: brightness(0.95);
-    color: var(--leb-error-color);
-    transform: translateY(-1px);
+#leb-amen-list .leb-am-delete-btn:hover {
+    background: var(--leb-error-color);
+    color:      var(--leb-white);
 }
 
-/* ── Empty State ────────────────────────────────────────────────── */
-.leb-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    gap: 16px;
-    color: var(--leb-text-muted);
-    text-align: center;
-}
-
-.leb-empty-state__icon {
-    width: 52px;
-    height: 52px;
-    stroke: var(--leb-text-muted);
-    opacity: 0.6;
-}
-
-.leb-empty-state__title {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--leb-text-muted);
-    margin: 0;
-}
-
-/* ── Pagination ─────────────────────────────────────────────────── */
-.leb-am-pagination {
-    display: flex;
-    align-items: center;
+/* ── Pagination Bar ─────────────────────────────────────────── */
+#leb-amen-list .leb-am-pagination {
+    display:         flex;
+    align-items:     center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 14px 20px;
-    border-top: 1px solid var(--leb-border-default);
-    flex-wrap: wrap;
+    flex-wrap:       wrap;
+    gap:             12px;
+    padding:         14px 20px;
+    border-top:      1px solid var(--leb-border-color);
 }
 
-.leb-am-pagination-text {
-    font-size: 0.87rem;
-    color: var(--leb-text-muted);
+#leb-amen-list .leb-am-pagination-text {
+    font-size: 0.8125rem;
+    color:     var(--leb-text-muted);
 }
 
-.leb-am-page-controls {
-    display: flex;
-    gap: 6px;
+#leb-amen-list .leb-am-page-controls {
+    display:     flex;
     align-items: center;
-    flex-wrap: wrap;
+    gap:         4px;
 }
 
-.leb-am-pg-btn {
-    display: inline-flex;
-    align-items: center;
+#leb-amen-list .leb-am-pg-btn {
+    display:         flex;
+    align-items:     center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--leb-border-default);
-    border-radius: 8px;
-    background: var(--leb-white);
-    color: var(--leb-text-muted);
-    font-size: 0.87rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.18s ease;
+    width:           34px;
+    height:          34px;
+    border:          1px solid var(--leb-border-color);
+    border-radius:   6px;
+    background:      var(--leb-white);
+    color:           var(--leb-text-muted);
+    font-size:       0.8125rem;
+    font-weight:     600;
+    font-family:     var(--leb-font-family);
+    cursor:          pointer;
+    transition:      all 0.15s ease;
 }
 
-.leb-am-pg-btn svg {
-    width: 14px;
-    height: 14px;
-}
-
-.leb-am-pg-btn:hover:not(:disabled) {
-    background: var(--leb-primary-light-bg);
+#leb-amen-list .leb-am-pg-btn:hover:not(:disabled) {
     border-color: var(--leb-primary-color);
-    color: var(--leb-primary-color);
+    color:        var(--leb-primary-color);
 }
 
-.leb-am-pg-btn:disabled {
-    opacity: 0.35;
-    cursor: default;
-}
-
-.leb-am-pg-btn.leb-am-pg-active {
-    background: var(--leb-primary-color);
+#leb-amen-list .leb-am-pg-btn.leb-am-pg-active {
+    background:   var(--leb-primary-color);
     border-color: var(--leb-primary-color);
-    color: var(--leb-white);
-    font-weight: 700;
+    color:        var(--leb-white);
 }
 
-/* ── Static Loading Overlay ─────────────────────────────────────── */
-.leb-loading-overlay {
-    position: absolute;
-    inset: 0;
-    background: var(--leb-overlay-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    border-radius: inherit;
-    backdrop-filter: blur(2px);
+#leb-amen-list .leb-am-pg-btn:disabled {
+    opacity: 0.4;
+    cursor:  not-allowed;
 }
 
-.leb-spinner {
-    width: 36px;
-    height: 36px;
-    border: 3px solid var(--leb-border-default);
-    border-top-color: var(--leb-primary-color);
-    border-radius: 50%;
-    animation: lebSpinAmen 0.72s linear infinite;
+#leb-amen-list .leb-am-pg-btn svg {
+    width:  16px;
+    height: 16px;
 }
 
-@keyframes lebSpinAmen {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* ── Responsive ─────────────────────────────────────────────────── */
-@media (max-width: 680px) {
-    .leb-am-card {
-        flex-direction: column;
-        align-items: flex-start;
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    #leb-amen-list .leb-am-page-title {
+        font-size: 1.4rem;
     }
 
-    .leb-am-card-actions {
-        margin-left: 0;
+    #leb-amen-list .leb-am-header-right {
+        flex-grow: 1;
     }
 
-
-}
-
-
-@media (width <=540px) {
-    .leb-am-header {
-        flex-direction: column;
-    }
-
-
-    .leb-am-header-right {
-        width: 100%;
+    #leb-amen-list .leb-am-add-btn {
+        width:           100%;
         justify-content: center;
-        display: flex;
-    }
-
-    .leb-am-add-btn {
-        justify-content: center;
-        width: 100%;
-    }
-
-    .leb-am-header-left{
-        width: 100%;
     }
 }
