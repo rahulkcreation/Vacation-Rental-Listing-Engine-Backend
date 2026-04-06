@@ -350,7 +350,7 @@
 
 .leb-pm-tab span {
     border: 1px solid var(--leb-border-default);
-    padding: 1px 6px;
+    padding: 1px;
     border-radius: 100rem;
     font-size: 0.75rem;
     min-width: 20px;
