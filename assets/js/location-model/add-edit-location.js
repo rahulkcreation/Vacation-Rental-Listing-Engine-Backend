@@ -104,7 +104,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
     /* ── Pre-fill in Edit mode ───────────────────────────────── */
     if ( isEdit && editId ) {
         var fd = new FormData();
-        fd.append( 'action', 'leb_ajax_loc_get_location' );
+        fd.append( 'action', 'leb_loc_get_location' );
         fd.append( 'nonce',  nonce );
         fd.append( 'id',     editId );
 
