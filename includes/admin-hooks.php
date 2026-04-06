@@ -440,6 +440,18 @@ function leb_ajax_amen_get_amenities() {
     $handler = new LEB_Database_Handler();
     $result  = $handler->get_amenities( $search, $page, $per_page );
 
+    if ( ! empty( $result['items'] ) ) {
+        foreach ( $result['items'] as &$item ) {
+            if ( ! empty( $item['svg_path'] ) ) {
+                $decoded = json_decode( $item['svg_path'], true );
+                if ( is_array( $decoded ) && isset( $decoded['path'] ) ) {
+                    $item['svg_path']      = $decoded['path'];
+                    $item['attachment_id'] = $decoded['attachment_id'] ?? 0;
+                }
+            }
+        }
+    }
+
     wp_send_json_success( $result );
 }
 
@@ -474,8 +486,16 @@ function leb_ajax_amen_create_amenity() {
         }
     }
 
+    $svg_data = '';
+    if ( ! empty( $svg_path ) || $attachment_id ) {
+        $svg_data = wp_json_encode( [
+            'path'          => $svg_path,
+            'attachment_id' => $attachment_id,
+        ] );
+    }
+
     $handler = new LEB_Database_Handler();
-    $result  = $handler->create_amenity( $name, $svg_path );
+    $result  = $handler->create_amenity( $name, $svg_data );
 
     if ( is_wp_error( $result ) ) {
         wp_send_json_error( [ 'message' => $result->get_error_message() ] );
@@ -511,8 +531,16 @@ function leb_ajax_amen_update_amenity() {
         }
     }
 
+    $svg_data = '';
+    if ( ! empty( $svg_path ) || $attachment_id ) {
+        $svg_data = wp_json_encode( [
+            'path'          => $svg_path,
+            'attachment_id' => $attachment_id,
+        ] );
+    }
+
     $handler = new LEB_Database_Handler();
-    $result  = $handler->update_amenity( $id, $name, $svg_path );
+    $result  = $handler->update_amenity( $id, $name, $svg_data );
 
     if ( is_wp_error( $result ) ) {
         wp_send_json_error( [ 'message' => $result->get_error_message() ] );
@@ -542,6 +570,14 @@ function leb_ajax_amen_get_amenity() {
 
     if ( ! $amenity ) {
         wp_send_json_error( [ 'message' => __( 'Amenity not found.', 'listing-engine-backend' ) ] );
+    }
+
+    if ( ! empty( $amenity['svg_path'] ) ) {
+        $decoded = json_decode( $amenity['svg_path'], true );
+        if ( is_array( $decoded ) && isset( $decoded['path'] ) ) {
+            $amenity['svg_path']      = $decoded['path'];
+            $amenity['attachment_id'] = $decoded['attachment_id'] ?? 0;
+        }
     }
 
     wp_send_json_success( [ 'amenity' => $amenity ] );

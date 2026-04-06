@@ -495,7 +495,7 @@ class LEB_Database_Handler {
         global $wpdb;
 
         $name     = sanitize_text_field( $name );
-        $svg_path = esc_url_raw( $svg_path );
+        $svg_path = wp_unslash( $svg_path );
 
         $inserted = $wpdb->insert(
             $this->amenities_table,
@@ -529,7 +529,7 @@ class LEB_Database_Handler {
         global $wpdb;
 
         $name     = sanitize_text_field( $name );
-        $svg_path = esc_url_raw( $svg_path );
+        $svg_path = wp_unslash( $svg_path );
 
         $updated = $wpdb->update(
             $this->amenities_table,
