@@ -72,8 +72,8 @@ function leb_admin_enqueue_scripts( string $hook_suffix ) {
     // template scripts can read LEB_Ajax.ajax_url and LEB_Ajax.nonce.
     leb_localize_ajax_data();
 
-    // Page-specific admin styles.
-    leb_enqueue_admin_styles( $hook_suffix );
+    // Page-specific admin assets (CSS/JS).
+    leb_enqueue_admin_assets( $hook_suffix );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -118,51 +118,69 @@ function leb_enqueue_toaster_assets() {
 }
 
 /**
- * Enqueue the admin-specific stylesheet(s).
+ * Enqueue the admin-specific stylesheet(s) and script(s).
  *
  * @param string $hook_suffix Current admin page hook.
  */
-function leb_enqueue_admin_styles( string $hook_suffix ) {
+function leb_enqueue_admin_assets( string $hook_suffix ) {
     $template_handle = '';
-    $template_file   = '';
+    $css_file        = '';
+    $js_file         = '';
 
     // Robust matching for Types / Add-Edit pages.
     if ( false !== strpos( $hook_suffix, 'leb-types' ) ) {
         $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
         if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
             $template_handle = 'leb-add-edit-type';
-            $template_file   = 'type-model/add-edit-type.css';
+            $css_file        = 'type-model/add-edit-type.css';
+            $js_file         = 'type-model/add-edit-type.js';
         } else {
             $template_handle = 'leb-type-management';
-            $template_file   = 'type-model/type-management.css';
+            $css_file        = 'type-model/type-management.css';
+            $js_file         = 'type-model/type-management.js';
         }
     } 
     // Robust matching for Database page.
     elseif ( false !== strpos( $hook_suffix, 'leb-database' ) ) {
         $template_handle = 'leb-database-page';
-        $template_file   = 'database-page.css';
+        $css_file        = 'database-page.css';
     }
     // Robust matching for Amenities list / Add-Edit pages.
     elseif ( false !== strpos( $hook_suffix, 'leb-amenities' ) ) {
         $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
         if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
             $template_handle = 'leb-add-edit-amenity';
-            $template_file   = 'amenity-model/add-edit-amenity.css';
+            $css_file        = 'amenity-model/add-edit-amenity.css';
+            $js_file         = 'amenity-model/add-edit-amenity.js';
             // WP Media Library is required for the SVG picker.
             wp_enqueue_media();
         } else {
             $template_handle = 'leb-amenity-management';
-            $template_file   = 'amenity-model/amenity-management.css';
+            $css_file        = 'amenity-model/amenity-management.css';
+            $js_file         = 'amenity-model/amenity-management.js';
         }
     }
 
-    if ( $template_handle && $template_file ) {
-        $full_path = LEB_PLUGIN_DIR . 'assets/css/' . $template_file;
+    // Enqueue CSS
+    if ( $template_handle && $css_file ) {
+        $css_full_path = LEB_PLUGIN_DIR . 'assets/css/' . $css_file;
         wp_enqueue_style(
             $template_handle,
-            LEB_ASSETS_CSS_URL . $template_file,
+            LEB_ASSETS_CSS_URL . $css_file,
             [ 'leb-global' ],
-            file_exists( $full_path ) ? (string) filemtime( $full_path ) : LEB_VERSION
+            file_exists( $css_full_path ) ? (string) filemtime( $css_full_path ) : LEB_VERSION
+        );
+    }
+
+    // Enqueue JS
+    if ( $template_handle && $js_file ) {
+        $js_full_path = LEB_PLUGIN_DIR . 'assets/js/' . $js_file;
+        wp_enqueue_script(
+            $template_handle,
+            LEB_ASSETS_JS_URL . $js_file,
+            [],
+            file_exists( $js_full_path ) ? (string) filemtime( $js_full_path ) : LEB_VERSION,
+            true
         );
     }
 }
