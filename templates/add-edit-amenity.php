@@ -129,6 +129,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
     var editId   = <?php echo (int) $leb_amen_edit_id; ?>;
     var ajaxUrl  = ( typeof LEB_Ajax !== 'undefined' ) ? LEB_Ajax.ajax_url : '';
     var nonce    = ( typeof LEB_Ajax !== 'undefined' ) ? LEB_Ajax.nonce   : '';
+    var defaultSvgPath = '<?php echo esc_url( plugins_url( "assets/images/default-amenity.svg", dirname( __FILE__ ) ) ); ?>';
 
     /* ── DOM ─────────────────────────────────────────────────── */
     var domName          = document.getElementById( 'leb-amen-ae-name' );
@@ -211,6 +212,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
                     if ( amenity.svg_path ) {
                         domSvgPath.value        = amenity.svg_path;
                         domPreviewImg.src        = amenity.svg_path;
+                        domPreviewImg.onerror    = function() { this.onerror = null; this.src = defaultSvgPath; };
                         domPreviewImg.style.display  = 'block';
                         domPlaceholder.style.display = 'none';
                         domBtnLabel.textContent      = 'Change SVG';
@@ -249,6 +251,13 @@ document.addEventListener( 'DOMContentLoaded', function () {
                 LEB_Toaster.show( 'Amenity Name is required.', 'warning' );
             }
             domName.focus();
+            return;
+        }
+
+        if ( ! svgPath ) {
+            if ( typeof LEB_Toaster !== 'undefined' ) {
+                LEB_Toaster.show( 'SVG Icon is required.', 'warning' );
+            }
             return;
         }
 

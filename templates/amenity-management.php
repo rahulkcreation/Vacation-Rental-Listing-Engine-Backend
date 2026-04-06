@@ -138,6 +138,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
         return div.innerHTML;
     }
 
+    /* ── Default SVG Path ───────────────────────────────────────── */
+    var defaultSvgPath = '<?php echo esc_url( plugins_url( "assets/images/default-amenity.svg", dirname( __FILE__ ) ) ); ?>';
+
     /* ── Render: Loading overlay ─────────────────────────────── */
     function lebAmenShowLoading() {
         if ( document.getElementById( 'leb-amen-loader' ) ) { return; }
@@ -181,13 +184,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
             var editUrl    = '<?php echo esc_js( admin_url( 'admin.php?page=leb-amenities&leb_action=edit&id=' ) ); ?>' + encodeURIComponent( row.id );
             var isSelected = lebAmenState.selectedIds.includes( parseInt( row.id ) );
 
-            /* SVG preview cell – renders the actual SVG if a path is stored */
+            /* SVG preview cell – renders the actual SVG if a path is stored, falling back to default if image fails to load */
             var svgCell = '';
-            if ( row.svg_path ) {
-                svgCell = '<img class="leb-am-svg-preview" src="' + lebAmenEscHtml( row.svg_path ) + '" alt="' + lebAmenEscHtml( row.name ) + ' icon" width="24" height="24" loading="lazy">';
-            } else {
-                svgCell = '<span class="leb-am-svg-none">—</span>';
-            }
+            var finalSvgPath = row.svg_path ? lebAmenEscHtml( row.svg_path ) : defaultSvgPath;
+            svgCell = '<img class="leb-am-svg-preview" src="' + finalSvgPath + '" alt="' + lebAmenEscHtml( row.name ) + ' icon" width="24" height="24" loading="lazy" onerror="this.onerror=null;this.src=\'' + defaultSvgPath + '\';">';
 
             html += [
                 '<div class="leb-am-card" data-id="' + row.id + '">',

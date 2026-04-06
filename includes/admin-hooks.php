@@ -478,6 +478,10 @@ function leb_ajax_amen_create_amenity() {
         wp_send_json_error( [ 'message' => __( 'Amenity Name is required.', 'listing-engine-backend' ) ] );
     }
 
+    if ( empty( $svg_path ) && empty( $attachment_id ) ) {
+        wp_send_json_error( [ 'message' => __( 'Amenity SVG Icon is required.', 'listing-engine-backend' ) ] );
+    }
+
     // Validate SVG attachment if one was provided.
     if ( $attachment_id ) {
         $svg_validation = leb_amen_validate_svg_attachment( $attachment_id );
@@ -521,6 +525,10 @@ function leb_ajax_amen_update_amenity() {
 
     if ( ! $id || empty( $name ) ) {
         wp_send_json_error( [ 'message' => __( 'ID and Name are required.', 'listing-engine-backend' ) ] );
+    }
+
+    if ( empty( $svg_path ) && empty( $attachment_id ) ) {
+        wp_send_json_error( [ 'message' => __( 'Amenity SVG Icon is required.', 'listing-engine-backend' ) ] );
     }
 
     // Validate new SVG attachment if a new one was selected.
