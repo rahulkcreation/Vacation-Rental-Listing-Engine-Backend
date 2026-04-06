@@ -13,12 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// =============================================================================
+// GLOBAL SETTINGS TABLES (Types, Amenities, Locations)
+// =============================================================================
+
 /**
  * Returns the CREATE TABLE SQL for the `{prefix}ls_types` table.
- *
- * Uses dbDelta-compatible formatting:
- * - Two spaces before each KEY definition.
- * - Single blank line between column groups.
+ * 
+ * This table stores property types (e.g., Apartment, Villa, Cabin).
+ * It uses a unique slug for easy filtering in the frontend.
  *
  * @return string SQL statement.
  */
@@ -59,13 +62,8 @@ function leb_get_default_type_rows() {
 /**
  * Returns the CREATE TABLE SQL for the `{prefix}ls_ameneties` table.
  *
- * Columns:
- *   id         – Auto-incrementing primary key.
- *   name       – Display name of the amenity.
- *   svg_path   – WordPress media library attachment URL for the 24×24 SVG icon.
- *   updated_at – Auto-updated timestamp.
- *
- * Uses dbDelta-compatible formatting (two spaces before KEY definitions).
+ * This table stores global amenities that properties can offer (e.g., WiFi, Pool).
+ * 'svg_path' stores the URL to the icon displayed in the interface.
  *
  * @return string SQL statement.
  */
@@ -88,12 +86,8 @@ function leb_get_amenities_schema() {
 /**
  * Returns the CREATE TABLE SQL for the `{prefix}ls_location` table.
  *
- * Columns:
- *   id         – Primary key.
- *   name       – Location name.
- *   slug       – Unique URL-friendly slug.
- *   svg_path   – JSON string containing 'path' and 'attachment_id'.
- *   updated_at – Updated timestamp.
+ * This table stores physical locations or regions (e.g., New York, Goa).
+ * It includes an icon path for map or list markers.
  *
  * @return string SQL statement.
  */
@@ -111,6 +105,88 @@ function leb_get_locations_schema() {
   updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY  (id),
   UNIQUE KEY slug (slug)
+) {$charset_collate};";
+}
+
+// =============================================================================
+// PROPERTY DATA TABLES (Listings, Images, Block Dates)
+// =============================================================================
+
+/**
+ * Returns the CREATE TABLE SQL for the `{prefix}ls_listings` table.
+ *
+ * This is the CORE table of the plugin. It stores all primary property information:
+ * - user_id:   The WP User ID who owns the listing.
+ * - location:  Detailed location info (often longtext/JSON).
+ * - ameneties: List of IDs/names of amenities available.
+ * - bed/bath:  Physical inventory of the property.
+ *
+ * @return string SQL statement.
+ */
+function leb_get_listings_schema() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ls_listings';
+    return "CREATE TABLE $table_name (
+        id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id bigint(20) UNSIGNED NOT NULL,
+        title varchar(255) NOT NULL,
+        location longtext NOT NULL,
+        ameneties longtext DEFAULT NULL,
+        guests int(11) DEFAULT 0,
+        bedroom int(11) DEFAULT 0,
+        bed int(11) DEFAULT 0,
+        bathroom int(11) DEFAULT 0,
+        description longtext DEFAULT NULL,
+        price decimal(10,2) DEFAULT 0.00,
+        map longtext DEFAULT NULL,
+        status varchar(50) DEFAULT 'draft',
+        updated_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+        PRIMARY KEY  (id)
+    ) {$wpdb->get_charset_collate()};";
+}
+
+/**
+ * Returns the CREATE TABLE SQL for the `{prefix}ls_img` table.
+ *
+ * This table stores a gallery of images for each listing.
+ * - property_id: Foreign key to ls_listings.id.
+ * - image:       Full URL or path to the image file.
+ *
+ * @return string SQL statement.
+ */
+function leb_get_ls_img_schema() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ls_img';
+    return "CREATE TABLE $table_name (
+        id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        property_id bigint(20) UNSIGNED NOT NULL,
+        image text NOT NULL,
+        PRIMARY KEY  (id),
+        KEY property_id (property_id)
+    ) {$wpdb->get_charset_collate()};";
+}
+
+/**
+ * Returns the CREATE TABLE SQL for the `{prefix}ls_block_date` table.
+ *
+ * This table manages availability by "blocking" certain dates for a property.
+ * - property_id: Foreign key to ls_listings.id.
+ * - dates:       A list or JSON string of blocked calendar dates.
+ *
+ * @return string SQL statement.
+ */
+function leb_get_ls_block_date_schema() {
+    global $wpdb;
+
+    $table_name      = $wpdb->prefix . 'ls_block_date';
+    $charset_collate = $wpdb->get_charset_collate();
+
+    return "CREATE TABLE {$table_name} (
+  id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  property_id bigint(20) UNSIGNED NOT NULL,
+  dates longtext NOT NULL,
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY  (id)
 ) {$charset_collate};";
 }
 

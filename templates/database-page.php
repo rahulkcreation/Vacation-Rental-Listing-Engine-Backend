@@ -13,8 +13,24 @@ if (! defined('ABSPATH')) {
 
 // On initial PHP render get the status of all tables.
 global $wpdb;
-$leb_types_table = $wpdb->prefix . 'ls_types';
-$leb_status      = leb_check_table_status($leb_types_table);
+
+$leb_types_table       = $wpdb->prefix . 'ls_types';
+$leb_status            = leb_check_table_status( $leb_types_table );
+
+$leb_amenities_table   = $wpdb->prefix . 'ls_ameneties';
+$leb_amen_status       = leb_check_table_status( $leb_amenities_table );
+
+$leb_locations_table   = $wpdb->prefix . 'ls_location';
+$leb_loc_status        = leb_check_table_status( $leb_locations_table );
+
+$leb_listings_table    = $wpdb->prefix . 'ls_listings';
+$leb_listings_status   = leb_check_table_status( $leb_listings_table );
+
+$leb_img_table         = $wpdb->prefix . 'ls_img';
+$leb_img_status        = leb_check_table_status( $leb_img_table );
+
+$leb_block_date_table  = $wpdb->prefix . 'ls_block_date';
+$leb_block_date_status = leb_check_table_status( $leb_block_date_table );
 ?>
 <div id="leb-database-page" class="leb-wrap">
 
@@ -119,10 +135,6 @@ $leb_status      = leb_check_table_status($leb_types_table);
         </div><!-- end Amenities card -->
 
         <!-- Locations Table Card -->
-        <?php
-        $leb_locations_table = $wpdb->prefix . 'ls_location';
-        $leb_loc_status       = leb_check_table_status( $leb_locations_table );
-        ?>
         <div class="leb-db-card" id="leb-db-card-ls_location">
             <h2 class="leb-db-card-title"><?php esc_html_e( 'Locations Table', 'listing-engine-backend' ); ?></h2>
 
@@ -158,6 +170,117 @@ $leb_status      = leb_check_table_status($leb_types_table);
                 </button>
             </div>
         </div><!-- end Locations card -->
+
+        <!-- Listings Table Card -->
+        <div class="leb-db-card" id="leb-db-card-ls_listings">
+            <h2 class="leb-db-card-title"><?php esc_html_e( 'Listings Table', 'listing-engine-backend' ); ?></h2>
+
+            <div class="leb-db-statuses" id="leb-db-statuses-ls_listings">
+                <?php leb_render_db_card_statuses( $leb_listings_status ); ?>
+            </div>
+
+            <div class="leb-db-actions">
+                <button
+                    class="leb-db-btn leb-db-btn--refresh"
+                    id="leb-db-refresh-ls_listings"
+                    data-table-key="ls_listings"
+                    aria-label="<?php esc_attr_e( 'Refresh listings table status', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Refresh', 'listing-engine-backend' ); ?></span>
+                </button>
+
+                <button
+                    class="leb-db-btn leb-db-btn--repair"
+                    id="leb-db-repair-ls_listings"
+                    data-table-key="ls_listings"
+                    aria-label="<?php esc_attr_e( 'Create or repair listings table', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Create / Repair', 'listing-engine-backend' ); ?></span>
+                </button>
+            </div>
+        </div><!-- end Listings card -->
+
+        <!-- Images Table Card -->
+        <div class="leb-db-card" id="leb-db-card-ls_img">
+            <h2 class="leb-db-card-title"><?php esc_html_e( 'Images Table', 'listing-engine-backend' ); ?></h2>
+
+            <div class="leb-db-statuses" id="leb-db-statuses-ls_img">
+                <?php leb_render_db_card_statuses( $leb_img_status ); ?>
+            </div>
+
+            <div class="leb-db-actions">
+                <button
+                    class="leb-db-btn leb-db-btn--refresh"
+                    id="leb-db-refresh-ls_img"
+                    data-table-key="ls_img"
+                    aria-label="<?php esc_attr_e( 'Refresh images table status', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Refresh', 'listing-engine-backend' ); ?></span>
+                </button>
+
+                <button
+                    class="leb-db-btn leb-db-btn--repair"
+                    id="leb-db-repair-ls_img"
+                    data-table-key="ls_img"
+                    aria-label="<?php esc_attr_e( 'Create or repair images table', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Create / Repair', 'listing-engine-backend' ); ?></span>
+                </button>
+            </div>
+        </div><!-- end Images card -->
+
+        <!-- Block Dates Table Card -->
+        <div class="leb-db-card" id="leb-db-card-ls_block_date">
+            <h2 class="leb-db-card-title"><?php esc_html_e( 'Block Dates Table', 'listing-engine-backend' ); ?></h2>
+
+            <div class="leb-db-statuses" id="leb-db-statuses-ls_block_date">
+                <?php leb_render_db_card_statuses( $leb_block_date_status ); ?>
+            </div>
+
+            <div class="leb-db-actions">
+                <button
+                    class="leb-db-btn leb-db-btn--refresh"
+                    id="leb-db-refresh-ls_block_date"
+                    data-table-key="ls_block_date"
+                    aria-label="<?php esc_attr_e( 'Refresh block dates table status', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Refresh', 'listing-engine-backend' ); ?></span>
+                </button>
+
+                <button
+                    class="leb-db-btn leb-db-btn--repair"
+                    id="leb-db-repair-ls_block_date"
+                    data-table-key="ls_block_date"
+                    aria-label="<?php esc_attr_e( 'Create or repair block dates table', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Create / Repair', 'listing-engine-backend' ); ?></span>
+                </button>
+            </div>
+        </div><!-- end Block Dates card -->
 
     </div><!-- /.leb-db-grid -->
 

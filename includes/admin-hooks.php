@@ -427,6 +427,30 @@ function leb_ajax_db_status() {
                 'exists'        => leb_check_table_status( $wpdb->prefix . 'ls_location' )['exists'],
                 'rows_complete' => leb_check_table_status( $wpdb->prefix . 'ls_location' )['rows_complete'],
             ],
+            // Listings Table Status.
+            [
+                'key'           => 'ls_listings',
+                'title'         => __( 'Listings Table', 'listing-engine-backend' ),
+                'table_name'    => $wpdb->prefix . 'ls_listings',
+                'exists'        => leb_check_table_status( $wpdb->prefix . 'ls_listings' )['exists'],
+                'rows_complete' => leb_check_table_status( $wpdb->prefix . 'ls_listings' )['rows_complete'],
+            ],
+            // Images Table Status.
+            [
+                'key'           => 'ls_img',
+                'title'         => __( 'Images Table', 'listing-engine-backend' ),
+                'table_name'    => $wpdb->prefix . 'ls_img',
+                'exists'        => leb_check_table_status( $wpdb->prefix . 'ls_img' )['exists'],
+                'rows_complete' => leb_check_table_status( $wpdb->prefix . 'ls_img' )['rows_complete'],
+            ],
+            // Block Dates Table Status.
+            [
+                'key'           => 'ls_block_date',
+                'title'         => __( 'Block Dates Table', 'listing-engine-backend' ),
+                'table_name'    => $wpdb->prefix . 'ls_block_date',
+                'exists'        => leb_check_table_status( $wpdb->prefix . 'ls_block_date' )['exists'],
+                'rows_complete' => leb_check_table_status( $wpdb->prefix . 'ls_block_date' )['rows_complete'],
+            ],
         ],
     ] );
 }
@@ -452,6 +476,15 @@ function leb_ajax_db_create_repair() {
         $result = $handler->create_or_repair_amenities_table();
     } elseif ( $table_key === 'ls_location' ) {
         $result = $handler->create_or_repair_locations_table();
+    } elseif ( $table_key === 'ls_listings' ) {
+        // Repair Listings table.
+        $result = $handler->create_or_repair_listings_table();
+    } elseif ( $table_key === 'ls_img' ) {
+        // Repair Images table.
+        $result = $handler->create_or_repair_ls_img_table();
+    } elseif ( $table_key === 'ls_block_date' ) {
+        // Repair Block Dates table.
+        $result = $handler->create_or_repair_ls_block_date_table();
     } else {
         wp_send_json_error( [ 'message' => __( 'Unknown table key.', 'listing-engine-backend' ) ] );
     }

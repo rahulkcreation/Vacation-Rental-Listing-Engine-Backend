@@ -28,6 +28,13 @@ class LEB_Database_Handler {
     private string $types_table;
 
     /**
+     * The fully-qualified name of the ls_ameneties table.
+     *
+     * @var string
+     */
+    private string $amenities_table;
+
+    /**
      * The fully-qualified name of the ls_location table.
      *
      * @var string
@@ -35,17 +42,42 @@ class LEB_Database_Handler {
     private string $locations_table;
 
     /**
+     * The fully-qualified name of the ls_listings table.
+     *
+     * @var string
+     */
+    private string $listings_table;
+
+    /**
+     * The fully-qualified name of the ls_img table.
+     *
+     * @var string
+     */
+    private string $ls_img_table;
+
+    /**
+     * The fully-qualified name of the ls_block_date table.
+     *
+     * @var string
+     */
+    private string $ls_block_date_table;
+
+    /**
      * Constructor – resolves table names with the WP prefix.
      */
     public function __construct() {
         global $wpdb;
-        $this->types_table     = $wpdb->prefix . 'ls_types';
-        $this->amenities_table = $wpdb->prefix . 'ls_ameneties';
-        $this->locations_table = $wpdb->prefix . 'ls_location';
+        $this->types_table      = $wpdb->prefix . 'ls_types';
+        $this->amenities_table  = $wpdb->prefix . 'ls_ameneties';
+        $this->locations_table  = $wpdb->prefix . 'ls_location';
+        $this->listings_table   = $wpdb->prefix . 'ls_listings';
+        $this->ls_img_table     = $wpdb->prefix . 'ls_img';
+        $this->ls_block_date_table = $wpdb->prefix . 'ls_block_date';
     }
 
     // ─────────────────────────────────────────────────────────
-    // Table Maintenance
+    // SECTION 1: GLOBAL LOOKUP TABLES MAINTENANCE
+    // (Types, Amenities, Locations)
     // ─────────────────────────────────────────────────────────
 
     /**
@@ -69,7 +101,7 @@ class LEB_Database_Handler {
             return new WP_Error( 'leb_table_create_failed', __( 'Table could not be created. Check database permissions.', 'listing-engine-backend' ) );
         }
 
-        // Insert any missing default rows.
+        // Insert any missing default rows (if any defined in db-schema.php).
         $this->seed_default_rows();
 
         return true;
@@ -788,5 +820,79 @@ class LEB_Database_Handler {
             $count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$this->locations_table}` WHERE slug = %s", $slug ) );
         }
         return (bool) $count;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // SECTION 2: PROPERTY LISTING DATA TABLES MAINTENANCE
+    // (Listings, Images, Block Dates)
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Create or repair the ls_listings table.
+     *
+     * @return true|WP_Error
+     */
+    /**
+     * Create or repair the 'ls_listings' table.
+     * 
+     * This is the main table that stores user-submitted property listings.
+     *
+     * @return true|WP_Error
+     */
+    public function create_or_repair_listings_table() {
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        $sql = leb_get_listings_schema();
+        dbDelta( $sql );
+        $status = leb_check_table_status( $this->listings_table );
+        if ( ! $status['exists'] ) {
+            return new WP_Error( 'leb_listings_table_create_failed', __( 'Listings table could not be created. Check database permissions.', 'listing-engine-backend' ) );
+        }
+        return true;
+    }
+
+    /**
+     * Create or repair the ls_img table.
+     *
+     * @return true|WP_Error
+     */
+    /**
+     * Create or repair the 'ls_img' table.
+     * 
+     * Handles images linked to properties via property_id.
+     *
+     * @return true|WP_Error
+     */
+    public function create_or_repair_ls_img_table() {
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        $sql = leb_get_ls_img_schema();
+        dbDelta( $sql );
+        $status = leb_check_table_status( $this->ls_img_table );
+        if ( ! $status['exists'] ) {
+            return new WP_Error( 'leb_ls_img_table_create_failed', __( 'Images table could not be created. Check database permissions.', 'listing-engine-backend' ) );
+        }
+        return true;
+    }
+
+    /**
+     * Create or repair the ls_block_date table.
+     *
+     * @return true|WP_Error
+     */
+    /**
+     * Create or repair the 'ls_block_date' table.
+     * 
+     * Handles blocked calendar dates for property availability.
+     *
+     * @return true|WP_Error
+     */
+    public function create_or_repair_ls_block_date_table() {
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        $sql = leb_get_ls_block_date_schema();
+        dbDelta( $sql );
+        $status = leb_check_table_status( $this->ls_block_date_table );
+        if ( ! $status['exists'] ) {
+            return new WP_Error( 'leb_ls_block_date_table_create_failed', __( 'Block Date table could not be created. Check database permissions.', 'listing-engine-backend' ) );
+        }
+        return true;
     }
 }
