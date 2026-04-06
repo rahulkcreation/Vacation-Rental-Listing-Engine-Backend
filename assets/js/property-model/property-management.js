@@ -349,14 +349,20 @@
                 const id = parseInt(btn.dataset.id, 10);
                 if (!id) return;
 
-                LEB_Confirm.show('Are you sure you want to delete this property?', function () {
-                    // Corrected action: leb_listing_delete_listing (singular)
-                    performAJAXAction('leb_listing_delete_listing', [id], 'Property deleted successfully.', function () {
-                        if (DOM.body.children.length === 1 && lebPmState.page > 1) {
-                            lebPmState.page--;
-                        }
-                        fetchListings();
-                    });
+                LEB_Confirm.show({
+                    title:       'Delete Property',
+                    message:     'Are you sure you want to delete this property? This action cannot be undone.',
+                    confirmText: 'Delete',
+                    cancelText:  'Cancel',
+                    type:        'leb-warning',
+                    onConfirm: function () {
+                        performAJAXAction('leb_listing_delete_listing', [id], 'Property deleted successfully.', function () {
+                            if (DOM.body.children.length === 1 && lebPmState.page > 1) {
+                                lebPmState.page--;
+                            }
+                            fetchListings();
+                        });
+                    }
                 });
             });
         }
@@ -402,14 +408,21 @@
             successMsg = 'Properties updated.';
         }
 
-        LEB_Confirm.show(confirmMsg, function () {
-            performAJAXAction(action, ids, successMsg, function () {
-                lebPmState.selected.clear();
-                if (actionType === 'delete' && DOM.body.children.length <= ids.length && lebPmState.page > 1) {
-                    lebPmState.page--;
-                }
-                fetchListings();
-            }, (actionType !== 'delete' ? actionType : null));
+        LEB_Confirm.show({
+            title:       actionType === 'delete' ? 'Delete Properties' : 'Change Status',
+            message:     confirmMsg,
+            confirmText: actionType === 'delete' ? 'Delete' : 'Confirm',
+            cancelText:  'Cancel',
+            type:        actionType === 'delete' ? 'leb-warning' : 'leb-info',
+            onConfirm: function () {
+                performAJAXAction(action, ids, successMsg, function () {
+                    lebPmState.selected.clear();
+                    if (actionType === 'delete' && DOM.body.children.length <= ids.length && lebPmState.page > 1) {
+                        lebPmState.page--;
+                    }
+                    fetchListings();
+                }, (actionType !== 'delete' ? actionType : null));
+            }
         });
     }
 
@@ -448,7 +461,7 @@
     }
 
     /**
-     * Generic AJAX action helper for bulk publish / draft / delete.
+     * Generic AJAX action helper for single and bulk publish / draft / delete.
      *
      * @param {string}   action     WordPress AJAX action name.
      * @param {number[]} ids        Array of listing IDs.
@@ -457,8 +470,22 @@
      * @param {string}   [newStatus] Optional status for bulk-status actions.
      */
     function performAJAXAction(action, ids, successMsg, onSuccess, newStatus) {
-        const data = { action: action, nonce: LEB_Ajax.nonce, ids: ids };
-        if (newStatus) data.status = newStatus;
+        const data = {
+            action: action,
+            nonce:  LEB_Ajax.nonce
+        };
+
+        // If it's a single delete or get, send singular 'id' along with 'ids'
+        if (ids && ids.length === 1) {
+            data.id = ids[0];
+        }
+        
+        // Always send ids as an array for bulk handlers
+        data.ids = ids;
+
+        if (newStatus) {
+            data.status = newStatus;
+        }
 
         jQuery.post(LEB_Ajax.ajax_url, data, function (res) {
             if (res.success) {

@@ -1189,6 +1189,13 @@ function leb_ajax_listing_delete_listing()
     }
 
     $id = isset($_POST['id']) ? absint($_POST['id']) : 0;
+
+    // Fallback: Check if ids array was sent instead
+    if (! $id && ! empty($_POST['ids'])) {
+        $ids = (array) $_POST['ids'];
+        $id  = absint(reset($ids));
+    }
+
     if (! $id) {
         wp_send_json_error(['message' => __('Invalid ID.', 'listing-engine-backend')]);
     }
@@ -1214,6 +1221,12 @@ function leb_ajax_listing_bulk_delete()
     }
 
     $ids = isset($_POST['ids']) ? (array) $_POST['ids'] : [];
+
+    // Fallback: Check if singular id was sent instead
+    if (empty($ids) && ! empty($_POST['id'])) {
+        $ids = [absint($_POST['id'])];
+    }
+
     $ids = array_filter(array_map('absint', $ids));
 
     if (empty($ids)) {
@@ -1242,7 +1255,13 @@ function leb_ajax_listing_bulk_status()
 
     $ids    = isset($_POST['ids'])    ? (array) $_POST['ids']    : [];
     $status = isset($_POST['status']) ? sanitize_text_field(wp_unslash($_POST['status'])) : '';
-    $ids    = array_filter(array_map('absint', $ids));
+
+    // Fallback: Check if singular id was sent instead
+    if (empty($ids) && ! empty($_POST['id'])) {
+        $ids = [absint($_POST['id'])];
+    }
+
+    $ids = array_filter(array_map('absint', $ids));
 
     if (empty($ids) || empty($status)) {
         wp_send_json_error(['message' => __('IDs and status are required.', 'listing-engine-backend')]);
