@@ -132,6 +132,7 @@ function leb_get_listings_schema() {
         title varchar(255) NOT NULL,
         location longtext NOT NULL,
         ameneties longtext DEFAULT NULL,
+        type varchar(255) DEFAULT NULL,
         guests int(11) DEFAULT 0,
         bedroom int(11) DEFAULT 0,
         bed int(11) DEFAULT 0,

@@ -370,7 +370,7 @@
     /* ===== SECTION 6: TWO DROPDOWNS ===== */
     .dropdowns-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
     }
 
@@ -1073,6 +1073,22 @@
       <!-- SECTION 6: TWO DROPDOWNS -->
       <div class="form-section">
         <div class="dropdowns-grid">
+          <!-- Property Type Single-Select -->
+          <div class="custom-select-wrapper" id="typeSelectWrapper">
+            <label class="form-label">Property Type</label>
+            <div class="custom-select-trigger" id="typeTrigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select property type">
+              <span id="typeSelectedDisplay">
+                <span class="placeholder">Select type...</span>
+              </span>
+              <svg class="arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </div>
+            <div class="custom-select-dropdown" id="typeDropdown" role="listbox" aria-label="Property type options">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
           <!-- Amenities Multi-Select -->
           <div class="custom-select-wrapper" id="amenitiesSelectWrapper">
             <label class="form-label">Amenities</label>
@@ -1335,6 +1351,54 @@
     // ============================
     // SECTION 6: CUSTOM DROPDOWNS
     // ============================
+
+    // --- Property Type Single-Select ---
+    const typeOptions = ['Apartment', 'Villa', 'Cabin', 'Cottage', 'House', 'Studio', 'Penthouse'];
+    let selectedType = null;
+
+    const typeTrigger = document.getElementById('typeTrigger');
+    const typeDropdown = document.getElementById('typeDropdown');
+    const typeSelectedDisplay = document.getElementById('typeSelectedDisplay');
+
+    function renderTypeOptions() {
+      typeDropdown.innerHTML = '';
+      typeOptions.forEach(opt => {
+        const div = document.createElement('div');
+        div.className = 'custom-select-option single-select-option' + (selectedType === opt ? ' selected' : '');
+        div.setAttribute('role', 'option');
+        div.setAttribute('aria-selected', selectedType === opt);
+        div.textContent = opt;
+        div.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectedType = opt;
+          renderTypeOptions();
+          typeSelectedDisplay.innerHTML = `<span class="selected-single">${opt}</span>`;
+          typeDropdown.classList.remove('open');
+          typeTrigger.classList.remove('open');
+          typeTrigger.setAttribute('aria-expanded', 'false');
+        });
+        typeDropdown.appendChild(div);
+      });
+    }
+
+    typeTrigger.addEventListener('click', () => {
+      const isOpen = typeDropdown.classList.contains('open');
+      closeAllDropdowns();
+      if (!isOpen) {
+        typeDropdown.classList.add('open');
+        typeTrigger.classList.add('open');
+        typeTrigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    typeTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        typeTrigger.click();
+      }
+    });
+
+    renderTypeOptions();
 
     // --- Amenities Multi-Select ---
     const amenitiesOptions = ['WiFi', 'Pool', 'Parking', 'Air Conditioning', 'Full Kitchen', 'TV/Cable', 'Gym', 'Washing Machine', 'Hot Tub', 'Beach Access', 'Pet Friendly', 'Elevator'];
@@ -1721,6 +1785,15 @@
       // Price
       const price = document.getElementById('pricePerNight');
       if (!validateField(price, parseFloat(price.value) > 0)) valid = false;
+
+      // Property Type
+      if (!selectedType) {
+        showToast('Please select a Property Type.', 'error');
+        typeTrigger.classList.add('error');
+        valid = false;
+      } else {
+        typeTrigger.classList.remove('error');
+      }
 
       // Email
       const email = document.getElementById('emailAddress');
