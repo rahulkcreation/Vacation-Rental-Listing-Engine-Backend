@@ -291,6 +291,30 @@ class LEB_Database_Handler {
         return true;
     }
 
+    /**
+     * Delete multiple type records by their IDs.
+     *
+     * @param array $ids Array of row IDs to delete.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function delete_types( array $ids ) {
+        global $wpdb;
+
+        if ( empty( $ids ) ) {
+            return true;
+        }
+
+        $ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+        $query           = $wpdb->prepare( "DELETE FROM {$this->types_table} WHERE id IN ($ids_placeholder)", $ids );
+        $deleted         = $wpdb->query( $query );
+
+        if ( false === $deleted ) {
+            return new WP_Error( 'leb_bulk_delete_failed', __( 'Failed to delete selected types. Please try again.', 'listing-engine-backend' ) );
+        }
+
+        return true;
+    }
+
     // ─────────────────────────────────────────────────────────
     // Internal Helpers
     // ─────────────────────────────────────────────────────────

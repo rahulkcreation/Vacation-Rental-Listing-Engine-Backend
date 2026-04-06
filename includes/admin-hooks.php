@@ -129,7 +129,8 @@ add_action( 'wp_ajax_leb_update_type',     'leb_ajax_update_type' );
 add_action( 'wp_ajax_leb_get_type',        'leb_ajax_get_type' );
 
 // -- Types: Delete --
-add_action( 'wp_ajax_leb_delete_type',     'leb_ajax_delete_type' );
+add_action( 'wp_ajax_leb_delete_type',      'leb_ajax_delete_type' );
+add_action( 'wp_ajax_leb_bulk_delete_types', 'leb_ajax_bulk_delete_types' );
 
 // -- Database: Refresh table status --
 add_action( 'wp_ajax_leb_db_status',       'leb_ajax_db_status' );
@@ -262,6 +263,33 @@ function leb_ajax_delete_type() {
     }
 
     wp_send_json_success( [ 'message' => __( 'Type deleted successfully.', 'listing-engine-backend' ) ] );
+}
+
+/**
+ * AJAX: Delete multiple type entries (Bulk Action).
+ */
+function leb_ajax_bulk_delete_types() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $ids = isset( $_POST['ids'] ) ? (array) $_POST['ids'] : [];
+    $ids = array_filter( array_map( 'absint', $ids ) );
+
+    if ( empty( $ids ) ) {
+        wp_send_json_error( [ 'message' => __( 'No valid IDs provided.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->delete_types( $ids );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => sprintf( __( '%d types deleted successfully.', 'listing-engine-backend' ), count( $ids ) ) ] );
 }
 
 /**

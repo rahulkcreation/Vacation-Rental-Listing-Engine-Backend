@@ -142,6 +142,61 @@
     margin-bottom:    24px;
 }
 
+/* ── Bulk Actions Bar ───────────────────────────────────────── */
+#leb-type-list .leb-tl-bulk-actions {
+    display:          none; /* Hidden by default */
+    align-items:      center;
+    justify-content:  space-between;
+    background-color: var(--leb-secondary-color);
+    color:            var(--leb-white);
+    padding:          12px 20px;
+    border-radius:    14px;
+    margin-bottom:    20px;
+    box-shadow:       0 10px 25px rgba(0, 0, 0, 0.1);
+    animation:        lebFadeIn 0.3s ease;
+}
+
+#leb-type-list .leb-tl-bulk-actions.leb-active {
+    display: flex;
+}
+
+@keyframes lebFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+#leb-type-list .leb-tl-bulk-info {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+    font-size:   0.875rem;
+    font-weight: 500;
+}
+
+#leb-type-list .leb-tl-bulk-delete-btn {
+    background:    var(--leb-error-color);
+    color:         var(--leb-white);
+    border:        none;
+    border-radius: 8px;
+    padding:       8px 16px;
+    font-size:     0.8125rem;
+    font-weight:   600;
+    cursor:        pointer;
+    transition:    background 0.2s ease;
+    display:       flex;
+    align-items:   center;
+    gap:           6px;
+}
+
+#leb-type-list .leb-tl-bulk-delete-btn:hover {
+    background: #d00120;
+}
+
+#leb-type-list .leb-tl-bulk-delete-btn svg {
+    width:  16px;
+    height: 16px;
+}
+
 #leb-type-list .leb-tl-header-left {
     display:     flex;
     align-items: center;
@@ -305,6 +360,32 @@
     display:       flex;
     flex-direction: column;
     gap:           6px;
+    position:      relative;
+    padding-top:  35px; /* Spacing for checkbox */
+}
+
+/* Checkbox Styling */
+#leb-type-list .leb-tl-checkbox-wrap {
+    position:  absolute;
+    left:      15px;
+    top:       15px;
+    display:   flex;
+    align-items: center;
+}
+
+#leb-type-list input[type="checkbox"].leb-tl-checkbox {
+    width:              16px !important;
+    height:             16px !important;
+    cursor:             pointer;
+    accent-color:       var(--leb-primary-color);
+    border:             2px solid var(--leb-border-default);
+    border-radius:      4px;
+    transition:         all 0.2s ease;
+}
+
+#leb-type-list input[type=checkbox]:checked:before {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
 }
 
 #leb-type-list .leb-tl-card-row {
@@ -330,6 +411,18 @@
     color:       var(--leb-text-color);
     text-align:  right;
     word-break:  break-all;
+}
+
+#leb-type-list .leb-s-no {
+    padding: 5px;
+    border-radius: 100rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--leb-primary-color);
+    color: var(--leb-white) !important;
 }
 
 /* Card action row */

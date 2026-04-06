@@ -71,6 +71,18 @@ if ( ! defined( 'ABSPATH' ) ) {
     <!-- ── Data Table / Card List ──────────────────────────── -->
     <div class="leb-tl-table-wrap" id="leb-tl-table-wrap">
 
+        <!-- Bulk Actions Bar -->
+        <div id="leb-tl-bulk-actions" class="leb-tl-bulk-actions">
+            <div class="leb-tl-bulk-info">
+                <input type="checkbox" id="leb-tl-select-all" class="leb-tl-checkbox">
+                <span id="leb-tl-selected-count">0 selected</span>
+            </div>
+            <button type="button" class="leb-tl-bulk-delete-btn" onclick="lebBulkDelete()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>
+                Delete Selected
+            </button>
+        </div>
+
         <!-- Cards are injected here by JS -->
         <div class="leb-tl-cards-list" id="leb-tl-cards-list"
              aria-live="polite" aria-label="<?php esc_attr_e( 'Types list', 'listing-engine-backend' ); ?>">
@@ -91,13 +103,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
     'use strict';
 
     /* ── State ────────────────────────────────────────────────── */
-    var lebState = {
+    const lebState = {
         currentPage : 1,
         perPage     : 10,
         totalItems  : 0,
         searchTerm  : '',
         searchTimer : null,
         isLoading   : false,
+        selectedIds : []
     };
 
     /* ── DOM References ──────────────────────────────────────── */
@@ -161,19 +174,24 @@ document.addEventListener( 'DOMContentLoaded', function () {
     function lebRenderCards( items ) {
         if ( ! items || items.length === 0 ) {
             lebRenderEmpty( 'No types found.' );
+            lebUpdateBulkBar();
             return;
         }
 
         var html = '';
         items.forEach( function ( row, index ) {
-            var sno     = ( ( lebState.currentPage - 1 ) * lebState.perPage ) + index + 1;
-            var editUrl = '<?php echo esc_js( admin_url( 'admin.php?page=leb-types&leb_action=edit&id=' ) ); ?>' + encodeURIComponent( row.id );
+            var sno        = ( ( lebState.currentPage - 1 ) * lebState.perPage ) + index + 1;
+            var editUrl    = '<?php echo esc_js( admin_url( 'admin.php?page=leb-types&leb_action=edit&id=' ) ); ?>' + encodeURIComponent( row.id );
+            var isSelected = lebState.selectedIds.includes( parseInt( row.id ) );
 
             html += [
-                '<div class="leb-tl-card">',
+                '<div class="leb-tl-card" data-id="' + row.id + '">',
+                '  <div class="leb-tl-checkbox-wrap">',
+                '    <input type="checkbox" class="leb-tl-checkbox leb-tl-item-checkbox" value="' + row.id + '"' + ( isSelected ? ' checked' : '' ) + '>',
+                '  </div>',
                 '  <div class="leb-tl-card-row">',
                 '    <span class="leb-tl-card-label">S.No</span>',
-                '    <span class="leb-tl-card-value">' + sno + '</span>',
+                '    <span class="leb-tl-card-value leb-s-no">' + sno + '</span>',
                 '  </div>',
                 '  <div class="leb-tl-card-row">',
                 '    <span class="leb-tl-card-label">Name</span>',
@@ -210,6 +228,21 @@ document.addEventListener( 'DOMContentLoaded', function () {
         } );
         domCardsList.innerHTML = html;
 
+        // Bind Individual Checkboxes
+        domCardsList.querySelectorAll( '.leb-tl-item-checkbox' ).forEach( function ( cb ) {
+            cb.addEventListener( 'change', function () {
+                var id = parseInt( this.value );
+                if ( this.checked ) {
+                    if ( ! lebState.selectedIds.includes( id ) ) {
+                        lebState.selectedIds.push( id );
+                    }
+                } else {
+                    lebState.selectedIds = lebState.selectedIds.filter( function ( sid ) { return sid !== id; } );
+                }
+                lebUpdateBulkBar();
+            } );
+        } );
+
         // Bind Delete Buttons
         domCardsList.querySelectorAll( '.leb-tl-delete-btn' ).forEach( function ( btn ) {
             btn.addEventListener( 'click', function () {
@@ -218,6 +251,103 @@ document.addEventListener( 'DOMContentLoaded', function () {
                 lebConfirmDelete( id, name );
             } );
         } );
+
+        lebUpdateBulkBar();
+    }
+
+    /* ── Bulk Actions Support ────────────────────────────────── */
+    window.lebUpdateBulkBar = function () {
+        var bulkBar       = document.getElementById( 'leb-tl-bulk-actions' );
+        var selectedCount = document.getElementById( 'leb-tl-selected-count' );
+        var selectAll     = document.getElementById( 'leb-tl-select-all' );
+        var pageChecks    = domCardsList.querySelectorAll( '.leb-tl-item-checkbox' );
+        
+        if ( lebState.selectedIds.length > 0 ) {
+            bulkBar.classList.add( 'leb-active' );
+            selectedCount.textContent = lebState.selectedIds.length + ' selected';
+        } else {
+            bulkBar.classList.remove( 'leb-active' );
+        }
+
+        // Sync Select All checkbox
+        if ( pageChecks.length > 0 ) {
+            var allChecked = true;
+            pageChecks.forEach( function ( cb ) { if ( ! cb.checked ) { allChecked = false; } } );
+            selectAll.checked = allChecked;
+        } else {
+            selectAll.checked = false;
+        }
+    };
+
+    document.getElementById( 'leb-tl-select-all' ).addEventListener( 'change', function ( e ) {
+        var isChecked  = e.target.checked;
+        var pageChecks = domCardsList.querySelectorAll( '.leb-tl-item-checkbox' );
+        
+        pageChecks.forEach( function ( cb ) {
+            var id = parseInt( cb.value );
+            cb.checked = isChecked;
+            if ( isChecked ) {
+                if ( ! lebState.selectedIds.includes( id ) ) { lebState.selectedIds.push( id ); }
+            } else {
+                lebState.selectedIds = lebState.selectedIds.filter( function ( sid ) { return sid !== id; } );
+            }
+        } );
+        lebUpdateBulkBar();
+    } );
+
+    window.lebBulkDelete = function () {
+        if ( lebState.selectedIds.length === 0 ) { return; }
+
+        if ( typeof LEB_Confirm === 'undefined' ) {
+            if ( confirm( 'Delete ' + lebState.selectedIds.length + ' selected types?' ) ) {
+                lebPerformBulkDelete();
+            }
+            return;
+        }
+
+        LEB_Confirm.show( {
+            title       : 'Delete Selected?',
+            message     : 'Are you sure you want to delete ' + lebState.selectedIds.length + ' selected items? This cannot be undone.',
+            confirmText : 'Delete All',
+            type        : 'leb-warning',
+            onConfirm   : function () {
+                lebPerformBulkDelete();
+            }
+        } );
+    };
+
+    function lebPerformBulkDelete() {
+        var formData = new FormData();
+        formData.append( 'action', 'leb_bulk_delete_types' );
+        formData.append( 'nonce',  nonce );
+        lebState.selectedIds.forEach( function ( id ) {
+            formData.append( 'ids[]', id );
+        } );
+
+        lebShowLoading();
+
+        fetch( ajaxUrl, { method: 'POST', body: formData, credentials: 'same-origin' } )
+            .then( function ( r ) { return r.json(); } )
+            .then( function ( data ) {
+                lebHideLoading();
+                if ( data.success ) {
+                    if ( typeof LEB_Toaster !== 'undefined' ) {
+                        LEB_Toaster.show( data.data.message || 'Batch deleted.', 'success' );
+                    }
+                    lebState.selectedIds = [];
+                    lebFetchTypes();
+                } else {
+                    if ( typeof LEB_Toaster !== 'undefined' ) {
+                        LEB_Toaster.show( data.data.message || 'Bulk delete failed.', 'error' );
+                    }
+                }
+            } )
+            .catch( function () {
+                lebHideLoading();
+                if ( typeof LEB_Toaster !== 'undefined' ) {
+                    LEB_Toaster.show( 'Network error during bulk delete.', 'error' );
+                }
+            } );
     }
 
     /* ── Render: Pagination ──────────────────────────────────── */

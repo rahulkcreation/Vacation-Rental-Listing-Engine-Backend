@@ -103,11 +103,11 @@ function leb_enqueue_global_styles() {
 function leb_enqueue_toaster_assets() {
     // Toast Notification system.
     wp_register_style( 'leb-toaster',  LEB_PLUGIN_URL . 'assets/css/leb-toaster.css', [], LEB_VERSION );
-    wp_register_script( 'leb-toaster', LEB_PLUGIN_URL . 'assets/js/leb-toaster.js',   [], LEB_VERSION, true );
+    wp_register_script( 'leb-toaster', LEB_PLUGIN_URL . 'assets/js/leb-toaster.js',   [], LEB_VERSION, false );
 
     // Confirmation Modal system.
     wp_register_style( 'leb-confirmation',  LEB_PLUGIN_URL . 'assets/css/leb-confirmation.css', [], LEB_VERSION );
-    wp_register_script( 'leb-confirmation', LEB_PLUGIN_URL . 'assets/js/leb-confirmation.js',   [], LEB_VERSION, true );
+    wp_register_script( 'leb-confirmation', LEB_PLUGIN_URL . 'assets/js/leb-confirmation.js',   [], LEB_VERSION, false );
 
     wp_enqueue_style( 'leb-toaster' );
     wp_enqueue_script( 'leb-toaster' );

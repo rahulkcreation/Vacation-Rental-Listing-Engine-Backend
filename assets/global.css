@@ -56,3 +56,20 @@
     --leb-overlay-dark:     rgba(0, 0, 0, 0.15); /* Darker backdrop for modals */
     --leb-white-alpha-40:   rgba(255, 255, 255, 0.4);
 }
+
+/* ============================================
+ * Global UI Overrides
+ * ============================================ */
+
+/* Remove default browser/WordPress outline and focus shadow centrally */
+*:focus,
+*:focus-visible,
+*:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Reset WordPress default paragraph margin */
+p {
+    margin: 0;
+}
