@@ -1111,6 +1111,11 @@ class LEB_Database_Handler
     {
         global $wpdb;
 
+        $amenities = $data['amenities'] ?? '';
+        if (is_array($amenities)) {
+            $amenities = json_encode($amenities);
+        }
+
         $inserted = $wpdb->insert(
             $this->listings_table,
             [
@@ -1124,7 +1129,7 @@ class LEB_Database_Handler
                 'price'       => absint($data['price'] ?? 0),
                 'type'        => sanitize_text_field($data['type'] ?? ''),
                 'location'    => sanitize_text_field($data['location'] ?? ''),
-                'amenities'   => sanitize_text_field($data['amenities'] ?? ''),
+                'amenities'   => sanitize_text_field($amenities),
                 'status'      => sanitize_text_field($data['status'] ?? 'draft'),
                 'updated_at'  => current_time('mysql'),
             ],
@@ -1139,6 +1144,10 @@ class LEB_Database_Handler
 
         // Save images (single row per property).
         $images_json = $data['images'] ?? '[]';
+        if (is_array($images_json)) {
+            $images_json = json_encode($images_json);
+        }
+
         $wpdb->insert(
             $this->ls_img_table,
             [
@@ -1150,6 +1159,10 @@ class LEB_Database_Handler
 
         // Save blocked dates (single row per property).
         $dates_json = $data['dates'] ?? '[]';
+        if (is_array($dates_json)) {
+            $dates_json = json_encode($dates_json);
+        }
+
         if (! empty($dates_json) && '[]' !== $dates_json) {
             $wpdb->insert(
                 $this->ls_block_date_table,
@@ -1176,6 +1189,11 @@ class LEB_Database_Handler
     {
         global $wpdb;
 
+        $amenities = $data['amenities'] ?? '';
+        if (is_array($amenities)) {
+            $amenities = json_encode($amenities);
+        }
+
         $updated = $wpdb->update(
             $this->listings_table,
             [
@@ -1188,7 +1206,7 @@ class LEB_Database_Handler
                 'price'       => absint($data['price'] ?? 0),
                 'type'        => sanitize_text_field($data['type'] ?? ''),
                 'location'    => sanitize_text_field($data['location'] ?? ''),
-                'amenities'   => sanitize_text_field($data['amenities'] ?? ''),
+                'amenities'   => sanitize_text_field($amenities),
                 'status'      => sanitize_text_field($data['status'] ?? 'draft'),
                 'updated_at'  => current_time('mysql'),
             ],
@@ -1203,6 +1221,10 @@ class LEB_Database_Handler
 
         // Update images: delete existing row, insert fresh.
         $images_json = $data['images'] ?? '[]';
+        if (is_array($images_json)) {
+            $images_json = json_encode($images_json);
+        }
+
         $wpdb->delete($this->ls_img_table, ['property_id' => $id], ['%d']);
         $wpdb->insert(
             $this->ls_img_table,
@@ -1215,6 +1237,10 @@ class LEB_Database_Handler
 
         // Update blocked dates: delete existing, insert fresh.
         $dates_json = $data['dates'] ?? '[]';
+        if (is_array($dates_json)) {
+            $dates_json = json_encode($dates_json);
+        }
+
         $wpdb->delete($this->ls_block_date_table, ['property_id' => $id], ['%d']);
         if (! empty($dates_json) && '[]' !== $dates_json) {
             $wpdb->insert(

@@ -177,6 +177,7 @@ form#propertyForm {
 .leb-aep-select-trigger.error {
     border-color: var(--leb-error-color) !important;
     background: var(--leb-error-light-bg) !important;
+    margin: 0px !important;
 }
 
 .leb-aep-input.success,

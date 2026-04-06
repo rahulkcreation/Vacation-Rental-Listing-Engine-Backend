@@ -635,7 +635,11 @@
                 try {
                     const imgs = typeof d.images === 'string' ? JSON.parse(d.images) : d.images;
                     state.images = imgs.map(function (img, i) {
-                        return { id: img.attachment_id || 0, url: img.image_url, sort_order: img.sort_order || i };
+                        return { 
+                            id:         img.id || img.attachment_id || 0, 
+                            url:        img.url || img.image_url || '', 
+                            sort_order: img.sort_order || i 
+                        };
                     });
                     renderImages();
                 } catch (e) { console.error('Image parse error', e); }
@@ -643,20 +647,29 @@
 
             /* Amenities */
             if (d.amenities) {
-                let ids = [];
                 try {
-                    ids = JSON.parse(d.amenities);
-                    if (!Array.isArray(ids)) ids = [ids];
-                } catch { ids = String(d.amenities).split(','); }
-                state.amenityIds = new Set(ids.filter(Boolean).map(Number));
-                // Sync checkboxes
-                DOM.amenDropdown.querySelectorAll('.leb-aep-select-option').forEach(function (opt) {
-                    if (state.amenityIds.has(parseInt(opt.dataset.value, 10))) {
-                        opt.classList.add('selected');
-                        opt.querySelector('.leb-aep-checkbox').textContent = '✓';
+                    let ids = typeof d.amenities === 'string' ? JSON.parse(d.amenities) : d.amenities;
+                    if (!Array.isArray(ids)) {
+                        // Fallback: if it's a comma-separated string instead of JSON array
+                        ids = String(d.amenities).split(',').map(Number).filter(n => !isNaN(n));
                     }
-                });
-                renderAmenityTags();
+                    state.amenityIds = new Set(ids.map(Number));
+                    
+                    // Sync checkboxes and UI classes
+                    DOM.amenDropdown.querySelectorAll('.leb-aep-select-option').forEach(function (opt) {
+                        const val = parseInt(opt.dataset.value, 10);
+                        if (state.amenityIds.has(val)) {
+                            opt.classList.add('selected');
+                            const indicator = opt.querySelector('.leb-aep-checkbox');
+                            if (indicator) indicator.textContent = '✓';
+                        }
+                    });
+                    renderAmenityTags();
+                } catch (e) {
+                    console.error('Amenities parse error', e);
+                    // Minimal fallback
+                    renderAmenityTags();
+                }
             }
 
             /* Blocked dates */
@@ -781,10 +794,10 @@
                 status:      state.status,
                 /* PHP expects amenities as a JSON-encoded string */
                 amenities:   JSON.stringify(Array.from(state.amenityIds)),
-                /* PHP handler key is 'images' (serialised array sent via jQuery) */
-                images:      state.images,
+                /* PHP handler key is 'images' (JSON stringified) */
+                images:      JSON.stringify(state.images),
                 /* PHP handler key is 'dates' (not 'blocked_dates') */
-                dates:       Array.from(state.blockedDates),
+                dates:       JSON.stringify(Array.from(state.blockedDates)),
             };
 
             /* Add ID only for update */
@@ -860,8 +873,8 @@
             location:    state.locationId,
             status:      state.status,
             amenities:   JSON.stringify(Array.from(state.amenityIds)),
-            images:      state.images,
-            dates:       Array.from(state.blockedDates),
+            images:      JSON.stringify(state.images),
+            dates:       JSON.stringify(Array.from(state.blockedDates)),
         };
 
         if (isEdit) payload.id = state.id;
