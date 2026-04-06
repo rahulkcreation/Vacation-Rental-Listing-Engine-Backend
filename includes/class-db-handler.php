@@ -1282,6 +1282,26 @@ class LEB_Database_Handler
     {
         global $wpdb;
 
+        // Fetch and delete associated Media Library attachments first.
+        $images_row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT image FROM `{$this->ls_img_table}` WHERE property_id = %d LIMIT 1",
+                $id
+            )
+        );
+
+        if ($images_row && ! empty($images_row->image)) {
+            $images = json_decode($images_row->image, true);
+            if (is_array($images)) {
+                foreach ($images as $img) {
+                    $attachment_id = $img['id'] ?? null;
+                    if ($attachment_id) {
+                        wp_delete_attachment($attachment_id, true);
+                    }
+                }
+            }
+        }
+
         // Cascade: remove related images and block dates first.
         $wpdb->delete($this->ls_img_table, ['property_id' => $id], ['%d']);
         $wpdb->delete($this->ls_block_date_table, ['property_id' => $id], ['%d']);
@@ -1310,6 +1330,31 @@ class LEB_Database_Handler
         }
 
         $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+
+        // Fetch all associated Media Library attachments for these listings.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $images_results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT image FROM `{$this->ls_img_table}` WHERE property_id IN ($placeholders)",
+                $ids
+            )
+        );
+
+        if ($images_results) {
+            foreach ($images_results as $row) {
+                if (! empty($row->image)) {
+                    $images = json_decode($row->image, true);
+                    if (is_array($images)) {
+                        foreach ($images as $img) {
+                            $attachment_id = $img['id'] ?? null;
+                            if ($attachment_id) {
+                                wp_delete_attachment($attachment_id, true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         // Cascade: remove related images and block dates.
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
