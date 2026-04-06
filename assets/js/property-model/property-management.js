@@ -98,8 +98,8 @@
         const editBase = lebState.editBaseUrl || (window.location.href.split('?')[0] + '?page=leb-properties&leb_action=edit&id=');
 
         DOM.body.innerHTML = items.map(function (item) {
-            const thumb = item.thumbnail_url
-                ? '<img class="leb-prop-mgmt-property-thumb" src="' + escHtml(item.thumbnail_url) + '" alt="">'
+            const thumb = item.first_image
+                ? '<img class="leb-prop-mgmt-property-thumb" src="' + escHtml(item.first_image) + '" alt="">'
                 : '<div class="leb-prop-mgmt-property-thumb" style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';
 
             const details = [];
@@ -125,7 +125,7 @@
                 + '<td class="leb-prop-mgmt-table__td">' + escHtml(item.type_name || '—') + '</td>'
                 + '<td class="leb-prop-mgmt-table__td">' + escHtml(item.location || '—') + '</td>'
                 + '<td class="leb-prop-mgmt-table__td"><strong>₹' + Number(item.price || 0).toLocaleString('en-IN') + '</strong>/night</td>'
-                + '<td class="leb-prop-mgmt-table__td">' + escHtml(item.host_name || '—') + '</td>'
+                + '<td class="leb-prop-mgmt-table__td">' + escHtml(item.username || '—') + '</td>'
                 + '<td class="leb-prop-mgmt-table__td">'
                 +     '<span class="leb-prop-mgmt-status leb-prop-mgmt-status--' + status + '">'
                 +         '<span class="leb-prop-mgmt-status__dot"></span>' + status
@@ -150,9 +150,9 @@
      * ═══════════════════════════════════════════════════════════ */
     function renderPagination(data) {
         const total      = parseInt(data.total, 10) || 0;
-        const totalPages = parseInt(data.total_pages, 10) || 1;
-        const page       = lebState.page;
         const perPage    = lebState.perPage;
+        const totalPages = Math.ceil(total / perPage) || 1;
+        const page       = lebState.page;
 
         // Info text
         if (total > 0) {

@@ -60,7 +60,7 @@ function leb_get_default_type_rows() {
 }
 
 /**
- * Returns the CREATE TABLE SQL for the `{prefix}ls_ameneties` table.
+ * Returns the CREATE TABLE SQL for the `{prefix}ls_amenities` table.
  *
  * This table stores global amenities that properties can offer (e.g., WiFi, Pool).
  * 'svg_path' stores the URL to the icon displayed in the interface.
@@ -70,7 +70,7 @@ function leb_get_default_type_rows() {
 function leb_get_amenities_schema() {
     global $wpdb;
 
-    $table_name      = $wpdb->prefix . 'ls_ameneties';
+    $table_name      = $wpdb->prefix . 'ls_amenities';
     $charset_collate = $wpdb->get_charset_collate();
 
     // NOTE: dbDelta requires TWO spaces before PRIMARY KEY / KEY lines.
@@ -118,7 +118,7 @@ function leb_get_locations_schema() {
  * This is the CORE table of the plugin. It stores all primary property information:
  * - user_id:   The WP User ID who owns the listing.
  * - location:  Detailed location info (often longtext/JSON).
- * - ameneties: List of IDs/names of amenities available.
+ * - amenities: List of IDs/names of amenities available.
  * - bed/bath:  Physical inventory of the property.
  *
  * @return string SQL statement.
@@ -131,7 +131,7 @@ function leb_get_listings_schema() {
         user_id bigint(20) UNSIGNED NOT NULL,
         title varchar(255) NOT NULL,
         location longtext NOT NULL,
-        ameneties longtext DEFAULT NULL,
+        amenities longtext DEFAULT NULL,
         type varchar(255) DEFAULT NULL,
         guests int(11) DEFAULT 0,
         bedroom int(11) DEFAULT 0,

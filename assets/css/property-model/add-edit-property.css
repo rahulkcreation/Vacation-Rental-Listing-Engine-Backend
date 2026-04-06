@@ -12,8 +12,8 @@
     max-width: 1320px;
     margin: 0 auto;
     padding: 0 24px 40px;
-    font-family: var(--leb-font-primary, 'Inter', sans-serif);
-    color: var(--leb-text-primary, #1e293b);
+    font-family: var(--leb-font-family);
+    color: var(--leb-secondary-color);
 }
 
 /* ─── Top Bar ─────────────────────────────────────────────── */
@@ -24,7 +24,7 @@
     gap: 16px;
     padding: 16px 0 24px;
     flex-wrap: wrap;
-    border-bottom: 1.5px solid var(--leb-border, #e2e8f0);
+    border-bottom: 1.5px solid var(--leb-border-default);
     margin-bottom: 28px;
 }
 
@@ -34,12 +34,12 @@
     gap: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: var(--leb-text-muted, #94a3b8);
+    color: var(--leb-text-muted);
     text-decoration: none;
     transition: color 0.2s;
 }
 .leb-prop-form-back:hover {
-    color: var(--leb-primary, #6366f1);
+    color: var(--leb-primary-color);
 }
 
 .leb-prop-form-topbar__title {
@@ -69,29 +69,29 @@
     transition: all 0.2s ease;
     text-decoration: none;
     white-space: nowrap;
-    font-family: inherit;
+    font-family: var(--leb-font-family);
 }
 
 .leb-prop-form-btn--primary {
-    background: var(--leb-primary, #6366f1);
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+    background: var(--leb-primary-color);
+    color: var(--white);
+    box-shadow: 0 2px 8px var(--leb-primary-glow);
 }
 .leb-prop-form-btn--primary:hover {
-    background: var(--leb-primary-hover, #4f46e5);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+    background: var(--leb-primary-dark);
+    box-shadow: 0 4px 16px var(--leb-primary-glow);
     transform: translateY(-1px);
 }
 
 .leb-prop-form-btn--outline {
     background: transparent;
-    border: 1.5px solid var(--leb-border, #e2e8f0);
-    color: var(--leb-text-primary, #1e293b);
+    border: 1.5px solid var(--leb-border-default);
+    color: var(--leb-secondary-color);
 }
 .leb-prop-form-btn--outline:hover {
-    border-color: var(--leb-primary, #6366f1);
-    color: var(--leb-primary, #6366f1);
-    background: var(--leb-primary-light, #eef2ff);
+    border-color: var(--leb-primary-color);
+    color: var(--leb-primary-color);
+    background: var(--leb-primary-light-bg);
 }
 
 .leb-prop-form-btn--full {
@@ -126,21 +126,22 @@
 
 /* ─── Card ────────────────────────────────────────────────── */
 .leb-prop-form-card {
-    background: #ffffff;
-    border: 1.5px solid var(--leb-border, #e2e8f0);
-    border-radius: 14px;
-    padding: 24px;
+    background: var(--leb-white);
+    border: 1px solid var(--leb-border-color);
+    box-shadow: var(--leb-card-shadow);
+    border-radius: 16px;
+    padding: 28px;
 }
 .leb-prop-form-card__title {
     margin: 0 0 6px;
     font-size: 16px;
     font-weight: 700;
-    color: var(--leb-text-primary, #1e293b);
+    color: var(--leb-secondary-color);
 }
 .leb-prop-form-card__desc {
     margin: 0 0 18px;
     font-size: 13px;
-    color: var(--leb-text-muted, #94a3b8);
+    color: var(--leb-text-muted);
 }
 
 /* ─── Form Fields ─────────────────────────────────────────── */
@@ -155,11 +156,11 @@
     display: block;
     font-size: 13px;
     font-weight: 600;
-    color: var(--leb-text-primary, #1e293b);
+    color: var(--leb-secondary-color);
     margin-bottom: 6px;
 }
 .leb-prop-form-req {
-    color: var(--leb-danger, #ef4444);
+    color: var(--leb-error-color);
 }
 
 .leb-prop-form-input,
@@ -167,12 +168,12 @@
 .leb-prop-form-select {
     width: 100%;
     padding: 10px 14px;
-    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border: 1.5px solid var(--leb-border-default);
     border-radius: 10px;
     font-size: 14px;
-    font-family: inherit;
-    color: var(--leb-text-primary, #1e293b);
-    background: #ffffff;
+    font-family: var(--leb-font-family);
+    color: var(--leb-secondary-color);
+    background: var(--leb-white);
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box;
@@ -180,12 +181,12 @@
 .leb-prop-form-input:focus,
 .leb-prop-form-textarea:focus,
 .leb-prop-form-select:focus {
-    border-color: var(--leb-primary, #6366f1);
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    border-color: var(--leb-primary-color);
+    box-shadow: var(--leb-focus-shadow);
 }
 .leb-prop-form-input::placeholder,
 .leb-prop-form-textarea::placeholder {
-    color: var(--leb-text-muted, #94a3b8);
+    color: var(--leb-text-muted);
 }
 .leb-prop-form-textarea {
     resize: vertical;
@@ -193,7 +194,7 @@
 }
 .leb-prop-form-input.leb-prop-form-input--error,
 .leb-prop-form-textarea.leb-prop-form-textarea--error {
-    border-color: var(--leb-danger, #ef4444);
+    border-color: var(--leb-error-color);
 }
 
 /* Select wrapper (for chevron) */
@@ -207,8 +208,8 @@
     top: 50%;
     width: 8px;
     height: 8px;
-    border-right: 2px solid var(--leb-text-muted, #94a3b8);
-    border-bottom: 2px solid var(--leb-text-muted, #94a3b8);
+    border-right: 2px solid var(--leb-text-muted);
+    border-bottom: 2px solid var(--leb-text-muted);
     transform: translateY(-60%) rotate(45deg);
     pointer-events: none;
 }
@@ -234,10 +235,10 @@
 .leb-prop-form-stepper {
     display: flex;
     align-items: center;
-    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border: 1.5px solid var(--leb-border-default);
     border-radius: 10px;
     overflow: hidden;
-    background: #ffffff;
+    background: var(--leb-white);
 }
 .leb-prop-form-stepper__btn {
     display: flex;
@@ -246,17 +247,17 @@
     width: 40px;
     height: 40px;
     border: none;
-    background: var(--leb-bg-secondary, #f8fafc);
+    background: var(--leb-bg-light);
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
-    color: var(--leb-text-primary, #1e293b);
+    color: var(--leb-secondary-color);
     transition: background 0.15s;
-    font-family: inherit;
+    font-family: var(--leb-font-family);
 }
 .leb-prop-form-stepper__btn:hover {
-    background: var(--leb-primary-light, #eef2ff);
-    color: var(--leb-primary, #6366f1);
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-color);
 }
 .leb-prop-form-stepper__value {
     flex: 1;
@@ -267,8 +268,9 @@
     padding: 8px 4px;
     outline: none;
     -moz-appearance: textfield;
-    font-family: inherit;
-    color: var(--leb-text-primary, #1e293b);
+    appearance: textfield;
+    font-family: var(--leb-font-family);
+    color: var(--leb-secondary-color);
     background: transparent;
 }
 .leb-prop-form-stepper__value::-webkit-inner-spin-button,
@@ -290,15 +292,15 @@
     border-radius: 12px;
     overflow: hidden;
     aspect-ratio: 1;
-    border: 2px solid var(--leb-border, #e2e8f0);
+    border: 2px solid var(--leb-border-default);
     cursor: grab;
     transition: box-shadow 0.2s;
 }
-.leb-prop-form-image-item:first-child {
-    border-color: var(--leb-primary, #6366f1);
+.leb-prop-form-image-item:last-child {
+    border-color: var(--leb-primary-color);
 }
 .leb-prop-form-image-item:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: var(--leb-card-shadow);
 }
 .leb-prop-form-image-item.leb-prop-form-image-item--dragging {
     opacity: 0.5;
@@ -313,8 +315,8 @@
     position: absolute;
     top: 6px;
     left: 6px;
-    background: var(--leb-primary, #6366f1);
-    color: #fff;
+    background: var(--leb-primary-color);
+    color: var(--leb-white);
     font-size: 10px;
     font-weight: 700;
     padding: 2px 8px;
@@ -327,7 +329,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.55);
+    background: var(--leb-overlay-dark);
     border: none;
     cursor: pointer;
     display: flex;
@@ -340,7 +342,7 @@
     opacity: 1;
 }
 .leb-prop-form-image-remove svg {
-    stroke: #fff;
+    stroke: var(--leb-white);
 }
 
 /* ─── Amenities Grid ──────────────────────────────────────── */
@@ -354,7 +356,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border: 1.5px solid var(--leb-border-default);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s;
@@ -362,13 +364,13 @@
     font-weight: 500;
 }
 .leb-prop-form-amenity-item:hover {
-    border-color: var(--leb-primary, #6366f1);
-    background: var(--leb-primary-light, #eef2ff);
+    border-color: var(--leb-primary-color);
+    background: var(--leb-primary-light-bg);
 }
 .leb-prop-form-amenity-item--selected {
-    border-color: var(--leb-primary, #6366f1);
-    background: var(--leb-primary-light, #eef2ff);
-    color: var(--leb-primary, #6366f1);
+    border-color: var(--leb-primary-color);
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-color);
     font-weight: 600;
 }
 .leb-prop-form-amenity-item img {
@@ -380,14 +382,14 @@
 .leb-prop-form-amenity-check {
     width: 18px;
     height: 18px;
-    accent-color: var(--leb-primary, #6366f1);
+    accent-color: var(--leb-primary-color);
     flex-shrink: 0;
 }
 .leb-prop-form-amenities-loading {
     grid-column: 1 / -1;
     text-align: center;
     padding: 20px;
-    color: var(--leb-text-muted, #94a3b8);
+    color: var(--leb-text-muted);
     font-size: 13px;
 }
 
@@ -402,7 +404,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    border: 1.5px solid var(--leb-border, #e2e8f0);
+    border: 1.5px solid var(--leb-border-default);
     border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
@@ -411,10 +413,10 @@
     text-transform: capitalize;
 }
 .leb-prop-form-status-option:hover {
-    border-color: var(--leb-primary, #6366f1);
+    border-color: var(--leb-primary-color);
 }
 .leb-prop-form-status-option input[type="radio"] {
-    accent-color: var(--leb-primary, #6366f1);
+    accent-color: var(--leb-primary-color);
     width: 16px;
     height: 16px;
 }
@@ -433,20 +435,20 @@
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    border: 1.5px solid var(--leb-border, #e2e8f0);
-    background: #ffffff;
+    border: 1.5px solid var(--leb-border-default);
+    background: var(--leb-white);
     font-size: 18px;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: inherit;
-    color: var(--leb-text-primary, #1e293b);
+    font-family: var(--leb-font-family);
+    color: var(--leb-secondary-color);
 }
 .leb-prop-form-calendar__arrow:hover {
-    border-color: var(--leb-primary, #6366f1);
-    color: var(--leb-primary, #6366f1);
+    border-color: var(--leb-primary-color);
+    color: var(--leb-primary-color);
 }
 .leb-prop-form-calendar__month {
     font-size: 14px;
@@ -459,7 +461,7 @@
     text-align: center;
     font-size: 11px;
     font-weight: 600;
-    color: var(--leb-text-muted, #94a3b8);
+    color: var(--leb-text-muted);
     margin-bottom: 6px;
 }
 
@@ -480,23 +482,23 @@
     transition: all 0.15s;
     border: none;
     background: transparent;
-    color: var(--leb-text-primary, #1e293b);
-    font-family: inherit;
+    color: var(--leb-secondary-color);
+    font-family: var(--leb-font-family);
 }
 .leb-prop-form-cal-day:hover {
-    background: var(--leb-bg-hover, #f1f5f9);
+    background: var(--leb-bg-light);
 }
 .leb-prop-form-cal-day--today {
     font-weight: 700;
-    border: 1.5px solid var(--leb-primary, #6366f1);
+    border: 1.5px solid var(--leb-primary-color);
 }
 .leb-prop-form-cal-day--blocked {
-    background: var(--leb-danger, #ef4444);
-    color: #ffffff;
+    background: var(--leb-error-color);
+    color: var(--leb-white);
     border-radius: 8px;
 }
 .leb-prop-form-cal-day--blocked:hover {
-    background: #dc2626;
+    background: var(--leb-primary-dark);
 }
 .leb-prop-form-cal-day--empty {
     pointer-events: none;
@@ -520,9 +522,9 @@
     border-radius: 8px;
     font-size: 12px;
     font-weight: 500;
-    background: #fef2f2;
-    color: var(--leb-danger, #ef4444);
-    border: 1px solid #fecaca;
+    background: var(--leb-error-light-bg);
+    color: var(--leb-error-color);
+    border: 1px solid var(--leb-border-color);
 }
 .leb-prop-form-blocked-chip__remove {
     cursor: pointer;

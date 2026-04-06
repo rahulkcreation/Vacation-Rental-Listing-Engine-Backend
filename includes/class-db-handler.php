@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class-db-handler.php
  *
@@ -9,7 +10,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH')) {
     exit;
 }
 
@@ -18,7 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Handles all CRUD operations and table maintenance for the LEB plugin.
  */
-class LEB_Database_Handler {
+class LEB_Database_Handler
+{
 
     /**
      * The fully-qualified name of the ls_types table.
@@ -65,10 +67,11 @@ class LEB_Database_Handler {
     /**
      * Constructor – resolves table names with the WP prefix.
      */
-    public function __construct() {
+    public function __construct()
+    {
         global $wpdb;
         $this->types_table      = $wpdb->prefix . 'ls_types';
-        $this->amenities_table  = $wpdb->prefix . 'ls_ameneties';
+        $this->amenities_table  = $wpdb->prefix . 'ls_amenities';
         $this->locations_table  = $wpdb->prefix . 'ls_location';
         $this->listings_table   = $wpdb->prefix . 'ls_listings';
         $this->ls_img_table     = $wpdb->prefix . 'ls_img';
@@ -88,17 +91,18 @@ class LEB_Database_Handler {
      *
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function create_or_repair_types_table() {
+    public function create_or_repair_types_table()
+    {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
         $sql    = leb_get_types_schema();
-        $result = dbDelta( $sql );
+        $result = dbDelta($sql);
 
         // dbDelta does not return errors directly; check table existence instead.
-        $status = leb_check_table_status( $this->types_table );
+        $status = leb_check_table_status($this->types_table);
 
-        if ( ! $status['exists'] ) {
-            return new WP_Error( 'leb_table_create_failed', __( 'Table could not be created. Check database permissions.', 'listing-engine-backend' ) );
+        if (! $status['exists']) {
+            return new WP_Error('leb_table_create_failed', __('Table could not be created. Check database permissions.', 'listing-engine-backend'));
         }
 
         // Insert any missing default rows (if any defined in db-schema.php).
@@ -110,16 +114,17 @@ class LEB_Database_Handler {
     /**
      * Seeds default rows into the types table if they don't already exist.
      */
-    private function seed_default_rows() {
+    private function seed_default_rows()
+    {
         global $wpdb;
 
         $default_rows = leb_get_default_type_rows();
 
-        if ( empty( $default_rows ) ) {
+        if (empty($default_rows)) {
             return;
         }
 
-        foreach ( $default_rows as $row ) {
+        foreach ($default_rows as $row) {
             $slug_exists = $wpdb->get_var(
                 $wpdb->prepare(
                     // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -128,15 +133,15 @@ class LEB_Database_Handler {
                 )
             );
 
-            if ( ! $slug_exists ) {
+            if (! $slug_exists) {
                 $wpdb->insert(
                     $this->types_table,
                     [
-                        'name'       => sanitize_text_field( $row['name'] ),
-                        'slug'       => sanitize_title( $row['slug'] ),
-                        'updated_at' => current_time( 'mysql' ),
+                        'name'       => sanitize_text_field($row['name']),
+                        'slug'       => sanitize_title($row['slug']),
+                        'updated_at' => current_time('mysql'),
                     ],
-                    [ '%s', '%s', '%s' ]
+                    ['%s', '%s', '%s']
                 );
             }
         }
@@ -157,13 +162,14 @@ class LEB_Database_Handler {
      *     @type int   $total  Total row count matching the query.
      * }
      */
-    public function get_types( string $search = '', int $page = 1, int $per_page = 10 ): array {
+    public function get_types(string $search = '', int $page = 1, int $per_page = 10): array
+    {
         global $wpdb;
 
-        $offset = ( $page - 1 ) * $per_page;
+        $offset = ($page - 1) * $per_page;
 
-        if ( ! empty( $search ) ) {
-            $like = '%' . $wpdb->esc_like( $search ) . '%';
+        if (! empty($search)) {
+            $like = '%' . $wpdb->esc_like($search) . '%';
 
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $items = $wpdb->get_results(
@@ -217,7 +223,8 @@ class LEB_Database_Handler {
      * @param int $id Row ID.
      * @return array|null Associative array of the row, or null if not found.
      */
-    public function get_type_by_id( int $id ): ?array {
+    public function get_type_by_id(int $id): ?array
+    {
         global $wpdb;
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -244,15 +251,16 @@ class LEB_Database_Handler {
      * @param string $slug Raw slug (will be converted to lowercase via sanitize_title).
      * @return int|WP_Error Inserted row ID on success, WP_Error on failure.
      */
-    public function create_type( string $name, string $slug ) {
+    public function create_type(string $name, string $slug)
+    {
         global $wpdb;
 
-        $name = sanitize_text_field( $name );
-        $slug = sanitize_title( $slug );     // Enforces lowercase.
+        $name = sanitize_text_field($name);
+        $slug = sanitize_title($slug);     // Enforces lowercase.
 
         // Check for duplicate slug.
-        if ( $this->slug_exists( $slug ) ) {
-            return new WP_Error( 'leb_duplicate_slug', __( 'A type with this slug already exists.', 'listing-engine-backend' ) );
+        if ($this->slug_exists($slug)) {
+            return new WP_Error('leb_duplicate_slug', __('A type with this slug already exists.', 'listing-engine-backend'));
         }
 
         $inserted = $wpdb->insert(
@@ -260,13 +268,13 @@ class LEB_Database_Handler {
             [
                 'name'       => $name,
                 'slug'       => $slug,
-                'updated_at' => current_time( 'mysql' ),
+                'updated_at' => current_time('mysql'),
             ],
-            [ '%s', '%s', '%s' ]
+            ['%s', '%s', '%s']
         );
 
-        if ( false === $inserted ) {
-            return new WP_Error( 'leb_insert_failed', __( 'Failed to create the type. Please try again.', 'listing-engine-backend' ) );
+        if (false === $inserted) {
+            return new WP_Error('leb_insert_failed', __('Failed to create the type. Please try again.', 'listing-engine-backend'));
         }
 
         return (int) $wpdb->insert_id;
@@ -280,15 +288,16 @@ class LEB_Database_Handler {
      * @param string $slug New slug (enforced lowercase).
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function update_type( int $id, string $name, string $slug ) {
+    public function update_type(int $id, string $name, string $slug)
+    {
         global $wpdb;
 
-        $name = sanitize_text_field( $name );
-        $slug = sanitize_title( $slug );
+        $name = sanitize_text_field($name);
+        $slug = sanitize_title($slug);
 
         // Check for duplicate slug excluding the current row.
-        if ( $this->slug_exists( $slug, $id ) ) {
-            return new WP_Error( 'leb_duplicate_slug', __( 'A type with this slug already exists.', 'listing-engine-backend' ) );
+        if ($this->slug_exists($slug, $id)) {
+            return new WP_Error('leb_duplicate_slug', __('A type with this slug already exists.', 'listing-engine-backend'));
         }
 
         $updated = $wpdb->update(
@@ -296,15 +305,15 @@ class LEB_Database_Handler {
             [
                 'name'       => $name,
                 'slug'       => $slug,
-                'updated_at' => current_time( 'mysql' ),
+                'updated_at' => current_time('mysql'),
             ],
-            [ 'id' => $id ],
-            [ '%s', '%s', '%s' ],
-            [ '%d' ]
+            ['id' => $id],
+            ['%s', '%s', '%s'],
+            ['%d']
         );
 
-        if ( false === $updated ) {
-            return new WP_Error( 'leb_update_failed', __( 'Failed to update the type. Please try again.', 'listing-engine-backend' ) );
+        if (false === $updated) {
+            return new WP_Error('leb_update_failed', __('Failed to update the type. Please try again.', 'listing-engine-backend'));
         }
 
         return true;
@@ -316,17 +325,18 @@ class LEB_Database_Handler {
      * @param int $id Row ID to delete.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function delete_type( int $id ) {
+    public function delete_type(int $id)
+    {
         global $wpdb;
 
         $deleted = $wpdb->delete(
             $this->types_table,
-            [ 'id' => $id ],
-            [ '%d' ]
+            ['id' => $id],
+            ['%d']
         );
 
-        if ( false === $deleted ) {
-            return new WP_Error( 'leb_delete_failed', __( 'Failed to delete the type. Please try again.', 'listing-engine-backend' ) );
+        if (false === $deleted) {
+            return new WP_Error('leb_delete_failed', __('Failed to delete the type. Please try again.', 'listing-engine-backend'));
         }
 
         return true;
@@ -338,19 +348,20 @@ class LEB_Database_Handler {
      * @param array $ids Array of row IDs to delete.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function delete_types( array $ids ) {
+    public function delete_types(array $ids)
+    {
         global $wpdb;
 
-        if ( empty( $ids ) ) {
+        if (empty($ids)) {
             return true;
         }
 
-        $ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-        $query           = $wpdb->prepare( "DELETE FROM {$this->types_table} WHERE id IN ($ids_placeholder)", $ids );
-        $deleted         = $wpdb->query( $query );
+        $ids_placeholder = implode(',', array_fill(0, count($ids), '%d'));
+        $query           = $wpdb->prepare("DELETE FROM {$this->types_table} WHERE id IN ($ids_placeholder)", $ids);
+        $deleted         = $wpdb->query($query);
 
-        if ( false === $deleted ) {
-            return new WP_Error( 'leb_bulk_delete_failed', __( 'Failed to delete selected types. Please try again.', 'listing-engine-backend' ) );
+        if (false === $deleted) {
+            return new WP_Error('leb_bulk_delete_failed', __('Failed to delete selected types. Please try again.', 'listing-engine-backend'));
         }
 
         return true;
@@ -367,10 +378,11 @@ class LEB_Database_Handler {
      * @param int|null $exclude_id Row ID to exclude from the check (used during updates).
      * @return bool TRUE if a duplicate exists.
      */
-    private function slug_exists( string $slug, ?int $exclude_id = null ): bool {
+    private function slug_exists(string $slug, ?int $exclude_id = null): bool
+    {
         global $wpdb;
 
-        if ( $exclude_id ) {
+        if ($exclude_id) {
             $count = $wpdb->get_var(
                 $wpdb->prepare(
                     // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -405,19 +417,20 @@ class LEB_Database_Handler {
      *
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function create_or_repair_amenities_table() {
+    public function create_or_repair_amenities_table()
+    {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
         $sql    = leb_get_amenities_schema();
-        $result = dbDelta( $sql );
+        $result = dbDelta($sql);
 
         // dbDelta does not return errors directly; check table existence.
-        $status = leb_check_table_status( $this->amenities_table );
+        $status = leb_check_table_status($this->amenities_table);
 
-        if ( ! $status['exists'] ) {
+        if (! $status['exists']) {
             return new WP_Error(
                 'leb_amen_table_create_failed',
-                __( 'Amenities table could not be created. Check database permissions.', 'listing-engine-backend' )
+                __('Amenities table could not be created. Check database permissions.', 'listing-engine-backend')
             );
         }
 
@@ -439,13 +452,14 @@ class LEB_Database_Handler {
      *     @type int   $total  Total row count matching the query.
      * }
      */
-    public function get_amenities( string $search = '', int $page = 1, int $per_page = 10 ): array {
+    public function get_amenities(string $search = '', int $page = 1, int $per_page = 10): array
+    {
         global $wpdb;
 
-        $offset = ( $page - 1 ) * $per_page;
+        $offset = ($page - 1) * $per_page;
 
-        if ( ! empty( $search ) ) {
-            $like = '%' . $wpdb->esc_like( $search ) . '%';
+        if (! empty($search)) {
+            $like = '%' . $wpdb->esc_like($search) . '%';
 
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
             $items = $wpdb->get_results(
@@ -497,7 +511,8 @@ class LEB_Database_Handler {
      * @param int $id Row ID.
      * @return array|null Associative array of the row, or null if not found.
      */
-    public function get_amenity_by_id( int $id ): ?array {
+    public function get_amenity_by_id(int $id): ?array
+    {
         global $wpdb;
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -524,26 +539,27 @@ class LEB_Database_Handler {
      * @param string $svg_path WordPress media attachment URL for the SVG icon (may be empty).
      * @return int|WP_Error Inserted row ID on success, WP_Error on failure.
      */
-    public function create_amenity( string $name, string $svg_path = '' ) {
+    public function create_amenity(string $name, string $svg_path = '')
+    {
         global $wpdb;
 
-        $name     = sanitize_text_field( $name );
-        $svg_path = wp_unslash( $svg_path );
+        $name     = sanitize_text_field($name);
+        $svg_path = wp_unslash($svg_path);
 
         $inserted = $wpdb->insert(
             $this->amenities_table,
             [
                 'name'       => $name,
                 'svg_path'   => $svg_path,
-                'updated_at' => current_time( 'mysql' ),
+                'updated_at' => current_time('mysql'),
             ],
-            [ '%s', '%s', '%s' ]
+            ['%s', '%s', '%s']
         );
 
-        if ( false === $inserted ) {
+        if (false === $inserted) {
             return new WP_Error(
                 'leb_amen_insert_failed',
-                __( 'Failed to create the amenity. Please try again.', 'listing-engine-backend' )
+                __('Failed to create the amenity. Please try again.', 'listing-engine-backend')
             );
         }
 
@@ -558,28 +574,29 @@ class LEB_Database_Handler {
      * @param string $svg_path New SVG attachment URL (empty string clears it).
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function update_amenity( int $id, string $name, string $svg_path = '' ) {
+    public function update_amenity(int $id, string $name, string $svg_path = '')
+    {
         global $wpdb;
 
-        $name     = sanitize_text_field( $name );
-        $svg_path = wp_unslash( $svg_path );
+        $name     = sanitize_text_field($name);
+        $svg_path = wp_unslash($svg_path);
 
         $updated = $wpdb->update(
             $this->amenities_table,
             [
                 'name'       => $name,
                 'svg_path'   => $svg_path,
-                'updated_at' => current_time( 'mysql' ),
+                'updated_at' => current_time('mysql'),
             ],
-            [ 'id' => $id ],
-            [ '%s', '%s', '%s' ],
-            [ '%d' ]
+            ['id' => $id],
+            ['%s', '%s', '%s'],
+            ['%d']
         );
 
-        if ( false === $updated ) {
+        if (false === $updated) {
             return new WP_Error(
                 'leb_amen_update_failed',
-                __( 'Failed to update the amenity. Please try again.', 'listing-engine-backend' )
+                __('Failed to update the amenity. Please try again.', 'listing-engine-backend')
             );
         }
 
@@ -592,19 +609,20 @@ class LEB_Database_Handler {
      * @param int $id Row ID to delete.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function delete_amenity( int $id ) {
+    public function delete_amenity(int $id)
+    {
         global $wpdb;
 
         $deleted = $wpdb->delete(
             $this->amenities_table,
-            [ 'id' => $id ],
-            [ '%d' ]
+            ['id' => $id],
+            ['%d']
         );
 
-        if ( false === $deleted ) {
+        if (false === $deleted) {
             return new WP_Error(
                 'leb_amen_delete_failed',
-                __( 'Failed to delete the amenity. Please try again.', 'listing-engine-backend' )
+                __('Failed to delete the amenity. Please try again.', 'listing-engine-backend')
             );
         }
 
@@ -617,22 +635,23 @@ class LEB_Database_Handler {
      * @param array $ids Array of row IDs to delete.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function delete_amenities( array $ids ) {
+    public function delete_amenities(array $ids)
+    {
         global $wpdb;
 
-        if ( empty( $ids ) ) {
+        if (empty($ids)) {
             return true;
         }
 
-        $ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+        $ids_placeholder = implode(',', array_fill(0, count($ids), '%d'));
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $query   = $wpdb->prepare( "DELETE FROM `{$this->amenities_table}` WHERE id IN ($ids_placeholder)", $ids );
-        $deleted = $wpdb->query( $query );
+        $query   = $wpdb->prepare("DELETE FROM `{$this->amenities_table}` WHERE id IN ($ids_placeholder)", $ids);
+        $deleted = $wpdb->query($query);
 
-        if ( false === $deleted ) {
+        if (false === $deleted) {
             return new WP_Error(
                 'leb_amen_bulk_delete_failed',
-                __( 'Failed to delete selected amenities. Please try again.', 'listing-engine-backend' )
+                __('Failed to delete selected amenities. Please try again.', 'listing-engine-backend')
             );
         }
 
@@ -648,18 +667,19 @@ class LEB_Database_Handler {
      *
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function create_or_repair_locations_table() {
+    public function create_or_repair_locations_table()
+    {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
         $sql    = leb_get_locations_schema();
-        $result = dbDelta( $sql );
+        $result = dbDelta($sql);
 
-        $status = leb_check_table_status( $this->locations_table );
+        $status = leb_check_table_status($this->locations_table);
 
-        if ( ! $status['exists'] ) {
+        if (! $status['exists']) {
             return new WP_Error(
                 'leb_loc_table_create_failed',
-                __( 'Locations table could not be created. Check database permissions.', 'listing-engine-backend' )
+                __('Locations table could not be created. Check database permissions.', 'listing-engine-backend')
             );
         }
 
@@ -673,46 +693,53 @@ class LEB_Database_Handler {
     /**
      * Retrieve a paginated, optionally searched list of locations.
      */
-    public function get_locations( string $search = '', int $page = 1, int $per_page = 10 ): array {
+    public function get_locations(string $search = '', int $page = 1, int $per_page = 10): array
+    {
         global $wpdb;
-        $offset = ( $page - 1 ) * $per_page;
+        $offset = ($page - 1) * $per_page;
 
-        if ( ! empty( $search ) ) {
-            $like = '%' . $wpdb->esc_like( $search ) . '%';
+        if (! empty($search)) {
+            $like = '%' . $wpdb->esc_like($search) . '%';
             $items = $wpdb->get_results(
                 $wpdb->prepare(
                     "SELECT * FROM `{$this->locations_table}` WHERE name LIKE %s OR slug LIKE %s ORDER BY id DESC LIMIT %d OFFSET %d",
-                    $like, $like, $per_page, $offset
+                    $like,
+                    $like,
+                    $per_page,
+                    $offset
                 ),
                 ARRAY_A
             );
             $total = (int) $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT COUNT(*) FROM `{$this->locations_table}` WHERE name LIKE %s OR slug LIKE %s",
-                    $like, $like
+                    $like,
+                    $like
                 )
             );
         } else {
             $items = $wpdb->get_results(
                 $wpdb->prepare(
                     "SELECT * FROM `{$this->locations_table}` ORDER BY id DESC LIMIT %d OFFSET %d",
-                    $per_page, $offset
+                    $per_page,
+                    $offset
                 ),
                 ARRAY_A
             );
-            $total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$this->locations_table}`" );
+            $total = (int) $wpdb->get_var("SELECT COUNT(*) FROM `{$this->locations_table}`");
         }
 
-        return [ 'items' => $items ?: [], 'total' => $total ];
+        return ['items' => $items ?: [], 'total' => $total];
     }
 
     /**
      * Get single location by ID.
      */
-    public function get_location_by_id( int $id ): ?array {
+    public function get_location_by_id(int $id): ?array
+    {
         global $wpdb;
         $row = $wpdb->get_row(
-            $wpdb->prepare( "SELECT * FROM `{$this->locations_table}` WHERE id = %d", $id ),
+            $wpdb->prepare("SELECT * FROM `{$this->locations_table}` WHERE id = %d", $id),
             ARRAY_A
         );
         return $row ?: null;
@@ -725,13 +752,14 @@ class LEB_Database_Handler {
     /**
      * Create location.
      */
-    public function create_location( string $name, string $slug, string $svg_path = '' ) {
+    public function create_location(string $name, string $slug, string $svg_path = '')
+    {
         global $wpdb;
-        $name = sanitize_text_field( $name );
-        $slug = sanitize_title( $slug );
+        $name = sanitize_text_field($name);
+        $slug = sanitize_title($slug);
 
-        if ( $this->location_slug_exists( $slug ) ) {
-            return new WP_Error( 'leb_loc_duplicate_slug', __( 'A location with this slug already exists.', 'listing-engine-backend' ) );
+        if ($this->location_slug_exists($slug)) {
+            return new WP_Error('leb_loc_duplicate_slug', __('A location with this slug already exists.', 'listing-engine-backend'));
         }
 
         $inserted = $wpdb->insert(
@@ -739,14 +767,14 @@ class LEB_Database_Handler {
             [
                 'name'       => $name,
                 'slug'       => $slug,
-                'svg_path'   => wp_unslash( $svg_path ),
-                'updated_at' => current_time( 'mysql' ),
+                'svg_path'   => wp_unslash($svg_path),
+                'updated_at' => current_time('mysql'),
             ],
-            [ '%s', '%s', '%s', '%s' ]
+            ['%s', '%s', '%s', '%s']
         );
 
-        if ( false === $inserted ) {
-            return new WP_Error( 'leb_loc_insert_failed', __( 'Failed to create the location.', 'listing-engine-backend' ) );
+        if (false === $inserted) {
+            return new WP_Error('leb_loc_insert_failed', __('Failed to create the location.', 'listing-engine-backend'));
         }
         return (int) $wpdb->insert_id;
     }
@@ -754,13 +782,14 @@ class LEB_Database_Handler {
     /**
      * Update location.
      */
-    public function update_location( int $id, string $name, string $slug, string $svg_path = '' ) {
+    public function update_location(int $id, string $name, string $slug, string $svg_path = '')
+    {
         global $wpdb;
-        $name = sanitize_text_field( $name );
-        $slug = sanitize_title( $slug );
+        $name = sanitize_text_field($name);
+        $slug = sanitize_title($slug);
 
-        if ( $this->location_slug_exists( $slug, $id ) ) {
-            return new WP_Error( 'leb_loc_duplicate_slug', __( 'A location with this slug already exists.', 'listing-engine-backend' ) );
+        if ($this->location_slug_exists($slug, $id)) {
+            return new WP_Error('leb_loc_duplicate_slug', __('A location with this slug already exists.', 'listing-engine-backend'));
         }
 
         $updated = $wpdb->update(
@@ -768,16 +797,16 @@ class LEB_Database_Handler {
             [
                 'name'       => $name,
                 'slug'       => $slug,
-                'svg_path'   => wp_unslash( $svg_path ),
-                'updated_at' => current_time( 'mysql' ),
+                'svg_path'   => wp_unslash($svg_path),
+                'updated_at' => current_time('mysql'),
             ],
-            [ 'id' => $id ],
-            [ '%s', '%s', '%s', '%s' ],
-            [ '%d' ]
+            ['id' => $id],
+            ['%s', '%s', '%s', '%s'],
+            ['%d']
         );
 
-        if ( false === $updated ) {
-            return new WP_Error( 'leb_loc_update_failed', __( 'Failed to update location.', 'listing-engine-backend' ) );
+        if (false === $updated) {
+            return new WP_Error('leb_loc_update_failed', __('Failed to update location.', 'listing-engine-backend'));
         }
         return true;
     }
@@ -785,11 +814,12 @@ class LEB_Database_Handler {
     /**
      * Delete single location.
      */
-    public function delete_location( int $id ) {
+    public function delete_location(int $id)
+    {
         global $wpdb;
-        $deleted = $wpdb->delete( $this->locations_table, [ 'id' => $id ], [ '%d' ] );
-        if ( false === $deleted ) {
-            return new WP_Error( 'leb_loc_delete_failed', __( 'Failed to delete the location.', 'listing-engine-backend' ) );
+        $deleted = $wpdb->delete($this->locations_table, ['id' => $id], ['%d']);
+        if (false === $deleted) {
+            return new WP_Error('leb_loc_delete_failed', __('Failed to delete the location.', 'listing-engine-backend'));
         }
         return true;
     }
@@ -797,14 +827,15 @@ class LEB_Database_Handler {
     /**
      * Bulk delete locations.
      */
-    public function delete_locations( array $ids ) {
+    public function delete_locations(array $ids)
+    {
         global $wpdb;
-        if ( empty( $ids ) ) return true;
-        $ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-        $query   = $wpdb->prepare( "DELETE FROM `{$this->locations_table}` WHERE id IN ($ids_placeholder)", $ids );
-        $deleted = $wpdb->query( $query );
-        if ( false === $deleted ) {
-            return new WP_Error( 'leb_loc_bulk_delete_failed', __( 'Failed to delete locations.', 'listing-engine-backend' ) );
+        if (empty($ids)) return true;
+        $ids_placeholder = implode(',', array_fill(0, count($ids), '%d'));
+        $query   = $wpdb->prepare("DELETE FROM `{$this->locations_table}` WHERE id IN ($ids_placeholder)", $ids);
+        $deleted = $wpdb->query($query);
+        if (false === $deleted) {
+            return new WP_Error('leb_loc_bulk_delete_failed', __('Failed to delete locations.', 'listing-engine-backend'));
         }
         return true;
     }
@@ -812,12 +843,13 @@ class LEB_Database_Handler {
     /**
      * Helper: check if location slug exists.
      */
-    private function location_slug_exists( string $slug, ?int $exclude_id = null ): bool {
+    private function location_slug_exists(string $slug, ?int $exclude_id = null): bool
+    {
         global $wpdb;
-        if ( $exclude_id ) {
-            $count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$this->locations_table}` WHERE slug = %s AND id != %d", $slug, $exclude_id ) );
+        if ($exclude_id) {
+            $count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM `{$this->locations_table}` WHERE slug = %s AND id != %d", $slug, $exclude_id));
         } else {
-            $count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$this->locations_table}` WHERE slug = %s", $slug ) );
+            $count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM `{$this->locations_table}` WHERE slug = %s", $slug));
         }
         return (bool) $count;
     }
@@ -839,13 +871,14 @@ class LEB_Database_Handler {
      *
      * @return true|WP_Error
      */
-    public function create_or_repair_listings_table() {
+    public function create_or_repair_listings_table()
+    {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         $sql = leb_get_listings_schema();
-        dbDelta( $sql );
-        $status = leb_check_table_status( $this->listings_table );
-        if ( ! $status['exists'] ) {
-            return new WP_Error( 'leb_listings_table_create_failed', __( 'Listings table could not be created. Check database permissions.', 'listing-engine-backend' ) );
+        dbDelta($sql);
+        $status = leb_check_table_status($this->listings_table);
+        if (! $status['exists']) {
+            return new WP_Error('leb_listings_table_create_failed', __('Listings table could not be created. Check database permissions.', 'listing-engine-backend'));
         }
         return true;
     }
@@ -862,13 +895,14 @@ class LEB_Database_Handler {
      *
      * @return true|WP_Error
      */
-    public function create_or_repair_ls_img_table() {
+    public function create_or_repair_ls_img_table()
+    {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         $sql = leb_get_ls_img_schema();
-        dbDelta( $sql );
-        $status = leb_check_table_status( $this->ls_img_table );
-        if ( ! $status['exists'] ) {
-            return new WP_Error( 'leb_ls_img_table_create_failed', __( 'Images table could not be created. Check database permissions.', 'listing-engine-backend' ) );
+        dbDelta($sql);
+        $status = leb_check_table_status($this->ls_img_table);
+        if (! $status['exists']) {
+            return new WP_Error('leb_ls_img_table_create_failed', __('Images table could not be created. Check database permissions.', 'listing-engine-backend'));
         }
         return true;
     }
@@ -885,13 +919,14 @@ class LEB_Database_Handler {
      *
      * @return true|WP_Error
      */
-    public function create_or_repair_ls_block_date_table() {
+    public function create_or_repair_ls_block_date_table()
+    {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         $sql = leb_get_ls_block_date_schema();
-        dbDelta( $sql );
-        $status = leb_check_table_status( $this->ls_block_date_table );
-        if ( ! $status['exists'] ) {
-            return new WP_Error( 'leb_ls_block_date_table_create_failed', __( 'Block Date table could not be created. Check database permissions.', 'listing-engine-backend' ) );
+        dbDelta($sql);
+        $status = leb_check_table_status($this->ls_block_date_table);
+        if (! $status['exists']) {
+            return new WP_Error('leb_ls_block_date_table_create_failed', __('Block Date table could not be created. Check database permissions.', 'listing-engine-backend'));
         }
         return true;
     }
@@ -918,10 +953,11 @@ class LEB_Database_Handler {
      *     @type int   $total  Total row count matching the query.
      * }
      */
-    public function get_listings( string $search = '', int $page = 1, int $per_page = 10, string $status = '' ): array {
+    public function get_listings(string $search = '', int $page = 1, int $per_page = 10, string $status = ''): array
+    {
         global $wpdb;
 
-        $offset = ( $page - 1 ) * $per_page;
+        $offset = ($page - 1) * $per_page;
 
         // Base SELECT with JOINs for type name, username, and first image.
         $base_select = "SELECT l.*, 
@@ -939,38 +975,38 @@ class LEB_Database_Handler {
         $where_parts = [];
         $where_vals  = [];
 
-        if ( ! empty( $status ) ) {
+        if (! empty($status)) {
             $where_parts[] = 'l.status = %s';
             $where_vals[]  = $status;
         }
 
-        if ( ! empty( $search ) ) {
-            $like          = '%' . $wpdb->esc_like( $search ) . '%';
+        if (! empty($search)) {
+            $like          = '%' . $wpdb->esc_like($search) . '%';
             $where_parts[] = 'l.title LIKE %s';
             $where_vals[]  = $like;
         }
 
         $where_sql = '';
-        if ( ! empty( $where_parts ) ) {
-            $where_sql = ' WHERE ' . implode( ' AND ', $where_parts );
+        if (! empty($where_parts)) {
+            $where_sql = ' WHERE ' . implode(' AND ', $where_parts);
         }
 
         // Count total matching rows.
-        if ( ! empty( $where_vals ) ) {
+        if (! empty($where_vals)) {
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-            $total = (int) $wpdb->get_var( $wpdb->prepare( $base_count . $where_sql, $where_vals ) );
+            $total = (int) $wpdb->get_var($wpdb->prepare($base_count . $where_sql, $where_vals));
         } else {
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-            $total = (int) $wpdb->get_var( $base_count . $where_sql );
+            $total = (int) $wpdb->get_var($base_count . $where_sql);
         }
 
         // Fetch items with pagination.
         $order_limit = ' GROUP BY l.id ORDER BY l.id DESC LIMIT %d OFFSET %d';
-        $query_vals  = array_merge( $where_vals, [ $per_page, $offset ] );
+        $query_vals  = array_merge($where_vals, [$per_page, $offset]);
 
         // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
         $items = $wpdb->get_results(
-            $wpdb->prepare( $base_select . $where_sql . $order_limit, $query_vals ),
+            $wpdb->prepare($base_select . $where_sql . $order_limit, $query_vals),
             ARRAY_A
         );
 
@@ -992,7 +1028,8 @@ class LEB_Database_Handler {
      * @param int $id Row ID.
      * @return array|null Full listing data, or null if not found.
      */
-    public function get_listing_by_id( int $id ): ?array {
+    public function get_listing_by_id(int $id): ?array
+    {
         global $wpdb;
 
         // Main listing with joins.
@@ -1011,7 +1048,7 @@ class LEB_Database_Handler {
             ARRAY_A
         );
 
-        if ( ! $row ) {
+        if (! $row) {
             return null;
         }
 
@@ -1036,7 +1073,7 @@ class LEB_Database_Handler {
         $row['blocked_dates'] = $dates_row ? $dates_row['dates'] : '[]';
 
         // Fetch host mobile number from usermeta.
-        if ( ! empty( $row['user_id'] ) ) {
+        if (! empty($row['user_id'])) {
             $mobile = $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT meta_value FROM `{$wpdb->usermeta}` WHERE user_id = %d AND meta_key = 'mobile_number' LIMIT 1",
@@ -1070,31 +1107,32 @@ class LEB_Database_Handler {
      * }
      * @return int|WP_Error Inserted listing ID on success, WP_Error on failure.
      */
-    public function create_listing( array $data ) {
+    public function create_listing(array $data)
+    {
         global $wpdb;
 
         $inserted = $wpdb->insert(
             $this->listings_table,
             [
-                'user_id'     => absint( $data['user_id'] ?? 0 ),
-                'title'       => sanitize_text_field( $data['title'] ?? '' ),
-                'description' => wp_kses_post( $data['description'] ?? '' ),
-                'guests'      => absint( $data['guests'] ?? 0 ),
-                'bedroom'     => absint( $data['bedroom'] ?? 0 ),
-                'bed'         => absint( $data['bed'] ?? 0 ),
-                'bathroom'    => absint( $data['bathroom'] ?? 0 ),
-                'price'       => absint( $data['price'] ?? 0 ),
-                'type'        => sanitize_text_field( $data['type'] ?? '' ),
-                'location'    => sanitize_text_field( $data['location'] ?? '' ),
-                'ameneties'   => sanitize_text_field( $data['ameneties'] ?? '' ),
-                'status'      => sanitize_text_field( $data['status'] ?? 'draft' ),
-                'updated_at'  => current_time( 'mysql' ),
+                'user_id'     => absint($data['user_id'] ?? 0),
+                'title'       => sanitize_text_field($data['title'] ?? ''),
+                'description' => wp_kses_post($data['description'] ?? ''),
+                'guests'      => absint($data['guests'] ?? 0),
+                'bedroom'     => absint($data['bedroom'] ?? 0),
+                'bed'         => absint($data['bed'] ?? 0),
+                'bathroom'    => absint($data['bathroom'] ?? 0),
+                'price'       => absint($data['price'] ?? 0),
+                'type'        => sanitize_text_field($data['type'] ?? ''),
+                'location'    => sanitize_text_field($data['location'] ?? ''),
+                'amenities'   => sanitize_text_field($data['amenities'] ?? ''),
+                'status'      => sanitize_text_field($data['status'] ?? 'draft'),
+                'updated_at'  => current_time('mysql'),
             ],
-            [ '%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s' ]
+            ['%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s']
         );
 
-        if ( false === $inserted ) {
-            return new WP_Error( 'leb_listing_insert_failed', __( 'Failed to create the listing.', 'listing-engine-backend' ) );
+        if (false === $inserted) {
+            return new WP_Error('leb_listing_insert_failed', __('Failed to create the listing.', 'listing-engine-backend'));
         }
 
         $listing_id = (int) $wpdb->insert_id;
@@ -1107,20 +1145,20 @@ class LEB_Database_Handler {
                 'property_id' => $listing_id,
                 'image'       => $images_json,
             ],
-            [ '%d', '%s' ]
+            ['%d', '%s']
         );
 
         // Save blocked dates (single row per property).
         $dates_json = $data['dates'] ?? '[]';
-        if ( ! empty( $dates_json ) && '[]' !== $dates_json ) {
+        if (! empty($dates_json) && '[]' !== $dates_json) {
             $wpdb->insert(
                 $this->ls_block_date_table,
                 [
                     'property_id' => $listing_id,
                     'dates'       => $dates_json,
-                    'created_at'  => current_time( 'mysql' ),
+                    'created_at'  => current_time('mysql'),
                 ],
-                [ '%d', '%s', '%s' ]
+                ['%d', '%s', '%s']
             );
         }
 
@@ -1134,58 +1172,59 @@ class LEB_Database_Handler {
      * @param array $data Same structure as create_listing data.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function update_listing( int $id, array $data ) {
+    public function update_listing(int $id, array $data)
+    {
         global $wpdb;
 
         $updated = $wpdb->update(
             $this->listings_table,
             [
-                'title'       => sanitize_text_field( $data['title'] ?? '' ),
-                'description' => wp_kses_post( $data['description'] ?? '' ),
-                'guests'      => absint( $data['guests'] ?? 0 ),
-                'bedroom'     => absint( $data['bedroom'] ?? 0 ),
-                'bed'         => absint( $data['bed'] ?? 0 ),
-                'bathroom'    => absint( $data['bathroom'] ?? 0 ),
-                'price'       => absint( $data['price'] ?? 0 ),
-                'type'        => sanitize_text_field( $data['type'] ?? '' ),
-                'location'    => sanitize_text_field( $data['location'] ?? '' ),
-                'ameneties'   => sanitize_text_field( $data['ameneties'] ?? '' ),
-                'status'      => sanitize_text_field( $data['status'] ?? 'draft' ),
-                'updated_at'  => current_time( 'mysql' ),
+                'title'       => sanitize_text_field($data['title'] ?? ''),
+                'description' => wp_kses_post($data['description'] ?? ''),
+                'guests'      => absint($data['guests'] ?? 0),
+                'bedroom'     => absint($data['bedroom'] ?? 0),
+                'bed'         => absint($data['bed'] ?? 0),
+                'bathroom'    => absint($data['bathroom'] ?? 0),
+                'price'       => absint($data['price'] ?? 0),
+                'type'        => sanitize_text_field($data['type'] ?? ''),
+                'location'    => sanitize_text_field($data['location'] ?? ''),
+                'amenities'   => sanitize_text_field($data['amenities'] ?? ''),
+                'status'      => sanitize_text_field($data['status'] ?? 'draft'),
+                'updated_at'  => current_time('mysql'),
             ],
-            [ 'id' => $id ],
-            [ '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s' ],
-            [ '%d' ]
+            ['id' => $id],
+            ['%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s'],
+            ['%d']
         );
 
-        if ( false === $updated ) {
-            return new WP_Error( 'leb_listing_update_failed', __( 'Failed to update the listing.', 'listing-engine-backend' ) );
+        if (false === $updated) {
+            return new WP_Error('leb_listing_update_failed', __('Failed to update the listing.', 'listing-engine-backend'));
         }
 
         // Update images: delete existing row, insert fresh.
         $images_json = $data['images'] ?? '[]';
-        $wpdb->delete( $this->ls_img_table, [ 'property_id' => $id ], [ '%d' ] );
+        $wpdb->delete($this->ls_img_table, ['property_id' => $id], ['%d']);
         $wpdb->insert(
             $this->ls_img_table,
             [
                 'property_id' => $id,
                 'image'       => $images_json,
             ],
-            [ '%d', '%s' ]
+            ['%d', '%s']
         );
 
         // Update blocked dates: delete existing, insert fresh.
         $dates_json = $data['dates'] ?? '[]';
-        $wpdb->delete( $this->ls_block_date_table, [ 'property_id' => $id ], [ '%d' ] );
-        if ( ! empty( $dates_json ) && '[]' !== $dates_json ) {
+        $wpdb->delete($this->ls_block_date_table, ['property_id' => $id], ['%d']);
+        if (! empty($dates_json) && '[]' !== $dates_json) {
             $wpdb->insert(
                 $this->ls_block_date_table,
                 [
                     'property_id' => $id,
                     'dates'       => $dates_json,
-                    'created_at'  => current_time( 'mysql' ),
+                    'created_at'  => current_time('mysql'),
                 ],
-                [ '%d', '%s', '%s' ]
+                ['%d', '%s', '%s']
             );
         }
 
@@ -1198,17 +1237,18 @@ class LEB_Database_Handler {
      * @param int $id Listing ID.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function delete_listing( int $id ) {
+    public function delete_listing(int $id)
+    {
         global $wpdb;
 
         // Cascade: remove related images and block dates first.
-        $wpdb->delete( $this->ls_img_table, [ 'property_id' => $id ], [ '%d' ] );
-        $wpdb->delete( $this->ls_block_date_table, [ 'property_id' => $id ], [ '%d' ] );
+        $wpdb->delete($this->ls_img_table, ['property_id' => $id], ['%d']);
+        $wpdb->delete($this->ls_block_date_table, ['property_id' => $id], ['%d']);
 
-        $deleted = $wpdb->delete( $this->listings_table, [ 'id' => $id ], [ '%d' ] );
+        $deleted = $wpdb->delete($this->listings_table, ['id' => $id], ['%d']);
 
-        if ( false === $deleted ) {
-            return new WP_Error( 'leb_listing_delete_failed', __( 'Failed to delete the listing.', 'listing-engine-backend' ) );
+        if (false === $deleted) {
+            return new WP_Error('leb_listing_delete_failed', __('Failed to delete the listing.', 'listing-engine-backend'));
         }
 
         return true;
@@ -1220,26 +1260,27 @@ class LEB_Database_Handler {
      * @param array $ids Array of listing IDs.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function delete_listings( array $ids ) {
+    public function delete_listings(array $ids)
+    {
         global $wpdb;
 
-        if ( empty( $ids ) ) {
+        if (empty($ids)) {
             return true;
         }
 
-        $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
 
         // Cascade: remove related images and block dates.
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $wpdb->query( $wpdb->prepare( "DELETE FROM `{$this->ls_img_table}` WHERE property_id IN ($placeholders)", $ids ) );
+        $wpdb->query($wpdb->prepare("DELETE FROM `{$this->ls_img_table}` WHERE property_id IN ($placeholders)", $ids));
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $wpdb->query( $wpdb->prepare( "DELETE FROM `{$this->ls_block_date_table}` WHERE property_id IN ($placeholders)", $ids ) );
+        $wpdb->query($wpdb->prepare("DELETE FROM `{$this->ls_block_date_table}` WHERE property_id IN ($placeholders)", $ids));
 
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $deleted = $wpdb->query( $wpdb->prepare( "DELETE FROM `{$this->listings_table}` WHERE id IN ($placeholders)", $ids ) );
+        $deleted = $wpdb->query($wpdb->prepare("DELETE FROM `{$this->listings_table}` WHERE id IN ($placeholders)", $ids));
 
-        if ( false === $deleted ) {
-            return new WP_Error( 'leb_listing_bulk_delete_failed', __( 'Failed to delete selected listings.', 'listing-engine-backend' ) );
+        if (false === $deleted) {
+            return new WP_Error('leb_listing_bulk_delete_failed', __('Failed to delete selected listings.', 'listing-engine-backend'));
         }
 
         return true;
@@ -1252,16 +1293,17 @@ class LEB_Database_Handler {
      * @param string $status New status value.
      * @return true|WP_Error TRUE on success, WP_Error on failure.
      */
-    public function update_listings_status( array $ids, string $status ) {
+    public function update_listings_status(array $ids, string $status)
+    {
         global $wpdb;
 
-        if ( empty( $ids ) ) {
+        if (empty($ids)) {
             return true;
         }
 
-        $status       = sanitize_text_field( $status );
-        $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-        $values       = array_merge( [ $status, current_time( 'mysql' ) ], $ids );
+        $status       = sanitize_text_field($status);
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+        $values       = array_merge([$status, current_time('mysql')], $ids);
 
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $updated = $wpdb->query(
@@ -1271,8 +1313,8 @@ class LEB_Database_Handler {
             )
         );
 
-        if ( false === $updated ) {
-            return new WP_Error( 'leb_listing_bulk_status_failed', __( 'Failed to update status for selected listings.', 'listing-engine-backend' ) );
+        if (false === $updated) {
+            return new WP_Error('leb_listing_bulk_status_failed', __('Failed to update status for selected listings.', 'listing-engine-backend'));
         }
 
         return true;
@@ -1283,7 +1325,8 @@ class LEB_Database_Handler {
      *
      * @return array Associative array of status => count.
      */
-    public function get_status_counts(): array {
+    public function get_status_counts(): array
+    {
         global $wpdb;
 
         $results = $wpdb->get_results(
@@ -1298,10 +1341,10 @@ class LEB_Database_Handler {
             'draft'     => 0,
         ];
 
-        if ( $results ) {
-            foreach ( $results as $row ) {
-                if ( isset( $counts[ $row['status'] ] ) ) {
-                    $counts[ $row['status'] ] = (int) $row['count'];
+        if ($results) {
+            foreach ($results as $row) {
+                if (isset($counts[$row['status']])) {
+                    $counts[$row['status']] = (int) $row['count'];
                 }
             }
         }
@@ -1314,7 +1357,8 @@ class LEB_Database_Handler {
      *
      * @return array Array of amenity rows with id, name, svg_path.
      */
-    public function get_all_amenities(): array {
+    public function get_all_amenities(): array
+    {
         global $wpdb;
         $items = $wpdb->get_results(
             "SELECT id, name, svg_path FROM `{$this->amenities_table}` ORDER BY name ASC",
@@ -1328,7 +1372,8 @@ class LEB_Database_Handler {
      *
      * @return array Array of location rows with id, name.
      */
-    public function get_all_locations(): array {
+    public function get_all_locations(): array
+    {
         global $wpdb;
         $items = $wpdb->get_results(
             "SELECT id, name FROM `{$this->locations_table}` ORDER BY name ASC",
@@ -1342,7 +1387,8 @@ class LEB_Database_Handler {
      *
      * @return array Array of type rows with id, name.
      */
-    public function get_all_types(): array {
+    public function get_all_types(): array
+    {
         global $wpdb;
         $items = $wpdb->get_results(
             "SELECT id, name FROM `{$this->types_table}` ORDER BY name ASC",

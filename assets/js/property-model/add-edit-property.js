@@ -52,20 +52,15 @@
         const idField = F.id();
         state.id = idField ? parseInt(idField.value, 10) || 0 : 0;
 
-        // Load lookup data in parallel.
-        loadTypes();
-        loadLocations();
-        loadAmenities();
-
-        // Wire up interactions.
-        bindSteppers();
-        bindCalendar();
-        bindImageUpload();
-        bindSaveButtons();
-
-        // If editing, fetch existing data once lookups settle.
+        // If editing, fetch existing data only after lookups settle.
         if (state.id > 0) {
-            setTimeout(fetchListingData, 400);
+            Promise.all([loadTypes(), loadLocations(), loadAmenities()]).then(function() {
+                fetchListingData();
+            });
+        } else {
+            loadTypes();
+            loadLocations();
+            loadAmenities();
         }
     });
 
@@ -73,70 +68,82 @@
      * LOOKUP DATA LOADERS
      * ═══════════════════════════════════════════════════════════ */
     function loadTypes() {
-        jQuery.post(LEB_Ajax.ajax_url, {
-            action: 'leb_listing_get_types',
-            nonce:  LEB_Ajax.nonce,
-        }, function (res) {
-            if (!res.success) return;
-            const sel = F.type();
-            (res.data || []).forEach(function (t) {
-                const opt = document.createElement('option');
-                opt.value = t.id;
-                opt.textContent = t.name;
-                sel.appendChild(opt);
-            });
+        return new Promise(function(resolve) {
+            jQuery.post(LEB_Ajax.ajax_url, {
+                action: 'leb_listing_get_types_all',
+                nonce:  LEB_Ajax.nonce,
+            }, function (res) {
+                if (res.success) {
+                    const sel = F.type();
+                    (res.data.items || []).forEach(function (t) {
+                        const opt = document.createElement('option');
+                        opt.value = t.id;
+                        opt.textContent = t.name;
+                        sel.appendChild(opt);
+                    });
+                }
+                resolve();
+            }).fail(resolve);
         });
     }
 
     function loadLocations() {
-        jQuery.post(LEB_Ajax.ajax_url, {
-            action: 'leb_listing_get_locations',
-            nonce:  LEB_Ajax.nonce,
-        }, function (res) {
-            if (!res.success) return;
-            const sel = F.location();
-            (res.data || []).forEach(function (l) {
-                const opt = document.createElement('option');
-                opt.value = l.id;
-                opt.textContent = l.name;
-                sel.appendChild(opt);
-            });
+        return new Promise(function(resolve) {
+            jQuery.post(LEB_Ajax.ajax_url, {
+                action: 'leb_listing_get_locations_all',
+                nonce:  LEB_Ajax.nonce,
+            }, function (res) {
+                if (res.success) {
+                    const sel = F.location();
+                    (res.data.items || []).forEach(function (l) {
+                        const opt = document.createElement('option');
+                        opt.value = l.id;
+                        opt.textContent = l.name;
+                        sel.appendChild(opt);
+                    });
+                }
+                resolve();
+            }).fail(resolve);
         });
     }
 
     function loadAmenities() {
-        jQuery.post(LEB_Ajax.ajax_url, {
-            action: 'leb_listing_get_amenities',
-            nonce:  LEB_Ajax.nonce,
-        }, function (res) {
-            if (!res.success) return;
-            const grid = F.amenities();
-            grid.innerHTML = '';
-            (res.data || []).forEach(function (a) {
-                const icon = a.icon_url
-                    ? '<img src="' + escHtml(a.icon_url) + '" alt="">'
-                    : '';
-                const div = document.createElement('label');
-                div.className = 'leb-prop-form-amenity-item';
-                div.innerHTML = '<input type="checkbox" class="leb-prop-form-amenity-check" value="' + a.id + '">'
-                    + icon
-                    + '<span>' + escHtml(a.name) + '</span>';
-                grid.appendChild(div);
-            });
+        return new Promise(function(resolve) {
+            jQuery.post(LEB_Ajax.ajax_url, {
+                action: 'leb_listing_get_amenities_all',
+                nonce:  LEB_Ajax.nonce,
+            }, function (res) {
+                if (res.success) {
+                    const grid = F.amenities();
+                    grid.innerHTML = '';
+                    (res.data.items || []).forEach(function (a) {
+                        const icon = a.svg_path
+                            ? '<img src="' + escHtml(a.svg_path) + '" alt="">'
+                            : '';
+                        const div = document.createElement('label');
+                        div.className = 'leb-prop-form-amenity-item';
+                        div.innerHTML = '<input type="checkbox" class="leb-prop-form-amenity-check" value="' + a.id + '">'
+                            + icon
+                            + '<span>' + escHtml(a.name) + '</span>';
+                        grid.appendChild(div);
+                    });
 
-            // Click / change handler.
-            grid.addEventListener('change', function (e) {
-                if (!e.target.classList.contains('leb-prop-form-amenity-check')) return;
-                const item = e.target.closest('.leb-prop-form-amenity-item');
-                const id = parseInt(e.target.value, 10);
-                if (e.target.checked) {
-                    state.amenityIds.add(id);
-                    item.classList.add('leb-prop-form-amenity-item--selected');
-                } else {
-                    state.amenityIds.delete(id);
-                    item.classList.remove('leb-prop-form-amenity-item--selected');
+                    // Click / change handler.
+                    grid.addEventListener('change', function (e) {
+                        if (!e.target.classList.contains('leb-prop-form-amenity-check')) return;
+                        const item = e.target.closest('.leb-prop-form-amenity-item');
+                        const id = parseInt(e.target.value, 10);
+                        if (e.target.checked) {
+                            state.amenityIds.add(id);
+                            item.classList.add('leb-prop-form-amenity-item--selected');
+                        } else {
+                            state.amenityIds.delete(id);
+                            item.classList.remove('leb-prop-form-amenity-item--selected');
+                        }
+                    });
                 }
-            });
+                resolve();
+            }).fail(resolve);
         });
     }
 
@@ -145,7 +152,7 @@
      * ═══════════════════════════════════════════════════════════ */
     function fetchListingData() {
         jQuery.post(LEB_Ajax.ajax_url, {
-            action: 'leb_listing_get_single',
+            action: 'leb_listing_get_listing',
             nonce:  LEB_Ajax.nonce,
             id:     state.id,
         }, function (res) {
@@ -153,7 +160,7 @@
                 LEB_Toaster.error(res.data?.message || 'Failed to load property.');
                 return;
             }
-            const d = res.data;
+            const d = res.data.listing;
 
             // Basic fields.
             F.title().value       = d.title || '';
@@ -164,11 +171,9 @@
             F.bathroom().value    = d.bathroom || 0;
             F.price().value       = d.price || '';
 
-            // Dropdowns –  set value after a tiny delay so options are populated.
-            setTimeout(function () {
-                if (d.type_id)     F.type().value = d.type_id;
-                if (d.location_id) F.location().value = d.location_id;
-            }, 100);
+            // Dropdowns.
+            if (d.type)     F.type().value = d.type;
+            if (d.location) F.location().value = d.location;
 
             // Status radio.
             if (d.status) {
@@ -177,24 +182,41 @@
             }
 
             // Images.
-            if (d.images && d.images.length) {
-                state.images = d.images.map(function (img, i) {
-                    return { id: img.attachment_id || 0, url: img.image_url, sort_order: img.sort_order || i };
-                });
-                renderImages();
+            if (d.images) {
+                try {
+                    const imgData = typeof d.images === 'string' ? JSON.parse(d.images) : d.images;
+                    state.images = imgData.map(function (img, i) {
+                        return { id: img.attachment_id || 0, url: img.image_url, sort_order: img.sort_order || i };
+                    });
+                    renderImages();
+                } catch (e) { console.error('Image parse error', e); }
             }
 
             // Amenities.
-            if (d.amenity_ids && d.amenity_ids.length) {
-                state.amenityIds = new Set(d.amenity_ids.map(Number));
+            if (d.amenities) { 
+                let amens = [];
+                try {
+                    // Try parsing as JSON array first
+                    amens = JSON.parse(d.amenities);
+                    if (!Array.isArray(amens)) {
+                        amens = [amens];
+                    }
+                } catch (e) {
+                    // Fallback: it might be a comma-separated string
+                    amens = String(d.amenities).split(',');
+                }
+                state.amenityIds = new Set(amens.filter(x => x).map(Number));
                 syncAmenityCheckboxes();
             }
 
             // Blocked dates.
-            if (d.blocked_dates && d.blocked_dates.length) {
-                state.blockedDates = d.blocked_dates.map(function (bd) { return bd.blocked_date || bd; });
-                renderBlockedChips();
-                renderCalendar();
+            if (d.blocked_dates) {
+                try {
+                    const dateData = typeof d.blocked_dates === 'string' ? JSON.parse(d.blocked_dates) : d.blocked_dates;
+                    state.blockedDates = dateData.map(function (bd) { return bd.blocked_date || bd; });
+                    renderBlockedChips();
+                    renderCalendar();
+                } catch (e) { console.error('Date parse error', e); }
             }
         });
     }
@@ -460,12 +482,12 @@
             bedroom:      parseInt(F.bedroom().value, 10) || 0,
             bed:          parseInt(F.bed().value, 10) || 0,
             bathroom:     parseInt(F.bathroom().value, 10) || 0,
-            type_id:      parseInt(F.type().value, 10) || 0,
-            location_id:  parseInt(F.location().value, 10) || 0,
+            type:         parseInt(F.type().value, 10) || 0,
+            location:     parseInt(F.location().value, 10) || 0,
             status:       status,
-            amenity_ids:  JSON.stringify(Array.from(state.amenityIds)),
+            amenities:    Array.from(state.amenityIds).join(','),
             images:       JSON.stringify(state.images.map(function (img) { return { attachment_id: img.id, image_url: img.url, sort_order: img.sort_order }; })),
-            blocked_dates: JSON.stringify(state.blockedDates),
+            dates:        JSON.stringify(state.blockedDates),
         };
 
         if (state.id > 0) {

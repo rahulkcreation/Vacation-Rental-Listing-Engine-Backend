@@ -17,7 +17,7 @@ global $wpdb;
 $leb_types_table       = $wpdb->prefix . 'ls_types';
 $leb_status            = leb_check_table_status( $leb_types_table );
 
-$leb_amenities_table   = $wpdb->prefix . 'ls_ameneties';
+$leb_amenities_table   = $wpdb->prefix . 'ls_amenities';
 $leb_amen_status       = leb_check_table_status( $leb_amenities_table );
 
 $leb_locations_table   = $wpdb->prefix . 'ls_location';
@@ -93,13 +93,13 @@ $leb_block_date_status = leb_check_table_status( $leb_block_date_table );
 
         <!-- Amenities Table Card (initial PHP render – JS updates on refresh) -->
         <?php
-        $leb_amenities_table  = $wpdb->prefix . 'ls_ameneties';
+        $leb_amenities_table  = $wpdb->prefix . 'ls_amenities';
         $leb_amen_status      = leb_check_table_status( $leb_amenities_table );
         ?>
-        <div class="leb-db-card" id="leb-db-card-ls_ameneties">
+        <div class="leb-db-card" id="leb-db-card-ls_amenities">
             <h2 class="leb-db-card-title"><?php esc_html_e( 'Amenities Table', 'listing-engine-backend' ); ?></h2>
 
-            <div class="leb-db-statuses" id="leb-db-statuses-ls_ameneties">
+            <div class="leb-db-statuses" id="leb-db-statuses-ls_amenities">
                 <?php leb_render_db_card_statuses( $leb_amen_status ); ?>
             </div>
 
@@ -107,8 +107,8 @@ $leb_block_date_status = leb_check_table_status( $leb_block_date_table );
                 <!-- Refresh button -->
                 <button
                     class="leb-db-btn leb-db-btn--refresh"
-                    id="leb-db-refresh-ls_ameneties"
-                    data-table-key="ls_ameneties"
+                    id="leb-db-refresh-ls_amenities"
+                    data-table-key="ls_amenities"
                     aria-label="<?php esc_attr_e( 'Refresh amenities table status', 'listing-engine-backend' ); ?>">
                     <span class="leb-db-card-spin" aria-hidden="true"></span>
                     <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -121,8 +121,8 @@ $leb_block_date_status = leb_check_table_status( $leb_block_date_table );
                 <!-- Create/Repair button -->
                 <button
                     class="leb-db-btn leb-db-btn--repair"
-                    id="leb-db-repair-ls_ameneties"
-                    data-table-key="ls_ameneties"
+                    id="leb-db-repair-ls_amenities"
+                    data-table-key="ls_amenities"
                     aria-label="<?php esc_attr_e( 'Create or repair amenities table', 'listing-engine-backend' ); ?>">
                     <span class="leb-db-card-spin" aria-hidden="true"></span>
                     <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
