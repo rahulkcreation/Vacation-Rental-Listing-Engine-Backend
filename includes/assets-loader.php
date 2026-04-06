@@ -136,73 +136,66 @@ function leb_enqueue_admin_assets( string $hook_suffix ) {
     $css_file        = '';
     $js_file         = '';
 
-    // Robust matching for Types / Add-Edit pages.
-    if ( false !== strpos( $hook_suffix, 'leb-types' ) ) {
+    // ── 1. Types Management ─────────────────────────────────────
+    // Matches the top-level 'LEB' menu or the 'Types' submenu.
+    // Hook patterns: 'toplevel_page_leb-types', 'leb-types_page_leb-types'.
+    if ( false !== strpos( $hook_suffix, 'toplevel_page_leb-types' ) || false !== strpos( $hook_suffix, 'page_leb-types' ) ) {
         $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
         if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
-            $template_handle = 'leb-add-edit-type';
-            $css_file        = 'type-model/add-edit-type.css';
-            $js_file         = 'type-model/add-edit-type.js';
+            $css_path = 'type-model/add-edit-type.css';
+            $js_path  = 'type-model/add-edit-type.js';
+            wp_enqueue_style( 'leb-add-edit-type', LEB_ASSETS_CSS_URL . $css_path, [ 'leb-global', 'leb-shared-css' ], filemtime( LEB_PLUGIN_DIR . 'assets/css/' . $css_path ) );
+            wp_enqueue_script( 'leb-add-edit-type', LEB_ASSETS_JS_URL . $js_path, [ 'jquery' ], filemtime( LEB_PLUGIN_DIR . 'assets/js/' . $js_path ), true );
         } else {
-            $template_handle = 'leb-type-management';
-            $css_file        = 'type-model/type-management.css';
-            $js_file         = 'type-model/type-management.js';
+            $css_path = 'type-model/type-management.css';
+            $js_path  = 'type-model/type-management.js';
+            wp_enqueue_style( 'leb-type-management', LEB_ASSETS_CSS_URL . $css_path, [ 'leb-global', 'leb-shared-css' ], filemtime( LEB_PLUGIN_DIR . 'assets/css/' . $css_path ) );
+            wp_enqueue_script( 'leb-type-management', LEB_ASSETS_JS_URL . $js_path, [ 'jquery' ], filemtime( LEB_PLUGIN_DIR . 'assets/js/' . $js_path ), true );
         }
     } 
-    // Robust matching for Database page.
-    elseif ( false !== strpos( $hook_suffix, 'leb-database' ) ) {
-        $template_handle = 'leb-database-page';
-        $css_file        = 'database-page.css';
+    // ── 2. Database Management ──────────────────────────────────
+    // Matches the 'Database' submenu page.
+    // Hook pattern: 'leb-types_page_leb-database'.
+    elseif ( false !== strpos( $hook_suffix, 'page_leb-database' ) ) {
+        $css_path = 'database-page.css';
+        wp_enqueue_style( 'leb-database-page', LEB_ASSETS_CSS_URL . $css_path, [ 'leb-global', 'leb-shared-css' ], filemtime( LEB_PLUGIN_DIR . 'assets/css/' . $css_path ) );
     }
-    // Robust matching for Amenities list / Add-Edit pages.
-    elseif (strpos($hook_suffix, 'leb-amenities') !== false) {
-        // -- Amenity Management (List or Add/Edit) --
+    // ── 3. Amenities Management ─────────────────────────────────
+    // Matches the 'Amenities' submenu and Handles both List and Add/Edit (viam query param leb_action).
+    // Hook pattern: 'leb-types_page_leb-amenities'.
+    elseif ( false !== strpos( $hook_suffix, 'page_leb-amenities' ) ) {
         $leb_action = isset($_GET['leb_action']) ? sanitize_text_field(wp_unslash($_GET['leb_action'])) : 'list';
         if (in_array($leb_action, ['add', 'edit'], true)) {
-            // Add / Edit Amenity
-            wp_enqueue_style('leb-amenity-add-edit', LEB_PLUGIN_URL . 'assets/css/amenity-model/add-edit-amenity.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/amenity-model/add-edit-amenity.css'));
-            wp_enqueue_script('leb-amenity-add-edit', LEB_PLUGIN_URL . 'assets/js/amenity-model/add-edit-amenity.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/amenity-model/add-edit-amenity.js'), true);
+            $css_path = 'amenity-model/add-edit-amenity.css';
+            $js_path  = 'amenity-model/add-edit-amenity.js';
+            wp_enqueue_style('leb-amenity-add-edit', LEB_ASSETS_CSS_URL . $css_path, ['leb-global', 'leb-shared-css'], filemtime(LEB_PLUGIN_DIR . 'assets/css/' . $css_path));
+            wp_enqueue_script('leb-amenity-add-edit', LEB_ASSETS_JS_URL . $js_path, ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/' . $js_path), true);
         } else {
-            // Amenity List
-            wp_enqueue_style('leb-amenity-management', LEB_PLUGIN_URL . 'assets/css/amenity-model/amenity-management.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/amenity-model/amenity-management.css'));
-            wp_enqueue_script('leb-amenity-management', LEB_PLUGIN_URL . 'assets/js/amenity-model/amenity-management.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/amenity-model/amenity-management.js'), true);
+            $css_path = 'amenity-model/amenity-management.css';
+            $js_path  = 'amenity-model/amenity-management.js';
+            wp_enqueue_style('leb-amenity-management', LEB_ASSETS_CSS_URL . $css_path, ['leb-global', 'leb-shared-css'], filemtime(LEB_PLUGIN_DIR . 'assets/css/' . $css_path));
+            wp_enqueue_script('leb-amenity-management', LEB_ASSETS_JS_URL . $js_path, ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/' . $js_path), true);
         }
-    } elseif (strpos($hook_suffix, 'leb-locations') !== false) {
-        // -- Location Management (List or Add/Edit) --
+    } 
+    // ── 4. Location Management ──────────────────────────────────
+    // Matches the 'Locations' submenu and Handles both List and Add/Edit (viam query param leb_action).
+    // Hook pattern: 'leb-types_page_leb-locations'.
+    elseif ( false !== strpos( $hook_suffix, 'page_leb-locations' ) ) {
         $leb_action = isset($_GET['leb_action']) ? sanitize_text_field(wp_unslash($_GET['leb_action'])) : 'list';
         if (in_array($leb_action, ['add', 'edit'], true)) {
-            // Add / Edit Location
-            wp_enqueue_style('leb-loc-add-edit', LEB_PLUGIN_URL . 'assets/css/location-model/add-edit-location.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/location-model/add-edit-location.css'));
-            wp_enqueue_script('leb-loc-add-edit', LEB_PLUGIN_URL . 'assets/js/location-model/add-edit-location.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/location-model/add-edit-location.js'), true);
+            $css_path = 'location-model/add-edit-location.css';
+            $js_path  = 'location-model/add-edit-location.js';
+            wp_enqueue_style('leb-loc-add-edit', LEB_ASSETS_CSS_URL . $css_path, ['leb-global', 'leb-shared-css'], filemtime(LEB_PLUGIN_DIR . 'assets/css/' . $css_path));
+            wp_enqueue_script('leb-loc-add-edit', LEB_ASSETS_JS_URL . $js_path, ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/' . $js_path), true);
         } else {
-            // Location List
-            wp_enqueue_style('leb-loc-management', LEB_PLUGIN_URL . 'assets/css/location-model/location-management.css', [], filemtime(LEB_PLUGIN_DIR . 'assets/css/location-model/location-management.css'));
-            wp_enqueue_script('leb-loc-management', LEB_PLUGIN_URL . 'assets/js/location-model/location-management.js', ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/location-model/location-management.js'), true);
+            $css_path = 'location-model/location-management.css';
+            $js_path  = 'location-model/location-management.js';
+            wp_enqueue_style('leb-loc-management', LEB_ASSETS_CSS_URL . $css_path, ['leb-global', 'leb-shared-css'], filemtime(LEB_PLUGIN_DIR . 'assets/css/' . $css_path));
+            wp_enqueue_script('leb-loc-management', LEB_ASSETS_JS_URL . $js_path, ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/' . $js_path), true);
         }
     }
 
-    // Enqueue CSS
-    if ( $template_handle && $css_file ) {
-        $css_full_path = LEB_PLUGIN_DIR . 'assets/css/' . $css_file;
-        wp_enqueue_style(
-            $template_handle,
-            LEB_ASSETS_CSS_URL . $css_file,
-            [ 'leb-global' ],
-            file_exists( $css_full_path ) ? (string) filemtime( $css_full_path ) : LEB_VERSION
-        );
-    }
-
-    // Enqueue JS
-    if ( $template_handle && $js_file ) {
-        $js_full_path = LEB_PLUGIN_DIR . 'assets/js/' . $js_file;
-        wp_enqueue_script(
-            $template_handle,
-            LEB_ASSETS_JS_URL . $js_file,
-            [],
-            file_exists( $js_full_path ) ? (string) filemtime( $js_full_path ) : LEB_VERSION,
-            true
-        );
-    }
+    // Assets are now enqueued directly within each block above for better isolation.
 }
 
 /**
@@ -245,6 +238,7 @@ function leb_is_leb_page( string $hook_suffix ): bool {
         'leb-types',      // Covers 'toplevel_page_leb-types' and the add/edit ?leb_action= variant.
         'leb-database',   // Covers any hook suffix referencing the Database submenu.
         'leb-amenities',  // Covers the new Amenities submenu and its add/edit form.
+        'leb-locations',  // Covers the new Locations submenu and its add/edit form.
     ];
 
     foreach ( $leb_slug_patterns as $pattern ) {

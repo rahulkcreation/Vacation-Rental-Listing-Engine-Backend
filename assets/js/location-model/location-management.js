@@ -249,7 +249,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
     function lebLocPerformBulkDelete() {
         var formData = new FormData();
-        formData.append( 'action', 'leb_ajax_loc_bulk_delete_locations' );
+        formData.append( 'action', 'leb_loc_bulk_delete_locations' );
         formData.append( 'nonce',  nonce );
         lebLocState.selectedIds.forEach( function ( id ) {
             formData.append( 'ids[]', id );
@@ -345,7 +345,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
     function lebLocPerformDelete( id ) {
         var formData = new FormData();
-        formData.append( 'action', 'leb_ajax_loc_delete_location' );
+        formData.append( 'action', 'leb_loc_delete_location' );
         formData.append( 'nonce',  nonce );
         formData.append( 'id',     id );
 
@@ -374,7 +374,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
         lebLocShowLoading();
 
         var formData = new FormData();
-        formData.append( 'action',   'leb_ajax_loc_get_locations' );
+        formData.append( 'action',   'leb_loc_get_locations' );
         formData.append( 'nonce',    nonce );
         formData.append( 'search',   lebLocState.searchTerm );
         formData.append( 'page',     lebLocState.currentPage );

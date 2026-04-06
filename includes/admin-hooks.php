@@ -898,7 +898,6 @@ function leb_ajax_loc_delete_location() {
 
     $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
     if ( ! $id ) wp_send_json_error( [ 'message' => 'Invalid ID' ] );
-
     $handler = new LEB_Database_Handler();
     $result  = $handler->delete_location( $id );
 

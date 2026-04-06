@@ -208,10 +208,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
         fd.append( 'attachment_id', attachmentId );
 
         if ( isEdit ) {
-            fd.append( 'action', 'leb_ajax_loc_update_location' );
+            fd.append( 'action', 'leb_loc_update_location' );
             fd.append( 'id',     editId );
         } else {
-            fd.append( 'action', 'leb_ajax_loc_create_location' );
+            fd.append( 'action', 'leb_loc_create_location' );
         }
 
         fetch( ajaxUrl, { method: 'POST', body: fd, credentials: 'same-origin' } )
