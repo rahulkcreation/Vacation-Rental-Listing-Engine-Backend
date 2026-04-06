@@ -58,6 +58,16 @@ function leb_register_admin_menus() {
         'leb-database',
         'leb_render_database_page'
     );
+
+    // Sub-menu 3: Amenities.
+    add_submenu_page(
+        'leb-types',
+        __( 'Manage Amenities', 'listing-engine-backend' ),
+        __( 'Amenities', 'listing-engine-backend' ),
+        'manage_options',
+        'leb-amenities',
+        'leb_render_amenity_management_page'
+    );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -91,6 +101,24 @@ function leb_render_database_page() {
         wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'listing-engine-backend' ) );
     }
     require_once LEB_TEMPLATES_PATH . 'database-page.php';
+}
+
+/**
+ * Render the Amenity Management screen.
+ * Handles both the list view and the add/edit form via `?leb_action=edit&id=X`.
+ */
+function leb_render_amenity_management_page() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'listing-engine-backend' ) );
+    }
+
+    $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : 'list';
+
+    if ( $leb_action === 'edit' || $leb_action === 'add' ) {
+        require_once LEB_TEMPLATES_PATH . 'add-edit-amenity.php';
+    } else {
+        require_once LEB_TEMPLATES_PATH . 'amenity-management.php';
+    }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -137,6 +165,25 @@ add_action( 'wp_ajax_leb_db_status',       'leb_ajax_db_status' );
 
 // -- Database: Create / Repair table --
 add_action( 'wp_ajax_leb_db_create_repair','leb_ajax_db_create_repair' );
+
+// ── Amenity AJAX Hooks ────────────────────────────────────────
+// -- Amenities: Get list (search + pagination) --
+add_action( 'wp_ajax_leb_amen_get_amenities',       'leb_ajax_amen_get_amenities' );
+
+// -- Amenities: Create --
+add_action( 'wp_ajax_leb_amen_create_amenity',      'leb_ajax_amen_create_amenity' );
+
+// -- Amenities: Update --
+add_action( 'wp_ajax_leb_amen_update_amenity',      'leb_ajax_amen_update_amenity' );
+
+// -- Amenities: Get single (for edit pre-fill) --
+add_action( 'wp_ajax_leb_amen_get_amenity',         'leb_ajax_amen_get_amenity' );
+
+// -- Amenities: Delete single --
+add_action( 'wp_ajax_leb_amen_delete_amenity',       'leb_ajax_amen_delete_amenity' );
+
+// -- Amenities: Bulk delete --
+add_action( 'wp_ajax_leb_amen_bulk_delete_amenities','leb_ajax_amen_bulk_delete_amenities' );
 
 /**
  * AJAX: Return paginated / searched list of types.
@@ -294,6 +341,9 @@ function leb_ajax_bulk_delete_types() {
 
 /**
  * AJAX: Return current DB status for all registered tables.
+ *
+ * Returns both ls_types and ls_ameneties so the JS refresh handler can
+ * update both cards with a single network request.
  */
 function leb_ajax_db_status() {
     check_ajax_referer( 'leb_nonce', 'nonce' );
@@ -303,17 +353,30 @@ function leb_ajax_db_status() {
     }
 
     global $wpdb;
-    $table_name = $wpdb->prefix . 'ls_types';
-    $status     = leb_check_table_status( $table_name );
+
+    // Types table status.
+    $types_table  = $wpdb->prefix . 'ls_types';
+    $types_status = leb_check_table_status( $types_table );
+
+    // Amenities table status.
+    $amen_table  = $wpdb->prefix . 'ls_ameneties';
+    $amen_status = leb_check_table_status( $amen_table );
 
     wp_send_json_success( [
         'tables' => [
             [
-                'key'            => 'ls_types',
-                'title'          => __( 'Types Table', 'listing-engine-backend' ),
-                'table_name'     => $table_name,
-                'exists'         => $status['exists'],
-                'rows_complete'  => $status['rows_complete'],
+                'key'           => 'ls_types',
+                'title'         => __( 'Types Table', 'listing-engine-backend' ),
+                'table_name'    => $types_table,
+                'exists'        => $types_status['exists'],
+                'rows_complete' => $types_status['rows_complete'],
+            ],
+            [
+                'key'           => 'ls_ameneties',
+                'title'         => __( 'Amenities Table', 'listing-engine-backend' ),
+                'table_name'    => $amen_table,
+                'exists'        => $amen_status['exists'],
+                'rows_complete' => $amen_status['rows_complete'],
             ],
         ],
     ] );
@@ -321,6 +384,8 @@ function leb_ajax_db_status() {
 
 /**
  * AJAX: Create or repair a specific table.
+ *
+ * Now supports both 'ls_types' and 'ls_ameneties' table keys.
  */
 function leb_ajax_db_create_repair() {
     check_ajax_referer( 'leb_nonce', 'nonce' );
@@ -330,17 +395,279 @@ function leb_ajax_db_create_repair() {
     }
 
     $table_key = isset( $_POST['table_key'] ) ? sanitize_text_field( wp_unslash( $_POST['table_key'] ) ) : '';
+    $handler   = new LEB_Database_Handler();
 
-    if ( $table_key !== 'ls_types' ) {
+    if ( $table_key === 'ls_types' ) {
+        $result = $handler->create_or_repair_types_table();
+    } elseif ( $table_key === 'ls_ameneties' ) {
+        $result = $handler->create_or_repair_amenities_table();
+    } else {
         wp_send_json_error( [ 'message' => __( 'Unknown table key.', 'listing-engine-backend' ) ] );
     }
-
-    $handler = new LEB_Database_Handler();
-    $result  = $handler->create_or_repair_types_table();
 
     if ( is_wp_error( $result ) ) {
         wp_send_json_error( [ 'message' => $result->get_error_message() ] );
     }
 
     wp_send_json_success( [ 'message' => __( 'Table created / repaired successfully.', 'listing-engine-backend' ) ] );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Amenity AJAX Handlers
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * AJAX: Return paginated / searched list of amenities.
+ */
+function leb_ajax_amen_get_amenities() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $search   = isset( $_POST['search'] )   ? sanitize_text_field( wp_unslash( $_POST['search'] ) )   : '';
+    $page     = isset( $_POST['page'] )     ? absint( $_POST['page'] )     : 1;
+    $per_page = isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : 10;
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->get_amenities( $search, $page, $per_page );
+
+    wp_send_json_success( $result );
+}
+
+/**
+ * AJAX: Create a new amenity entry.
+ *
+ * SVG from WP Media Library:
+ *  – Only SVG mime-type is accepted.
+ *  – Max size: 1 MB.
+ *  – Dimensions must be 24×24 px (verified server-side via attachment post meta).
+ */
+function leb_ajax_amen_create_amenity() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $name          = isset( $_POST['name'] )          ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+    $svg_path      = isset( $_POST['svg_path'] )      ? esc_url_raw( wp_unslash( $_POST['svg_path'] ) )     : '';
+    $attachment_id = isset( $_POST['attachment_id'] ) ? absint( $_POST['attachment_id'] )                   : 0;
+
+    if ( empty( $name ) ) {
+        wp_send_json_error( [ 'message' => __( 'Amenity Name is required.', 'listing-engine-backend' ) ] );
+    }
+
+    // Validate SVG attachment if one was provided.
+    if ( $attachment_id ) {
+        $svg_validation = leb_amen_validate_svg_attachment( $attachment_id );
+        if ( is_wp_error( $svg_validation ) ) {
+            wp_send_json_error( [ 'message' => $svg_validation->get_error_message() ] );
+        }
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->create_amenity( $name, $svg_path );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => __( 'Amenity created successfully.', 'listing-engine-backend' ), 'id' => $result ] );
+}
+
+/**
+ * AJAX: Update an existing amenity entry.
+ */
+function leb_ajax_amen_update_amenity() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $id            = isset( $_POST['id'] )            ? absint( $_POST['id'] )                             : 0;
+    $name          = isset( $_POST['name'] )          ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+    $svg_path      = isset( $_POST['svg_path'] )      ? esc_url_raw( wp_unslash( $_POST['svg_path'] ) )     : '';
+    $attachment_id = isset( $_POST['attachment_id'] ) ? absint( $_POST['attachment_id'] )                   : 0;
+
+    if ( ! $id || empty( $name ) ) {
+        wp_send_json_error( [ 'message' => __( 'ID and Name are required.', 'listing-engine-backend' ) ] );
+    }
+
+    // Validate new SVG attachment if a new one was selected.
+    if ( $attachment_id ) {
+        $svg_validation = leb_amen_validate_svg_attachment( $attachment_id );
+        if ( is_wp_error( $svg_validation ) ) {
+            wp_send_json_error( [ 'message' => $svg_validation->get_error_message() ] );
+        }
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->update_amenity( $id, $name, $svg_path );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => __( 'Amenity updated successfully.', 'listing-engine-backend' ) ] );
+}
+
+/**
+ * AJAX: Get a single amenity row (for the edit form pre-fill).
+ */
+function leb_ajax_amen_get_amenity() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+
+    if ( ! $id ) {
+        wp_send_json_error( [ 'message' => __( 'Invalid ID.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler  = new LEB_Database_Handler();
+    $amenity  = $handler->get_amenity_by_id( $id );
+
+    if ( ! $amenity ) {
+        wp_send_json_error( [ 'message' => __( 'Amenity not found.', 'listing-engine-backend' ) ] );
+    }
+
+    wp_send_json_success( [ 'amenity' => $amenity ] );
+}
+
+/**
+ * AJAX: Delete an existing amenity entry.
+ */
+function leb_ajax_amen_delete_amenity() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+
+    if ( ! $id ) {
+        wp_send_json_error( [ 'message' => __( 'Invalid ID.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->delete_amenity( $id );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => __( 'Amenity deleted successfully.', 'listing-engine-backend' ) ] );
+}
+
+/**
+ * AJAX: Delete multiple amenity entries (Bulk Action).
+ */
+function leb_ajax_amen_bulk_delete_amenities() {
+    check_ajax_referer( 'leb_nonce', 'nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( [ 'message' => __( 'Unauthorized.', 'listing-engine-backend' ) ] );
+    }
+
+    $ids = isset( $_POST['ids'] ) ? (array) $_POST['ids'] : [];
+    $ids = array_filter( array_map( 'absint', $ids ) );
+
+    if ( empty( $ids ) ) {
+        wp_send_json_error( [ 'message' => __( 'No valid IDs provided.', 'listing-engine-backend' ) ] );
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->delete_amenities( $ids );
+
+    if ( is_wp_error( $result ) ) {
+        wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+    }
+
+    wp_send_json_success( [ 'message' => sprintf( __( '%d amenities deleted successfully.', 'listing-engine-backend' ), count( $ids ) ) ] );
+}
+
+// ─────────────────────────────────────────────────────────────
+// SVG Attachment Validation Helper
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Validate that a WP media attachment meets the SVG icon requirements:
+ *   – Must exist and be an SVG (image/svg+xml).
+ *   – File size must not exceed 1 MB.
+ *   – Image dimensions must be exactly 24 × 24 px.
+ *
+ * @param int $attachment_id WordPress attachment post ID.
+ * @return true|WP_Error TRUE if valid, WP_Error with a human-readable message otherwise.
+ */
+function leb_amen_validate_svg_attachment( int $attachment_id ) {
+    // Verify the attachment post exists.
+    $attachment = get_post( $attachment_id );
+    if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
+        return new WP_Error( 'leb_amen_invalid_attachment', __( 'Invalid attachment ID.', 'listing-engine-backend' ) );
+    }
+
+    // Verify the MIME type is SVG.
+    $mime_type = get_post_mime_type( $attachment_id );
+    if ( 'image/svg+xml' !== $mime_type ) {
+        return new WP_Error( 'leb_amen_not_svg', __( 'Only SVG files are allowed for amenity icons.', 'listing-engine-backend' ) );
+    }
+
+    // Verify file size (must be ≤ 1 MB = 1,048,576 bytes).
+    $file_path = get_attached_file( $attachment_id );
+    if ( $file_path && file_exists( $file_path ) ) {
+        $file_size = filesize( $file_path );
+        if ( $file_size > 1048576 ) {
+            return new WP_Error(
+                'leb_amen_file_too_large',
+                __( 'SVG file size must not exceed 1 MB.', 'listing-engine-backend' )
+            );
+        }
+    }
+
+    // Verify dimensions (must be exactly 24 × 24 px).
+    // Note: PHP getimagesize() does not read SVG dimensions, so we check
+    // the attachment meta first; if unavailable, we parse the SVG file.
+    $image_meta = wp_get_attachment_metadata( $attachment_id );
+    $width      = isset( $image_meta['width'] )  ? (int) $image_meta['width']  : 0;
+    $height     = isset( $image_meta['height'] ) ? (int) $image_meta['height'] : 0;
+
+    // Fallback: read width/height attributes directly from the SVG markup.
+    if ( ( ! $width || ! $height ) && $file_path && file_exists( $file_path ) ) {
+        $svg_content = file_get_contents( $file_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+        if ( $svg_content ) {
+            // Match width="24" and height="24" attributes (or viewBox="0 0 24 24").
+            if ( preg_match( '/\bwidth=["\']?(\d+)["\']?/i', $svg_content, $w_match ) ) {
+                $width = (int) $w_match[1];
+            }
+            if ( preg_match( '/\bheight=["\']?(\d+)["\']?/i', $svg_content, $h_match ) ) {
+                $height = (int) $h_match[1];
+            }
+            // Try viewBox as last resort.
+            if ( ( ! $width || ! $height ) && preg_match( '/\bviewBox=["\']?\d+\s+\d+\s+(\d+)\s+(\d+)["\']?/i', $svg_content, $vb ) ) {
+                $width  = (int) $vb[1];
+                $height = (int) $vb[2];
+            }
+        }
+    }
+
+    if ( $width && $height && ( $width !== 24 || $height !== 24 ) ) {
+        return new WP_Error(
+            'leb_amen_wrong_dimensions',
+            /* translators: 1: actual width, 2: actual height */
+            sprintf(
+                __( 'SVG icon must be exactly 24×24 px. Uploaded file is %1$d×%2$d px.', 'listing-engine-backend' ),
+                $width,
+                $height
+            )
+        );
+    }
+
+    return true;
 }

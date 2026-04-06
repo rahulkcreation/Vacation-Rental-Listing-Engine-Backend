@@ -57,6 +57,37 @@ function leb_get_default_type_rows() {
 }
 
 /**
+ * Returns the CREATE TABLE SQL for the `{prefix}ls_ameneties` table.
+ *
+ * Columns:
+ *   id         – Auto-incrementing primary key.
+ *   name       – Display name of the amenity.
+ *   svg_path   – WordPress media library attachment URL for the 24×24 SVG icon.
+ *   updated_at – Auto-updated timestamp.
+ *
+ * Uses dbDelta-compatible formatting (two spaces before KEY definitions).
+ *
+ * @return string SQL statement.
+ */
+function leb_get_amenities_schema() {
+    global $wpdb;
+
+    $table_name      = $wpdb->prefix . 'ls_ameneties';
+    $charset_collate = $wpdb->get_charset_collate();
+
+    // NOTE: dbDelta requires TWO spaces before PRIMARY KEY / KEY lines.
+    return "CREATE TABLE {$table_name} (
+  id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  svg_path varchar(2048) DEFAULT NULL,
+  updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (id)
+) {$charset_collate};";
+}
+
+// ─────────────────────────────────────────────────────────────
+
+/**
  * Checks the current status of a given table in the WordPress database.
  *
  * @param string $table_name Fully-qualified table name (with prefix).

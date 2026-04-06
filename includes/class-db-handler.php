@@ -28,11 +28,19 @@ class LEB_Database_Handler {
     private string $types_table;
 
     /**
-     * Constructor – resolves the table name with the WP prefix.
+     * The fully-qualified name of the ls_ameneties table.
+     *
+     * @var string
+     */
+    private string $amenities_table;
+
+    /**
+     * Constructor – resolves both table names with the WP prefix.
      */
     public function __construct() {
         global $wpdb;
-        $this->types_table = $wpdb->prefix . 'ls_types';
+        $this->types_table     = $wpdb->prefix . 'ls_types';
+        $this->amenities_table = $wpdb->prefix . 'ls_ameneties';
     }
 
     // ─────────────────────────────────────────────────────────
@@ -349,5 +357,252 @@ class LEB_Database_Handler {
         }
 
         return (bool) $count;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Amenities – Table Maintenance
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Create or repair the ls_ameneties table.
+     *
+     * Uses dbDelta() for safe upgrades. SVG validation is intentionally
+     * handled at the AJAX/template layer; this method only concerns itself
+     * with table structure.
+     *
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function create_or_repair_amenities_table() {
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+        $sql    = leb_get_amenities_schema();
+        $result = dbDelta( $sql );
+
+        // dbDelta does not return errors directly; check table existence.
+        $status = leb_check_table_status( $this->amenities_table );
+
+        if ( ! $status['exists'] ) {
+            return new WP_Error(
+                'leb_amen_table_create_failed',
+                __( 'Amenities table could not be created. Check database permissions.', 'listing-engine-backend' )
+            );
+        }
+
+        return true;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Amenities – Read Operations
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Retrieve a paginated, optionally searched list of amenities.
+     *
+     * @param string $search   Search term (matched against name).
+     * @param int    $page     1-based page number.
+     * @param int    $per_page Items per page.
+     * @return array {
+     *     @type array $items  Rows from the database.
+     *     @type int   $total  Total row count matching the query.
+     * }
+     */
+    public function get_amenities( string $search = '', int $page = 1, int $per_page = 10 ): array {
+        global $wpdb;
+
+        $offset = ( $page - 1 ) * $per_page;
+
+        if ( ! empty( $search ) ) {
+            $like = '%' . $wpdb->esc_like( $search ) . '%';
+
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $items = $wpdb->get_results(
+                $wpdb->prepare(
+                    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                    "SELECT * FROM `{$this->amenities_table}` WHERE name LIKE %s ORDER BY id DESC LIMIT %d OFFSET %d",
+                    $like,
+                    $per_page,
+                    $offset
+                ),
+                ARRAY_A
+            );
+
+            $total = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                    "SELECT COUNT(*) FROM `{$this->amenities_table}` WHERE name LIKE %s",
+                    $like
+                )
+            );
+        } else {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $items = $wpdb->get_results(
+                $wpdb->prepare(
+                    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                    "SELECT * FROM `{$this->amenities_table}` ORDER BY id DESC LIMIT %d OFFSET %d",
+                    $per_page,
+                    $offset
+                ),
+                ARRAY_A
+            );
+
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $total = (int) $wpdb->get_var(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                "SELECT COUNT(*) FROM `{$this->amenities_table}`"
+            );
+        }
+
+        return [
+            'items' => $items ?: [],
+            'total' => $total,
+        ];
+    }
+
+    /**
+     * Retrieve a single amenity record by its ID.
+     *
+     * @param int $id Row ID.
+     * @return array|null Associative array of the row, or null if not found.
+     */
+    public function get_amenity_by_id( int $id ): ?array {
+        global $wpdb;
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                "SELECT * FROM `{$this->amenities_table}` WHERE id = %d",
+                $id
+            ),
+            ARRAY_A
+        );
+
+        return $row ?: null;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Amenities – Write Operations
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Insert a new amenity record.
+     *
+     * @param string $name     Amenity display name.
+     * @param string $svg_path WordPress media attachment URL for the SVG icon (may be empty).
+     * @return int|WP_Error Inserted row ID on success, WP_Error on failure.
+     */
+    public function create_amenity( string $name, string $svg_path = '' ) {
+        global $wpdb;
+
+        $name     = sanitize_text_field( $name );
+        $svg_path = esc_url_raw( $svg_path );
+
+        $inserted = $wpdb->insert(
+            $this->amenities_table,
+            [
+                'name'       => $name,
+                'svg_path'   => $svg_path,
+                'updated_at' => current_time( 'mysql' ),
+            ],
+            [ '%s', '%s', '%s' ]
+        );
+
+        if ( false === $inserted ) {
+            return new WP_Error(
+                'leb_amen_insert_failed',
+                __( 'Failed to create the amenity. Please try again.', 'listing-engine-backend' )
+            );
+        }
+
+        return (int) $wpdb->insert_id;
+    }
+
+    /**
+     * Update an existing amenity record.
+     *
+     * @param int    $id       Row ID to update.
+     * @param string $name     New amenity display name.
+     * @param string $svg_path New SVG attachment URL (empty string clears it).
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function update_amenity( int $id, string $name, string $svg_path = '' ) {
+        global $wpdb;
+
+        $name     = sanitize_text_field( $name );
+        $svg_path = esc_url_raw( $svg_path );
+
+        $updated = $wpdb->update(
+            $this->amenities_table,
+            [
+                'name'       => $name,
+                'svg_path'   => $svg_path,
+                'updated_at' => current_time( 'mysql' ),
+            ],
+            [ 'id' => $id ],
+            [ '%s', '%s', '%s' ],
+            [ '%d' ]
+        );
+
+        if ( false === $updated ) {
+            return new WP_Error(
+                'leb_amen_update_failed',
+                __( 'Failed to update the amenity. Please try again.', 'listing-engine-backend' )
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete an existing amenity record by its ID.
+     *
+     * @param int $id Row ID to delete.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function delete_amenity( int $id ) {
+        global $wpdb;
+
+        $deleted = $wpdb->delete(
+            $this->amenities_table,
+            [ 'id' => $id ],
+            [ '%d' ]
+        );
+
+        if ( false === $deleted ) {
+            return new WP_Error(
+                'leb_amen_delete_failed',
+                __( 'Failed to delete the amenity. Please try again.', 'listing-engine-backend' )
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete multiple amenity records by their IDs.
+     *
+     * @param array $ids Array of row IDs to delete.
+     * @return true|WP_Error TRUE on success, WP_Error on failure.
+     */
+    public function delete_amenities( array $ids ) {
+        global $wpdb;
+
+        if ( empty( $ids ) ) {
+            return true;
+        }
+
+        $ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $query   = $wpdb->prepare( "DELETE FROM `{$this->amenities_table}` WHERE id IN ($ids_placeholder)", $ids );
+        $deleted = $wpdb->query( $query );
+
+        if ( false === $deleted ) {
+            return new WP_Error(
+                'leb_amen_bulk_delete_failed',
+                __( 'Failed to delete selected amenities. Please try again.', 'listing-engine-backend' )
+            );
+        }
+
+        return true;
     }
 }

@@ -1,25 +1,6 @@
 /* ─────────────────────────────────────────────────────────
    Global Reset & Shared LEB Components
 ───────────────────────────────────────────────────────── */
-.leb-wrap *,
-.leb-wrap *::before,
-.leb-wrap *::after {
-    box-sizing: border-box;
-}
-
-.leb-wrap {
-    font-family:      var(--leb-font-family);
-    color:            var(--leb-text-color);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    margin-right: 0;
-}
-
-.leb-wrap h1 {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-}
 
 .leb-loading-overlay {
     position:    absolute;
@@ -125,7 +106,7 @@
     color: var(--leb-text-color);
     max-width: 1200px;
     margin: 2rem auto;
-    width: 96%;
+    width: 95%;
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -222,12 +203,16 @@
 }
 
 #leb-type-list .leb-tl-page-title {
-    font-size:      1.75rem;
+    font-size:      1.7rem;
     font-weight:    700;
     color:          var(--leb-secondary-color);
     letter-spacing: -0.03em;
     line-height:    1.2;
     margin:         0;
+}
+
+#leb-type-list .leb-tl-header-right {
+    display: flex;
 }
 
 #leb-type-list .leb-tl-add-btn {

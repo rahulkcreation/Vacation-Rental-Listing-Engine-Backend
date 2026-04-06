@@ -1,26 +1,6 @@
 /* ─────────────────────────────────────────────────────────
    Global Reset & Shared LEB Components
 ───────────────────────────────────────────────────────── */
-.leb-wrap *,
-.leb-wrap *::before,
-.leb-wrap *::after {
-    box-sizing: border-box;
-}
-
-.leb-wrap {
-    font-family:      var(--leb-font-family);
-    color:            var(--leb-text-color);
-    background-color: var(--leb-bg-light);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    margin-right: 0;
-}
-
-.leb-wrap h1 {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-}
 
 .leb-loading-overlay {
     position:    absolute;
@@ -126,16 +106,17 @@
     color:       var(--leb-text-color);
     display:     flex;
     justify-content: center;
-    padding:     2rem 1rem;
     min-height:  80vh;
     align-items: flex-start;
+    max-width: 520px;
+    margin: 2rem auto;
+    width: 95%;
 }
 
 /* ── Card ─────────────────────────────────────────────────── */
 #leb-add-edit-type .leb-ae-card {
     background:    var(--leb-white);
     width:         100%;
-    max-width:     520px;
     border-radius: 12px;
     box-shadow:    var(--leb-card-shadow);
     border:        1px solid var(--leb-border-color);

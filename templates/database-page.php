@@ -73,7 +73,50 @@ $leb_status      = leb_check_table_status($leb_types_table);
                     <span class="leb-db-btn-label"><?php esc_html_e('Create / Repair', 'listing-engine-backend'); ?></span>
                 </button>
             </div>
-        </div>
+        </div><!-- end Types card -->
+
+        <!-- Amenities Table Card (initial PHP render – JS updates on refresh) -->
+        <?php
+        $leb_amenities_table  = $wpdb->prefix . 'ls_ameneties';
+        $leb_amen_status      = leb_check_table_status( $leb_amenities_table );
+        ?>
+        <div class="leb-db-card" id="leb-db-card-ls_ameneties">
+            <h2 class="leb-db-card-title"><?php esc_html_e( 'Amenities Table', 'listing-engine-backend' ); ?></h2>
+
+            <div class="leb-db-statuses" id="leb-db-statuses-ls_ameneties">
+                <?php leb_render_db_card_statuses( $leb_amen_status ); ?>
+            </div>
+
+            <div class="leb-db-actions">
+                <!-- Refresh button -->
+                <button
+                    class="leb-db-btn leb-db-btn--refresh"
+                    id="leb-db-refresh-ls_ameneties"
+                    data-table-key="ls_ameneties"
+                    aria-label="<?php esc_attr_e( 'Refresh amenities table status', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Refresh', 'listing-engine-backend' ); ?></span>
+                </button>
+
+                <!-- Create/Repair button -->
+                <button
+                    class="leb-db-btn leb-db-btn--repair"
+                    id="leb-db-repair-ls_ameneties"
+                    data-table-key="ls_ameneties"
+                    aria-label="<?php esc_attr_e( 'Create or repair amenities table', 'listing-engine-backend' ); ?>">
+                    <span class="leb-db-card-spin" aria-hidden="true"></span>
+                    <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span class="leb-db-btn-label"><?php esc_html_e( 'Create / Repair', 'listing-engine-backend' ); ?></span>
+                </button>
+            </div>
+        </div><!-- end Amenities card -->
 
     </div><!-- /.leb-db-grid -->
 

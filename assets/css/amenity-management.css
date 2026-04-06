@@ -1,0 +1,509 @@
+/* ==========================================================================
+   amenity-management.css
+   Scoped to #leb-amen-list, .leb-wrap, and .leb-am-* classnames.
+   Zero conflict with type-management.css or any other LEB module.
+   All colors referenced from global.css design tokens – no hardcoded values.
+   ========================================================================== */
+
+/* ── Page Wrapper ─────────────────────────────────────────────── */
+#leb-amen-list {
+    max-width: 1200px;
+    margin: 2rem auto;
+    width: 95%;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+.leb-am-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    background-color: var(--leb-white);
+    padding: 1rem 1.25rem;
+    border-radius: 14px;
+    box-shadow: var(--leb-card-shadow);
+    margin-bottom: 24px;
+}
+
+.leb-am-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.leb-am-icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--leb-primary-color);
+    flex-shrink: 0;
+}
+
+.leb-am-icon-box svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--leb-white);
+}
+
+.leb-am-page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--leb-secondary-color);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* ── Add New Button ─────────────────────────────────────────────── */
+.leb-am-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 100rem;
+    background: var(--leb-primary-color);
+    color: var(--leb-white);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 2px 8px var(--leb-primary-glow);
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+}
+
+.leb-am-add-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--leb-white);
+    flex-shrink: 0;
+}
+
+.leb-am-add-btn:hover {
+    background: var(--leb-primary-dark);
+    box-shadow: 0 4px 14px var(--leb-primary-glow);
+    transform: translateY(-1px);
+    color: var(--leb-white);
+    text-decoration: none;
+}
+
+.leb-am-add-btn:active {
+    transform: translateY(0);
+}
+
+/* ── Search Bar ─────────────────────────────────────────────────── */
+.leb-am-search-wrap {
+    position: relative;
+    margin-bottom: 20px;
+    transition: max-width 0.25s ease;
+}
+
+.leb-am-search-wrap.leb-am-search-focused {
+    max-width: 560px;
+}
+
+.leb-am-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 17px;
+    height: 17px;
+    stroke: var(--leb-text-muted);
+    pointer-events: none;
+}
+
+.leb-am-search-input {
+    width: 100%;
+    padding: 8px 44px 8px 42px !important;
+    border: 2px solid var(--leb-border-default) !important;
+    border-radius: 10px !important;
+    background: var(--leb-white);
+    color: var(--leb-secondary-color) !important;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leb-am-search-input:focus {
+    border-color: var(--leb-primary-color);
+    box-shadow: var(--leb-focus-shadow);
+}
+
+.leb-am-search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    color: var(--leb-text-muted);
+}
+
+.leb-am-search-clear:hover {
+    color: var(--leb-secondary-color);
+}
+
+.leb-am-search-clear.leb-am-clear-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.leb-am-search-clear svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ── Table Wrapper ──────────────────────────────────────────────── */
+.leb-am-table-wrap {
+    position: relative;
+    background: var(--leb-white);
+    border-radius: 14px;
+    border: 1px solid var(--leb-border-default);
+    overflow: hidden;
+    box-shadow: var(--leb-card-shadow);
+}
+
+/* ── Bulk Actions Bar ───────────────────────────────────────────── */
+.leb-am-bulk-actions {
+    display: none;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    background: var(--leb-primary-light-bg);
+    border-bottom: 1px solid var(--leb-border-color);
+}
+
+.leb-am-bulk-actions.leb-active {
+    display: flex;
+}
+
+.leb-am-bulk-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: var(--leb-text-muted);
+    font-weight: 500;
+}
+
+.leb-am-bulk-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    background: var(--leb-error-color);
+    color: var(--leb-white);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.leb-am-bulk-delete-btn:hover {
+    background: var(--leb-error-color);
+    filter: brightness(0.9);
+    transform: translateY(-1px);
+}
+
+.leb-am-bulk-delete-btn svg {
+    width: 15px;
+    height: 15px;
+    stroke: var(--leb-white);
+}
+
+/* ── Card rows (list view) ──────────────────────────────────────── */
+.leb-am-cards-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.leb-am-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--leb-border-default);
+    transition: background 0.15s ease;
+    flex-wrap: wrap;
+}
+
+.leb-am-card:last-child {
+    border-bottom: none;
+}
+
+.leb-am-card:hover {
+    background: var(--leb-bg-light);
+}
+
+.leb-am-checkbox {
+    cursor: pointer;
+    accent-color: var(--leb-primary-color);
+}
+
+.leb-am-card-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 80px;
+    flex: 1;
+}
+
+.leb-am-card-label {
+    font-size: 0.73rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--leb-text-muted);
+}
+
+.leb-am-card-value {
+    font-size: 0.9rem;
+    color: var(--leb-secondary-color);
+    font-weight: 500;
+}
+
+.leb-am-s-no {
+    font-weight: 700;
+    color: var(--leb-primary-color);
+}
+
+/* SVG icon inside card */
+.leb-am-svg-cell {
+    display: flex;
+    align-items: center;
+}
+
+.leb-am-svg-preview {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    border-radius: 4px;
+    border: 1px solid var(--leb-border-default);
+    padding: 2px;
+    background: var(--leb-bg-light);
+}
+
+.leb-am-svg-none {
+    font-size: 0.85rem;
+    color: var(--leb-text-muted);
+}
+
+/* ── Card Action Buttons ────────────────────────────────────────── */
+.leb-am-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.leb-am-edit-btn,
+.leb-am-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.12s ease;
+    text-decoration: none;
+    border: none;
+}
+
+.leb-am-edit-btn {
+    background: var(--leb-primary-light-bg);
+    color: var(--leb-primary-color);
+}
+
+.leb-am-edit-btn:hover {
+    background: var(--leb-primary-light-bg);
+    filter: brightness(0.95);
+    color: var(--leb-primary-dark);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.leb-am-edit-btn svg,
+.leb-am-delete-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.leb-am-delete-btn {
+    background: var(--leb-error-light-bg);
+    color: var(--leb-error-color);
+}
+
+.leb-am-delete-btn:hover {
+    background: var(--leb-error-light-bg);
+    filter: brightness(0.95);
+    color: var(--leb-error-color);
+    transform: translateY(-1px);
+}
+
+/* ── Empty State ────────────────────────────────────────────────── */
+.leb-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+    color: var(--leb-text-muted);
+    text-align: center;
+}
+
+.leb-empty-state__icon {
+    width: 52px;
+    height: 52px;
+    stroke: var(--leb-text-muted);
+    opacity: 0.6;
+}
+
+.leb-empty-state__title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--leb-text-muted);
+    margin: 0;
+}
+
+/* ── Pagination ─────────────────────────────────────────────────── */
+.leb-am-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--leb-border-default);
+    flex-wrap: wrap;
+}
+
+.leb-am-pagination-text {
+    font-size: 0.87rem;
+    color: var(--leb-text-muted);
+}
+
+.leb-am-page-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.leb-am-pg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--leb-border-default);
+    border-radius: 8px;
+    background: var(--leb-white);
+    color: var(--leb-text-muted);
+    font-size: 0.87rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.leb-am-pg-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.leb-am-pg-btn:hover:not(:disabled) {
+    background: var(--leb-primary-light-bg);
+    border-color: var(--leb-primary-color);
+    color: var(--leb-primary-color);
+}
+
+.leb-am-pg-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.leb-am-pg-btn.leb-am-pg-active {
+    background: var(--leb-primary-color);
+    border-color: var(--leb-primary-color);
+    color: var(--leb-white);
+    font-weight: 700;
+}
+
+/* ── Static Loading Overlay ─────────────────────────────────────── */
+.leb-loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--leb-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: inherit;
+    backdrop-filter: blur(2px);
+}
+
+.leb-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--leb-border-default);
+    border-top-color: var(--leb-primary-color);
+    border-radius: 50%;
+    animation: lebSpinAmen 0.72s linear infinite;
+}
+
+@keyframes lebSpinAmen {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 680px) {
+    .leb-am-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .leb-am-card-actions {
+        margin-left: 0;
+    }
+
+
+}
+
+
+@media (width <=540px) {
+    .leb-am-header {
+        flex-direction: column;
+    }
+
+
+    .leb-am-header-right {
+        width: 100%;
+        justify-content: center;
+        display: flex;
+    }
+
+    .leb-am-add-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .leb-am-header-left{
+        width: 100%;
+    }
+}

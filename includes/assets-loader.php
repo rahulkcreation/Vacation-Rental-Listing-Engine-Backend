@@ -142,13 +142,26 @@ function leb_enqueue_admin_styles( string $hook_suffix ) {
         $template_handle = 'leb-database-page';
         $template_file   = 'database-page.css';
     }
+    // Robust matching for Amenities list / Add-Edit pages.
+    elseif ( false !== strpos( $hook_suffix, 'leb-amenities' ) ) {
+        $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
+        if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
+            $template_handle = 'leb-add-edit-amenity';
+            $template_file   = 'add-edit-amenity.css';
+            // WP Media Library is required for the SVG picker.
+            wp_enqueue_media();
+        } else {
+            $template_handle = 'leb-amenity-management';
+            $template_file   = 'amenity-management.css';
+        }
+    }
 
     if ( $template_handle && $template_file ) {
         $full_path = LEB_PLUGIN_DIR . 'assets/css/' . $template_file;
         wp_enqueue_style(
             $template_handle,
             LEB_ASSETS_CSS_URL . $template_file,
-            [],
+            [ 'leb-global' ],
             file_exists( $full_path ) ? (string) filemtime( $full_path ) : LEB_VERSION
         );
     }
@@ -191,8 +204,9 @@ function leb_is_leb_page( string $hook_suffix ): bool {
 
     // Match any hook that contains one of the LEB menu slugs.
     $leb_slug_patterns = [
-        'leb-types',    // Covers 'toplevel_page_leb-types' and the add/edit ?leb_action= variant.
-        'leb-database', // Covers any hook suffix referencing the Database submenu.
+        'leb-types',      // Covers 'toplevel_page_leb-types' and the add/edit ?leb_action= variant.
+        'leb-database',   // Covers any hook suffix referencing the Database submenu.
+        'leb-amenities',  // Covers the new Amenities submenu and its add/edit form.
     ];
 
     foreach ( $leb_slug_patterns as $pattern ) {
