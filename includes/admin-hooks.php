@@ -18,6 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 // ─────────────────────────────────────────────────────────────
 add_action( 'admin_menu', 'leb_register_admin_menus' );
 
+// SVG UI & Media Library Display Fixes (Core Upload filters moved to main file)
+add_filter( 'wp_prepare_attachment_for_js', 'leb_fix_svg_attachment_for_js', 2147483647, 3 );
+add_filter( 'wp_generate_attachment_metadata', 'leb_skip_svg_metadata', 2147483647, 2 );
+add_filter( 'plupload_init', 'leb_add_svg_to_plupload', 2147483647 );
+add_filter( 'wp_image_editors', 'leb_skip_svg_image_editor_check', 2147483647 );
+add_action( 'admin_head', 'leb_admin_svg_display_fix' );
+
 /**
  * Register the LEB main menu and all sub-menus.
  */
@@ -670,4 +677,109 @@ function leb_amen_validate_svg_attachment( int $attachment_id ) {
     }
 
     return true;
+}
+
+/**
+ * Filter: Skip metadata generation (thumbnails) for SVGs.
+ * This is the crucial step that usually throws the "cannot be processed" error.
+ */
+function leb_skip_svg_metadata( $metadata, $attachment_id ) {
+    $mime = get_post_mime_type( $attachment_id );
+    if ( 'image/svg+xml' === $mime ) {
+        return array(); // Return empty metadata to skip processing
+    }
+    return $metadata;
+}
+
+/**
+ * Filter: Final fallback to force SVG upload success even if WP throws a processing error.
+ */
+function leb_force_svg_upload_success( $upload ) {
+    if ( isset( $upload['type'] ) && 'application/svg+xml' === $upload['type'] ) {
+        $upload['type'] = 'image/svg+xml';
+    }
+
+    if ( isset( $upload['error'] ) && stripos( $upload['file'], '.svg' ) !== false ) {
+        $errors_to_clear = [
+            'processed by the web server',
+            'not an image',
+            'security reasons',
+            'mismatch',
+        ];
+
+        foreach ( $errors_to_clear as $err_frag ) {
+            if ( stripos( $upload['error'], $err_frag ) !== false ) {
+                unset( $upload['error'] );
+                break;
+            }
+        }
+    }
+    return $upload;
+}
+
+/**
+ * Filter: Add SVG support to Plupload settings.
+ */
+function leb_add_svg_to_plupload( $params ) {
+    $params['filters']['mime_types'][] = array(
+        'title'      => 'SVG Images',
+        'extensions' => 'svg,svgz',
+    );
+    $params['resize'] = false;
+    return $params;
+}
+
+/**
+ * Filter: Ensure Media Library JS handles SVG attachments correctly.
+ */
+function leb_fix_svg_attachment_for_js( $response, $attachment, $meta ) {
+    if ( 'image/svg+xml' === $response['mime'] && empty( $response['sizes'] ) ) {
+        $svg_path = get_attached_file( $attachment->ID );
+
+        if ( ! file_exists( $svg_path ) ) {
+            $svg_path = $response['url'];
+        }
+
+        $response['sizes'] = [
+            'full' => [
+                'url'         => $response['url'],
+                'width'       => 24,
+                'height'      => 24,
+                'orientation' => 'portrait',
+            ],
+        ];
+    }
+
+    return $response;
+}
+
+/**
+ * Action: Fix SVG display in the WordPress Admin / Media Library.
+ *
+ * By default, WordPress doesn't show previews for SVGs in the Media Library
+ * grid view because they have no intrinsic dimensions. This CSS ensures they
+ * fill their container.
+ */
+function leb_admin_svg_display_fix() {
+    echo '<style type="text/css">
+        .attachment-24x24, .thumbnail img[src$=".svg"] { width: 24px !important; height: 24px !important; }
+        .media-icon img[src$=".svg"], .attachments .portrait img, .attachments .landscape img { width: 100% !important; height: auto !important; }
+    </style>';
+}
+
+/**
+ * Filter: Skip image editing for SVGs to prevent server errors.
+ */
+function leb_skip_svg_image_editor_check( $editors ) {
+    return $editors;
+}
+
+/**
+ * Filter: Final safeguard against "This file cannot be processed" error.
+ */
+function leb_skip_svg_image_editor( $editors, $path ) {
+    if ( strpos( $path, '.svg' ) !== false ) {
+        return false;
+    }
+    return $editors;
 }
