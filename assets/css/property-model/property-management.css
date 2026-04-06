@@ -1,13 +1,15 @@
 /**
  * property-management.css
- * Overhauled to the new Premium UI.
+ *
+ * Full premium UI stylesheet for the Property Management dashboard.
+ * All selectors are strictly prefixed with "leb-pm" for zero CSS conflicts.
  *
  * @package ListingEngineBackend
  */
 
-/* ─── Layout & Background ──────────────────────────────────── */
+/* ─── Background Decoration ─────────────────────────────────── */
 
-.leb-pl-bg-decoration {
+.leb-pm-bg-decoration {
     position: fixed;
     top: 0;
     left: 0;
@@ -18,7 +20,7 @@
     overflow: hidden;
 }
 
-.leb-pl-bg-orb-1 {
+.leb-pm-bg-orb-1 {
     position: absolute;
     top: -10%;
     right: -5%;
@@ -29,7 +31,7 @@
     opacity: 0.6;
 }
 
-.leb-pl-bg-orb-2 {
+.leb-pm-bg-orb-2 {
     position: absolute;
     bottom: -15%;
     left: -10%;
@@ -40,7 +42,9 @@
     opacity: 0.5;
 }
 
-.leb-pl-main-container {
+/* ─── Main Container ─────────────────────────────────── */
+
+.leb-pm-main-container {
     max-width: 1400px;
     margin: 20px auto;
     position: relative;
@@ -50,12 +54,13 @@
     color: var(--leb-text-color);
 }
 
-/* ─── Header ──────────────────────────────────── */
-.leb-pl-header-section {
-    margin-bottom: 30px;
+/* ─── Header ─────────────────────────────────── */
+
+.leb-pm-header-section {
+    margin-bottom: 24px;
 }
 
-.leb-pl-header-top {
+.leb-pm-header-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -67,13 +72,13 @@
     box-shadow: var(--leb-card-shadow);
 }
 
-.leb-pl-header-left {
+.leb-pm-header-left {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-.leb-pl-header-icon-box {
+.leb-pm-header-icon-box {
     width: 48px;
     height: 48px;
     background: linear-gradient(135deg, var(--leb-primary-color), var(--leb-primary-dark));
@@ -81,96 +86,206 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--leb-primary-glow);
+    box-shadow: 0 6px 20px var(--leb-primary-glow);
+    flex-shrink: 0;
 }
 
-.leb-pl-header-icon-svg {
+.leb-pm-header-icon-svg {
     width: 24px;
     height: 24px;
     color: var(--leb-white);
 }
 
-.leb-pl-page-title {
+.leb-pm-page-title {
     font-size: 1.75rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--leb-secondary-color);
     letter-spacing: -0.03em;
     line-height: 1.2;
     margin: 0;
 }
 
-.add-type-btn {
+.leb-pm-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background-color: var(--leb-primary-color);
+    color: var(--leb-white);
     padding: 0.6rem 1.2rem;
     border-radius: 1rem;
-    border: 1px solid var(--leb-border-color);
-    color: var(--leb-white);
-    box-shadow: var(--leb-card-shadow);
-    cursor: pointer;
+    border: 1px solid transparent;
     font-weight: 600;
+    font-size: 0.9rem;
+    font-family: var(--leb-font-family);
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    box-shadow: var(--leb-card-shadow);
+}
+
+.leb-pm-add-btn:hover {
+    background-color: var(--leb-primary-dark);
+    color: var(--leb-white);
+    box-shadow: 0 6px 20px var(--leb-primary-glow);
+}
+
+.leb-pm-add-btn-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* ─── Bulk Actions Bar ─────────────────────────────────── */
+
+.leb-pm-bulk-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: var(--leb-white);
+    border: 2px solid var(--leb-primary-color);
+    border-radius: 1rem;
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--leb-card-shadow);
+    animation: leb-pm-slide-in 0.2s ease;
+}
+
+@keyframes leb-pm-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.leb-pm-bulk-count {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--leb-secondary-color);
+}
+
+.leb-pm-bulk-count span {
+    color: var(--leb-primary-color);
+}
+
+.leb-pm-bulk-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.leb-pm-bulk-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 18px;
+    border-radius: 100rem;
+    border: 1px solid var(--leb-border-default);
+    font-weight: 600;
+    font-size: 0.825rem;
+    font-family: var(--leb-font-family);
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.add-type-btn:hover {
-    background-color: var(--leb-primary-dark);
+.leb-pm-bulk-btn--publish {
+    background-color: var(--leb-success-light-bg);
+    color: var(--leb-success-color);
+    border-color: var(--leb-success-color);
 }
 
-/* ─── Search Bar ──────────────────────────────────── */
-.leb-pl-search-section {
-    margin-bottom: 24px;
+.leb-pm-bulk-btn--publish:hover {
+    background-color: var(--leb-success-color);
+    color: var(--leb-white);
 }
 
-.leb-pl-search-bar-wrapper {
+.leb-pm-bulk-btn--draft {
+    background-color: var(--leb-warning-light-bg);
+    color: var(--leb-warning-color);
+    border-color: var(--leb-warning-color);
+}
+
+.leb-pm-bulk-btn--draft:hover {
+    background-color: var(--leb-warning-color);
+    color: var(--leb-white);
+}
+
+.leb-pm-bulk-btn--delete {
+    background-color: var(--leb-error-light-bg);
+    color: var(--leb-error-color);
+    border-color: var(--leb-error-color);
+}
+
+.leb-pm-bulk-btn--delete:hover {
+    background-color: var(--leb-error-color);
+    color: var(--leb-white);
+}
+
+/* ─── Search Bar ─────────────────────────────────── */
+
+.leb-pm-search-section {
+    margin-bottom: 20px;
+}
+
+.leb-pm-search-bar-wrapper {
     background-color: var(--leb-white);
     border-radius: 14px;
-    padding: 8px 12px 8px 22px;
+    padding: 6px 8px 6px 22px;
     display: flex;
     align-items: center;
     gap: 12px;
     box-shadow: var(--leb-card-shadow);
-    border: 2px solid var(--leb-border-color);
-    transition: all 0.3s ease;
+    border: 2px solid var(--leb-border-light);
+    transition: border-color 0.3s ease;
 }
 
-.leb-pl-search-bar-wrapper.leb-pl-search-focused {
+.leb-pm-search-bar-wrapper.leb-pm-search-focused {
     border-color: var(--leb-primary-color);
 }
 
-.leb-pl-search-icon {
+.leb-pm-search-icon {
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.leb-pl-search-icon-svg {
+.leb-pm-search-icon-svg {
     width: 20px;
     height: 20px;
     color: var(--leb-text-muted);
     transition: color 0.3s ease;
 }
 
-.leb-pl-search-bar-wrapper.leb-pl-search-focused .leb-pl-search-icon-svg {
+.leb-pm-search-bar-wrapper.leb-pm-search-focused .leb-pm-search-icon-svg {
     color: var(--leb-primary-color);
 }
 
-.leb-pl-search-input {
+.leb-pm-search-input {
     flex: 1;
     border: none !important;
-    outline: none;
+    outline: none !important;
     font-size: 0.9375rem;
     color: var(--leb-text-color) !important;
     background: transparent;
-    font-family: inherit;
-    padding: 6px 0 !important;
+    font-family: var(--leb-font-family);
+    padding: 10px 0 !important;
+    box-shadow: none !important;
 }
 
-.leb-pl-search-input::placeholder {
+.leb-pm-search-input::placeholder {
     color: var(--leb-text-muted);
     font-weight: 400;
 }
 
-.leb-pl-search-clear-btn {
+.leb-pm-search-clear-btn {
     display: none;
     align-items: center;
     justify-content: center;
@@ -185,287 +300,419 @@
     transition: all 0.2s ease;
 }
 
-.leb-pl-search-clear-btn:hover {
+.leb-pm-search-clear-btn:hover {
     background-color: var(--leb-border-default);
     color: var(--leb-secondary-color);
 }
 
-.leb-pl-search-clear-btn.leb-pl-search-clear-visible {
+.leb-pm-search-clear-btn.leb-pm-search-clear-visible {
     display: flex;
 }
 
-.leb-pl-search-clear-svg {
+.leb-pm-search-clear-svg {
     width: 16px;
     height: 16px;
 }
 
-/* ─── Status Wrapper ──────────────────────────────────── */
-.leb-pl-status {
+/* ─── Status Tabs ─────────────────────────────────── */
+
+.leb-pm-status-tabs {
     background-color: var(--leb-white);
     padding: 6px;
     border-radius: 1rem;
     box-shadow: var(--leb-card-shadow);
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     text-align: center;
     align-items: center;
+    gap: 4px;
 }
 
-.status {
+.leb-pm-tab {
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    padding: 0.6rem 1rem;
+    padding: 0.6rem 0.8rem;
     color: var(--leb-text-color);
-    transition: all 0.2s;
-    border-radius: 1rem;
+    transition: all 0.2s ease;
+    border-radius: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    user-select: none;
 }
 
-.status span {
-    border: solid 1px var(--leb-border-color);
-    padding: 1px 5px;
+.leb-pm-tab:hover {
+    background-color: var(--leb-bg-light);
+}
+
+.leb-pm-tab span {
+    border: 1px solid var(--leb-border-default);
+    padding: 1px 6px;
     border-radius: 100rem;
-    font-size: 0.8rem;
-    height: 20px;
+    font-size: 0.75rem;
+    min-width: 20px;
     display: inline-flex;
     align-items: center;
-    margin-left: 4px;
+    justify-content: center;
 }
 
-.status.active {
+.leb-pm-tab--active {
     background-color: var(--leb-primary-color);
     color: var(--leb-white);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
 }
 
-.status.active span {
-    border-color: rgba(255, 255, 255, 0.3);
+.leb-pm-tab--active:hover {
+    background-color: var(--leb-primary-dark);
+}
+
+.leb-pm-tab--active span {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--leb-white);
 }
 
 @media (max-width: 768px) {
-    .leb-pl-status {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        padding: 10px;
+    .leb-pm-status-tabs {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 8px;
     }
 }
 
-/* ─── Table Section ──────────────────────────────────── */
+@media (max-width: 480px) {
+    .leb-pm-status-tabs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
-.leb-pl-table-section {
+/* ─── State Boxes (Loading / Empty) ─────────────────────────────────── */
+
+.leb-pm-state-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    gap: 16px;
     background: var(--leb-white);
     border-radius: 18px;
     box-shadow: var(--leb-card-shadow);
-    border: 1px solid var(--leb-border-color);
+    border: 1px solid var(--leb-border-light);
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.leb-pm-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--leb-border-light);
+    border-top-color: var(--leb-primary-color);
+    border-radius: 50%;
+    animation: leb-pm-spin 0.8s linear infinite;
+}
+
+@keyframes leb-pm-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.leb-pm-state-text {
+    font-size: 0.9rem;
+    color: var(--leb-text-muted);
+    margin: 0;
+}
+
+.leb-pm-empty-icon {
+    color: var(--leb-text-muted);
+    opacity: 0.5;
+}
+
+.leb-pm-empty-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--leb-secondary-color);
+    margin: 0;
+}
+
+/* ─── Table Section ─────────────────────────────────── */
+
+.leb-pm-table-section {
+    background: var(--leb-white);
+    border-radius: 18px;
+    box-shadow: var(--leb-card-shadow);
+    border: 1px solid var(--leb-border-light);
     overflow: hidden;
 }
 
-.leb-pl-table-scroll {
+.leb-pm-table-scroll {
     overflow-x: hidden;
-    /* Changed from auto since we have cards wrapping correctly */
     width: 100%;
 }
 
-.leb-pl-t-datas {
+/* Select All Bar */
+.leb-pm-select-all-bar {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--leb-border-light);
+    display: flex;
+    align-items: center;
+}
+
+.leb-pm-select-all-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--leb-text-muted);
+    user-select: none;
+}
+
+.leb-pm-select-all-cb {
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: var(--leb-primary-color);
+    cursor: pointer !important;
+}
+
+/* Card Grid */
+.leb-pm-card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 0rem 1rem;
+}
+
+
+/* ─── Individual Property Card ─────────────────────────────────── */
+
+.leb-pm-card {
     position: relative;
-    margin: 15px;
-    padding: 30px 20px 15px 20px;
-    border: 1px solid var(--leb-border-color);
+    padding: 4rem 0.8rem 1rem 0.8rem;
+    border: 1px solid var(--leb-border-default);
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    background: var(--leb-bg-light);
+    gap: 0.75rem;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: default;
 }
 
-.leb-pl-t-datas:hover {
+
+.leb-pm-card:hover {
     border-color: var(--leb-border-default);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
 }
 
-.leb-pl-t-datas.selected {
+.leb-pm-card.leb-pm-card--selected {
     background: var(--leb-primary-light-bg);
     border-color: var(--leb-primary-color);
 }
 
-.leb-pl-t-data-entry {
+/* Card Checkbox (top-left absolute) */
+.leb-pm-card-checkbox {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: var(--leb-primary-color);
+    cursor: pointer;
+}
+
+/* Card Serial Number */
+.leb-pm-card-sno {
+    position: absolute;
+    top: 34px;
+    left: 12px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--leb-primary-color);
+    border-radius: 100rem;
+    font-size: 0.75rem;
+    color: var(--leb-white);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card Thumbnail (top-right absolute) */
+.leb-pm-card-thumb-wrap {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid var(--leb-border-light);
+    padding: 2px;
+    background: var(--leb-white);
+    display: flex;
+}
+
+.leb-pm-card-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* Card Data Rows */
+.leb-pm-card-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+}
+
+.leb-pm-card-row {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    gap: 10px;
     width: 100%;
-    gap: 1rem;
 }
 
-.leb-pl-data-label {
-    font-size: 0.85rem;
+.leb-pm-card-label {
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--leb-text-muted);
+    flex-shrink: 0;
 }
 
-.leb-pl-data-entry {
-    font-size: 0.85rem;
+.leb-pm-card-value {
+    font-size: 0.825rem;
     font-weight: 500;
     color: var(--leb-text-color);
     text-align: right;
+    word-break: break-word;
 }
 
-.leb-pl-t-data-action {
-    margin-top: 5px;
-    border-top: 1px solid var(--leb-border-color);
-    padding-top: 15px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
+/* .leb-pm-card-value--title {
+    font-weight: 700;
+    color: var(--leb-secondary-color);
+} */
 
-.leb-pl-data-status {
-    padding: 4px 12px;
-    border-radius: 100rem;
-    font-size: 13px;
-    font-weight: 600;
+/* Status Badge */
+.leb-pm-status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    padding: 3px 12px;
+    border-radius: 100rem;
+    font-size: 0.775rem;
+    font-weight: 600;
     text-transform: capitalize;
 }
 
-.leb-pl-data-status--published {
+.leb-pm-status-badge--published {
     background: var(--leb-success-light-bg);
     color: var(--leb-success-color);
     border: 1px solid var(--leb-success-color);
 }
 
-.leb-pl-data-status--draft {
+.leb-pm-status-badge--draft {
     background: var(--leb-warning-light-bg);
-    color: var(--leb-text-color);
-    border: 1px solid var(--leb-border-color);
+    color: #b45309;
+    border: 1px solid #f59e0b;
 }
 
-.leb-pl-data-status--pending {
+.leb-pm-status-badge--pending {
     background: var(--leb-warning-light-bg);
     color: var(--leb-warning-color);
     border: 1px solid var(--leb-warning-color);
 }
 
-.leb-pl-data-status--rejected {
+.leb-pm-status-badge--rejected {
     background: var(--leb-error-light-bg);
     color: var(--leb-error-color);
     border: 1px solid var(--leb-error-color);
 }
 
-.leb-pl-data-btn {
+/* Card Action Row */
+.leb-pm-card-actions {
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--leb-border-default);
+    width: 100%;
+    margin-top: 4px;
+}
+
+/* Action Buttons */
+.leb-pm-action-btn {
+    display: inline-flex;
     align-items: center;
     gap: 5px;
+    padding: 5px 16px;
+    border-radius: 100rem;
+    border: 1px solid var(--leb-border-default);
     background-color: var(--leb-white);
     color: var(--leb-secondary-color);
-    border-radius: 100rem;
-    padding: 6px 16px;
-    border: 1px solid var(--leb-border-default);
+    font-size: 0.8rem;
     font-weight: 600;
-    font-size: 13px;
+    font-family: var(--leb-font-family);
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
+    line-height: 1;
 }
 
-.leb-pl-data-btn:hover {
+.leb-pm-action-btn:hover {
     background-color: var(--leb-bg-light);
     border-color: var(--leb-secondary-color);
+    color: var(--leb-secondary-color);
 }
 
-.leb-pl-data-entry-delete {
-    color: var(--leb-error-color) !important;
+.leb-pm-action-btn--delete {
+    color: var(--leb-error-color);
+    border-color: rgba(234, 1, 36, 0.25);
 }
 
-.leb-pl-data-entry-delete:hover {
-    background-color: var(--leb-error-light-bg) !important;
-    border-color: var(--leb-error-color) !important;
+.leb-pm-action-btn--delete:hover {
+    background-color: var(--leb-error-light-bg);
+    border-color: var(--leb-error-color);
+    color: var(--leb-error-color);
 }
 
-.leb-pl-action-btn-icon {
-    width: 16px;
-    height: 16px;
+.leb-pm-action-btn-icon {
+    width: 14px;
+    height: 14px;
     flex-shrink: 0;
+    stroke: currentColor;
 }
 
-.leb-pl-s-no {
-    background-color: var(--leb-primary-color);
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    color: var(--leb-white);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/* ─── Pagination ─────────────────────────────────── */
 
-input.leb-pl-checkbox {
-    width: 18px;
-    height: 18px;
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    accent-color: var(--leb-primary-color);
-    cursor: pointer;
-}
-
-.leb-data-img-cont {
-    overflow: hidden;
-    border-radius: 12px;
-    border: 1px solid var(--leb-border-color);
-    padding: 3px;
-    background: var(--leb-white);
-    display: flex;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-}
-
-img.leb-data-img {
-    border-radius: 8px;
-    width: 56px;
-    height: 56px;
-    object-fit: cover;
-}
-
-/* ─── Pagination ──────────────────────────────────── */
-
-.leb-pl-pagination-bar {
+.leb-pm-pagination-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 24px;
-    border-top: 1px solid var(--leb-border-color);
+    border-top: 1px solid var(--leb-border-light);
     flex-wrap: wrap;
     gap: 12px;
     background: var(--leb-white);
 }
 
-.leb-pl-pagination-text {
+.leb-pm-pagination-text {
     font-size: 0.85rem;
     color: var(--leb-text-muted);
 }
 
-.leb-pl-pagination-controls {
+.leb-pm-pagination-controls {
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.leb-pl-page-btn {
+.leb-pm-page-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -479,70 +726,54 @@ img.leb-data-img {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: var(--leb-font-family);
 }
 
-.leb-pl-page-btn:hover:not(:disabled) {
+.leb-pm-page-btn:hover:not(:disabled) {
     background-color: var(--leb-bg-light);
-    border-color: var(--leb-secondary-color);
+    border-color: var(--leb-primary-color);
+    color: var(--leb-primary-color);
 }
 
-.leb-pl-page-btn-active {
+.leb-pm-page-btn--active {
     background-color: var(--leb-primary-color);
     border-color: var(--leb-primary-color);
     color: var(--leb-white);
 }
 
-.leb-pl-page-btn-active:hover:not(:disabled) {
+.leb-pm-page-btn--active:hover:not(:disabled) {
     background-color: var(--leb-primary-dark);
 }
 
-.leb-pl-page-btn[disabled] {
+.leb-pm-page-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
-.leb-pl-page-btn-svg {
+.leb-pm-page-btn-svg {
     width: 16px;
     height: 16px;
 }
 
-/* ─── Responsive Adjustments ──────────────────────────────────── */
-@media (max-width: 420px) {
-    .leb-pl-page-title {
-        font-size: 1.4rem;
+/* ─── Responsive: Mobile Header ─────────────────────────────────── */
+
+@media (max-width: 480px) {
+    .leb-pm-page-title {
+        font-size: 1.35rem;
     }
 
-    .leb-pl-header-icon-box {
+    .leb-pm-header-icon-box {
         width: 40px;
         height: 40px;
     }
 
-    .leb-pl-header-right {
+    .leb-pm-header-right {
         flex-grow: 1;
+        display: flex;
     }
 
-    .add-type-btn {
-        display: flex;
+    .leb-pm-add-btn {
         width: 100%;
         justify-content: center;
-    }
-}
-
-@media (min-width: 768px) {
-    .leb-pl-table-mobile {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        padding: 5px 10px;
-    }
-
-    .leb-pl-t-datas {
-        margin: 0;
-    }
-}
-
-@media (min-width: 1024px) {
-    .leb-pl-table-mobile {
-        grid-template-columns: repeat(3, 1fr);
     }
 }
