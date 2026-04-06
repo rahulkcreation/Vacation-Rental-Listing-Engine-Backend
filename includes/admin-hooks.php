@@ -93,10 +93,10 @@ function leb_render_type_management_page() {
     // Determine which sub-template to show.
     $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : 'list';
 
-    if ( $leb_action === 'edit' || $leb_action === 'add' ) {
-        require_once LEB_TEMPLATES_PATH . 'add-edit-type.php';
+    if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
+        require_once LEB_TEMPLATES_PATH . 'type-model/add-edit-type.php';
     } else {
-        require_once LEB_TEMPLATES_PATH . 'type-management.php';
+        require_once LEB_TEMPLATES_PATH . 'type-model/type-management.php';
     }
 }
 
@@ -121,10 +121,10 @@ function leb_render_amenity_management_page() {
 
     $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : 'list';
 
-    if ( $leb_action === 'edit' || $leb_action === 'add' ) {
-        require_once LEB_TEMPLATES_PATH . 'add-edit-amenity.php';
+    if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
+        require_once LEB_TEMPLATES_PATH . 'amenity-model/add-edit-amenity.php';
     } else {
-        require_once LEB_TEMPLATES_PATH . 'amenity-management.php';
+        require_once LEB_TEMPLATES_PATH . 'amenity-model/amenity-management.php';
     }
 }
 

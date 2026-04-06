@@ -131,10 +131,10 @@ function leb_enqueue_admin_styles( string $hook_suffix ) {
         $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
         if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
             $template_handle = 'leb-add-edit-type';
-            $template_file   = 'add-edit-type.css';
+            $template_file   = 'type-model/add-edit-type.css';
         } else {
             $template_handle = 'leb-type-management';
-            $template_file   = 'type-management.css';
+            $template_file   = 'type-model/type-management.css';
         }
     } 
     // Robust matching for Database page.
@@ -147,12 +147,12 @@ function leb_enqueue_admin_styles( string $hook_suffix ) {
         $leb_action = isset( $_GET['leb_action'] ) ? sanitize_text_field( wp_unslash( $_GET['leb_action'] ) ) : '';
         if ( in_array( $leb_action, [ 'add', 'edit' ], true ) ) {
             $template_handle = 'leb-add-edit-amenity';
-            $template_file   = 'add-edit-amenity.css';
+            $template_file   = 'amenity-model/add-edit-amenity.css';
             // WP Media Library is required for the SVG picker.
             wp_enqueue_media();
         } else {
             $template_handle = 'leb-amenity-management';
-            $template_file   = 'amenity-management.css';
+            $template_file   = 'amenity-model/amenity-management.css';
         }
     }
 
