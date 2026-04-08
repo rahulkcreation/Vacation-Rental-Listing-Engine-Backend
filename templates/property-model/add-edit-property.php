@@ -178,12 +178,16 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
                         </svg>
                     </div>
                     <div class="leb-aep-select-dropdown" id="propertyTypeDropdown" role="listbox" aria-label="Property type options">
-                        <div class="leb-aep-select-loading">Loading types…</div>
                     </div>
                 </div>
+            </div> <!-- Close Grid -->
 
+            <!-- Property Address -->
+            <div class="leb-aep-select-wrap leb-aep-select-wrap--full" style="margin-top: 20px;">
+                <label class="leb-aep-label" for="address">Property Address <span class="leb-aep-req" aria-hidden="true">*</span></label>
+                <input type="text" id="address" class="leb-aep-input" placeholder="Enter full property address" required>
             </div>
-        </div>
+        </div> <!-- Close Section -->
 
         <!-- ══════════════════════════════════════════
              SECTION 7: BLOCKED DATES CALENDAR

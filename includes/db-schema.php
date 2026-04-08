@@ -131,6 +131,7 @@ function leb_get_listings_schema() {
         user_id bigint(20) UNSIGNED NOT NULL,
         title varchar(255) NOT NULL,
         location longtext NOT NULL,
+        address longtext NOT NULL,
         amenities longtext DEFAULT NULL,
         type varchar(255) DEFAULT NULL,
         guests int(11) DEFAULT 0,

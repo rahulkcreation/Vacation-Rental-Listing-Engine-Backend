@@ -53,6 +53,7 @@
         bedrooms:       $('bedrooms'),
         beds:           $('beds'),
         bathrooms:      $('bathrooms'),
+        address:        $('address'),
         price:          $('pricePerNight'),
         imageGrid:      $('imagePreviewGrid'),
         uploadArea:     $('uploadArea'),
@@ -606,6 +607,7 @@
             if (DOM.bedrooms)    DOM.bedrooms.value     = d.bedroom     || '';
             if (DOM.beds)        DOM.beds.value         = d.bed         || '';
             if (DOM.bathrooms)   DOM.bathrooms.value    = d.bathroom    || '';
+            if (DOM.address)     DOM.address.value      = d.address     || '';
             if (DOM.price)       DOM.price.value        = d.price       || '';
 
             /* Type */
@@ -796,6 +798,13 @@
                 }
             });
 
+            const address = DOM.address ? DOM.address.value.trim() : '';
+            if (!address) {
+                showFieldError('address', 'Property address is required.');
+                valid = false;
+                if (!firstError) firstError = DOM.address;
+            }
+
             const price = DOM.price ? parseFloat(DOM.price.value) : 0;
             if (isNaN(price) || price <= 0) {
                 showFieldError('pricePerNight', 'Please enter a valid price per night.');
@@ -830,6 +839,7 @@
                 bedroom:     DOM.bedrooms   ? DOM.bedrooms.value   : 0,
                 bed:         DOM.beds       ? DOM.beds.value       : 0,
                 bathroom:    DOM.bathrooms  ? DOM.bathrooms.value  : 0,
+                address:     DOM.address    ? DOM.address.value.trim() : '',
                 price:       DOM.price      ? DOM.price.value      : 0,
                 type:        state.typeId,
                 location:    state.locationId,
@@ -902,6 +912,7 @@
             bedroom:     DOM.bedrooms   ? DOM.bedrooms.value   : 0,
             bed:         DOM.beds       ? DOM.beds.value       : 0,
             bathroom:    DOM.bathrooms  ? DOM.bathrooms.value  : 0,
+            address:     DOM.address    ? DOM.address.value.trim() : '',
             price:       DOM.price      ? DOM.price.value      : 0,
             type:        state.typeId,
             location:    state.locationId,
@@ -930,7 +941,7 @@
 
     function bindAutosaveListeners() {
         const triggers = [
-            DOM.title, DOM.description, DOM.guests, DOM.bedrooms, DOM.beds, DOM.bathrooms, DOM.price
+            DOM.title, DOM.description, DOM.guests, DOM.bedrooms, DOM.beds, DOM.bathrooms, DOM.address, DOM.price
         ];
         triggers.forEach(el => {
             if (el) el.addEventListener('input', triggerAutosave);

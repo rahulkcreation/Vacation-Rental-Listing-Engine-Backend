@@ -1144,11 +1144,12 @@ class LEB_Database_Handler
                 'price'       => absint($data['price'] ?? 0),
                 'type'        => sanitize_text_field($data['type'] ?? ''),
                 'location'    => sanitize_text_field($data['location'] ?? ''),
+                'address'     => sanitize_text_field($data['address'] ?? ''),
                 'amenities'   => sanitize_text_field($amenities),
                 'status'      => sanitize_text_field($data['status'] ?? 'draft'),
                 'updated_at'  => current_time('mysql'),
             ],
-            ['%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s']
+            ['%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
         );
 
         if (false === $inserted) {
@@ -1221,12 +1222,13 @@ class LEB_Database_Handler
                 'price'       => absint($data['price'] ?? 0),
                 'type'        => sanitize_text_field($data['type'] ?? ''),
                 'location'    => sanitize_text_field($data['location'] ?? ''),
+                'address'     => sanitize_text_field($data['address'] ?? ''),
                 'amenities'   => sanitize_text_field($amenities),
                 'status'      => sanitize_text_field($data['status'] ?? 'draft'),
                 'updated_at'  => current_time('mysql'),
             ],
             ['id' => $id],
-            ['%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s'],
+            ['%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s'],
             ['%d']
         );
 

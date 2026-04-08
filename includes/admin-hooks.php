@@ -1091,8 +1091,14 @@ function leb_ajax_listing_create_listing()
     }
 
     $title = isset($_POST['title']) ? sanitize_text_field(wp_unslash($_POST['title'])) : '';
+    $address = isset($_POST['address']) ? sanitize_text_field(wp_unslash($_POST['address'])) : '';
+
     if (empty($title)) {
         wp_send_json_error(['message' => __('Property title is required.', 'listing-engine-backend')]);
+    }
+
+    if (empty($address)) {
+        wp_send_json_error(['message' => __('Property address is required.', 'listing-engine-backend')]);
     }
 
     $data = [
@@ -1106,6 +1112,7 @@ function leb_ajax_listing_create_listing()
         'price'       => isset($_POST['price'])       ? absint($_POST['price'])       : 0,
         'type'        => isset($_POST['type'])        ? sanitize_text_field(wp_unslash($_POST['type']))     : '',
         'location'    => isset($_POST['location'])    ? sanitize_text_field(wp_unslash($_POST['location'])) : '',
+        'address'     => $address,
         'amenities'   => isset($_POST['amenities'])   ? sanitize_text_field(wp_unslash($_POST['amenities'])) : '',
         'status'      => isset($_POST['status'])      ? sanitize_text_field(wp_unslash($_POST['status']))  : 'draft',
         'images'      => isset($_POST['images'])      ? wp_unslash($_POST['images'])  : '[]',
@@ -1156,6 +1163,7 @@ function leb_ajax_listing_update_listing()
         'price'       => isset($_POST['price'])       ? absint($_POST['price'])       : 0,
         'type'        => isset($_POST['type'])        ? sanitize_text_field(wp_unslash($_POST['type']))     : '',
         'location'    => isset($_POST['location'])    ? sanitize_text_field(wp_unslash($_POST['location'])) : '',
+        'address'     => isset($_POST['address'])     ? sanitize_text_field(wp_unslash($_POST['address']))  : '',
         'amenities'   => isset($_POST['amenities'])   ? sanitize_text_field(wp_unslash($_POST['amenities'])) : '',
         'status'      => isset($_POST['status'])      ? sanitize_text_field(wp_unslash($_POST['status']))  : 'draft',
         'images'      => isset($_POST['images'])      ? wp_unslash($_POST['images'])  : '[]',
