@@ -67,6 +67,7 @@
             page:     lebPmState.page,
             per_page: lebPmState.perPage,
             status:   lebPmState.status,
+            _v:       Date.now(),
         }, function (res) {
             showLoading(false);
             if (res.success) {
@@ -108,11 +109,10 @@
 
         DOM.body.innerHTML = items.map(function (item, index) {
             // Thumbnail - item.first_image is now a URL string from backend
+            const placeholder = (LEB_Ajax.assets_url || '') + 'images/placeholder.png';
             const thumb = item.first_image
-                ? '<img class="leb-pm-card-thumb" src="' + escHtml(item.first_image) + '" alt="" loading="lazy">'
-                : '<div class="leb-pm-card-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--leb-border-light);">'
-                + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'
-                + '</div>';
+                ? '<img class="leb-pm-card-thumb" src="' + escHtml(item.first_image) + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + placeholder + '\';">'
+                : '<img class="leb-pm-card-thumb" src="' + placeholder + '" alt="" loading="lazy">';
 
             const status = (item.status || 'draft').toLowerCase();
             const sNo    = ((lebPmState.page - 1) * lebPmState.perPage) + index + 1;

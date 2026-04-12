@@ -405,8 +405,13 @@
             item.dataset.index = idx;
 
             const imgEl = document.createElement('img');
+            const placeholder = (LEB_Ajax.assets_url || '') + 'images/placeholder.png';
             imgEl.src = img.url;
             imgEl.alt = 'Property image ' + (idx + 1);
+            imgEl.onerror = function() {
+                this.onerror = null;
+                this.src = placeholder;
+            };
             item.appendChild(imgEl);
 
             const btn = document.createElement('button');

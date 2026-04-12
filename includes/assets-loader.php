@@ -231,6 +231,7 @@ function leb_localize_ajax_data() {
             'ajax_url'   => admin_url( 'admin-ajax.php' ),
             'nonce'      => wp_create_nonce( 'leb_nonce' ),
             'manage_url' => admin_url( 'admin.php?page=leb-properties' ),
+            'assets_url' => LEB_ASSETS_URL,
         ]
     );
 }
