@@ -44,7 +44,7 @@ class LEB_Database_Handler
     private string $locations_table;
 
     /**
-     * The fully-qualified name of the ls_listings table.
+     * The fully-qualified name of the ls_property table.
      *
      * @var string
      */
@@ -73,7 +73,7 @@ class LEB_Database_Handler
         $this->types_table      = $wpdb->prefix . 'ls_types';
         $this->amenities_table  = $wpdb->prefix . 'ls_amenities';
         $this->locations_table  = $wpdb->prefix . 'ls_location';
-        $this->listings_table   = $wpdb->prefix . 'ls_listings';
+        $this->listings_table   = $wpdb->prefix . 'ls_property';
         $this->ls_img_table     = $wpdb->prefix . 'ls_img';
         $this->ls_block_date_table = $wpdb->prefix . 'ls_block_date';
     }
@@ -860,12 +860,12 @@ class LEB_Database_Handler
     // ─────────────────────────────────────────────────────────
 
     /**
-     * Create or repair the ls_listings table.
+     * Create or repair the ls_property table.
      *
      * @return true|WP_Error
      */
     /**
-     * Create or repair the 'ls_listings' table.
+     * Create or repair the 'ls_property' table.
      * 
      * This is the main table that stores user-submitted property listings.
      *

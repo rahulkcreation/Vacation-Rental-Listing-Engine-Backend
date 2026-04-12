@@ -113,7 +113,7 @@ function leb_get_locations_schema() {
 // =============================================================================
 
 /**
- * Returns the CREATE TABLE SQL for the `{prefix}ls_listings` table.
+ * Returns the CREATE TABLE SQL for the `{prefix}ls_property` table.
  *
  * This is the CORE table of the plugin. It stores all primary property information:
  * - user_id:   The WP User ID who owns the listing.
@@ -125,7 +125,7 @@ function leb_get_locations_schema() {
  */
 function leb_get_listings_schema() {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'ls_listings';
+    $table_name = $wpdb->prefix . 'ls_property';
     return "CREATE TABLE $table_name (
         id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id bigint(20) UNSIGNED NOT NULL,
@@ -151,7 +151,7 @@ function leb_get_listings_schema() {
  * Returns the CREATE TABLE SQL for the `{prefix}ls_img` table.
  *
  * This table stores a gallery of images for each listing.
- * - property_id: Foreign key to ls_listings.id.
+ * - property_id: Foreign key to ls_property.id.
  * - image:       Full URL or path to the image file.
  *
  * @return string SQL statement.
@@ -172,7 +172,7 @@ function leb_get_ls_img_schema() {
  * Returns the CREATE TABLE SQL for the `{prefix}ls_block_date` table.
  *
  * This table manages availability by "blocking" certain dates for a property.
- * - property_id: Foreign key to ls_listings.id.
+ * - property_id: Foreign key to ls_property.id.
  * - dates:       A list or JSON string of blocked calendar dates.
  *
  * @return string SQL statement.

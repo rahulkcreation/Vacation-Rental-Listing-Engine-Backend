@@ -484,11 +484,11 @@ function leb_ajax_db_status()
             ],
             // Listings Table Status.
             [
-                'key'           => 'ls_listings',
-                'title'         => __('Listings Table', 'listing-engine-backend'),
-                'table_name'    => $wpdb->prefix . 'ls_listings',
-                'exists'        => leb_check_table_status($wpdb->prefix . 'ls_listings')['exists'],
-                'rows_complete' => leb_check_table_status($wpdb->prefix . 'ls_listings')['rows_complete'],
+                'key'           => 'ls_property',
+                'title'         => __('Property Table', 'listing-engine-backend'),
+                'table_name'    => $wpdb->prefix . 'ls_property',
+                'exists'        => leb_check_table_status($wpdb->prefix . 'ls_property')['exists'],
+                'rows_complete' => leb_check_table_status($wpdb->prefix . 'ls_property')['rows_complete'],
             ],
             // Images Table Status.
             [
@@ -532,7 +532,7 @@ function leb_ajax_db_create_repair()
         $result = $handler->create_or_repair_amenities_table();
     } elseif ($table_key === 'ls_location') {
         $result = $handler->create_or_repair_locations_table();
-    } elseif ($table_key === 'ls_listings') {
+    } elseif ($table_key === 'ls_property') {
         // Repair Listings table.
         $result = $handler->create_or_repair_listings_table();
     } elseif ($table_key === 'ls_img') {

@@ -23,7 +23,7 @@ $leb_amen_status       = leb_check_table_status( $leb_amenities_table );
 $leb_locations_table   = $wpdb->prefix . 'ls_location';
 $leb_loc_status        = leb_check_table_status( $leb_locations_table );
 
-$leb_listings_table    = $wpdb->prefix . 'ls_listings';
+$leb_listings_table    = $wpdb->prefix . 'ls_property';
 $leb_listings_status   = leb_check_table_status( $leb_listings_table );
 
 $leb_img_table         = $wpdb->prefix . 'ls_img';
@@ -172,18 +172,18 @@ $leb_block_date_status = leb_check_table_status( $leb_block_date_table );
         </div><!-- end Locations card -->
 
         <!-- Listings Table Card -->
-        <div class="leb-db-card" id="leb-db-card-ls_listings">
-            <h2 class="leb-db-card-title"><?php esc_html_e( 'Listings Table', 'listing-engine-backend' ); ?></h2>
+        <div class="leb-db-card" id="leb-db-card-ls_property">
+            <h2 class="leb-db-card-title"><?php esc_html_e( 'Property Table', 'listing-engine-backend' ); ?></h2>
 
-            <div class="leb-db-statuses" id="leb-db-statuses-ls_listings">
+            <div class="leb-db-statuses" id="leb-db-statuses-ls_property">
                 <?php leb_render_db_card_statuses( $leb_listings_status ); ?>
             </div>
 
             <div class="leb-db-actions">
                 <button
                     class="leb-db-btn leb-db-btn--refresh"
-                    id="leb-db-refresh-ls_listings"
-                    data-table-key="ls_listings"
+                    id="leb-db-refresh-ls_property"
+                    data-table-key="ls_property"
                     aria-label="<?php esc_attr_e( 'Refresh listings table status', 'listing-engine-backend' ); ?>">
                     <span class="leb-db-card-spin" aria-hidden="true"></span>
                     <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -195,8 +195,8 @@ $leb_block_date_status = leb_check_table_status( $leb_block_date_table );
 
                 <button
                     class="leb-db-btn leb-db-btn--repair"
-                    id="leb-db-repair-ls_listings"
-                    data-table-key="ls_listings"
+                    id="leb-db-repair-ls_property"
+                    data-table-key="ls_property"
                     aria-label="<?php esc_attr_e( 'Create or repair listings table', 'listing-engine-backend' ); ?>">
                     <span class="leb-db-card-spin" aria-hidden="true"></span>
                     <svg class="leb-db-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
