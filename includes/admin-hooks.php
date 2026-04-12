@@ -274,6 +274,7 @@ add_action('wp_ajax_leb_listing_bulk_status',        'leb_ajax_listing_bulk_stat
 add_action('wp_ajax_leb_listing_get_amenities_all',  'leb_ajax_listing_get_amenities_all');
 add_action('wp_ajax_leb_listing_get_locations_all',  'leb_ajax_listing_get_locations_all');
 add_action('wp_ajax_leb_listing_get_types_all',      'leb_ajax_listing_get_types_all');
+add_action('wp_ajax_leb_listing_duplicate',          'leb_ajax_listing_duplicate');
 
 /**
  * AJAX: Return paginated / searched list of types.
@@ -1505,4 +1506,32 @@ function leb_validate_listing_images($images)
     }
 
     return true;
+}
+
+/**
+ * AJAX: Duplicate an existing property listing.
+ */
+function leb_ajax_listing_duplicate()
+{
+    check_ajax_referer('leb_nonce', 'nonce');
+    if (! current_user_can('manage_options')) {
+        wp_send_json_error(['message' => __('Unauthorized.', 'listing-engine-backend')]);
+    }
+
+    $id = isset($_POST['id']) ? absint($_POST['id']) : 0;
+    if (! $id) {
+        wp_send_json_error(['message' => __('Invalid property ID.', 'listing-engine-backend')]);
+    }
+
+    $handler = new LEB_Database_Handler();
+    $result  = $handler->duplicate_listing($id);
+
+    if (is_wp_error($result)) {
+        wp_send_json_error(['message' => $result->get_error_message()]);
+    }
+
+    wp_send_json_success([
+        'message' => __('Property duplicated successfully.', 'listing-engine-backend'),
+        'new_id'  => $result
+    ]);
 }

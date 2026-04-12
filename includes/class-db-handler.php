@@ -1032,6 +1032,62 @@ class LEB_Database_Handler
     }
 
     /**
+     * Duplicate an existing property listing along with all its related data.
+     *
+     * @param int $id The source property ID to duplicate.
+     * @return int|WP_Error New property ID on success, WP_Error on failure.
+     */
+    public function duplicate_listing(int $id)
+    {
+        global $wpdb;
+
+        // 1. Fetch source listing
+        $listing = $wpdb->get_row($wpdb->prepare("SELECT * FROM `{$this->listings_table}` WHERE id = %d", $id), ARRAY_A);
+        if (!$listing) {
+            return new WP_Error('leb_listing_not_found', __('Listing to duplicate not found.', 'listing-engine-backend'));
+        }
+
+        // 2. Prepare new data
+        $new_listing = $listing;
+        unset($new_listing['id']);
+        $new_listing['title']  = $listing['title'] . ' - Copy';
+        $new_listing['status'] = 'draft';
+        $new_listing['updated_at'] = current_time('mysql');
+
+        // 3. Insert new listing
+        $inserted = $wpdb->insert($this->listings_table, $new_listing);
+        if (!$inserted) {
+            $error_msg = __('Failed to create duplicate property.', 'listing-engine-backend');
+            if (! empty($wpdb->last_error)) {
+                $error_msg .= ' DB Error: ' . $wpdb->last_error;
+            }
+            return new WP_Error('leb_duplicate_failed', $error_msg);
+        }
+        $new_id = $wpdb->insert_id;
+
+        // 4. Duplicate images
+        $img_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM `{$this->ls_img_table}` WHERE property_id = %d", $id), ARRAY_A);
+        if ($img_row) {
+            $wpdb->insert($this->ls_img_table, [
+                'property_id' => $new_id,
+                'image'       => $img_row['image']
+            ]);
+        }
+
+        // 5. Duplicate blocked dates
+        $date_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM `{$this->ls_block_date_table}` WHERE property_id = %d", $id), ARRAY_A);
+        if ($date_row) {
+            $wpdb->insert($this->ls_block_date_table, [
+                'property_id' => $new_id,
+                'dates'       => $date_row['dates'],
+                'created_at'  => current_time('mysql')
+            ]);
+        }
+
+        return $new_id;
+    }
+
+    /**
      * Retrieve a single listing by ID with all related data.
      *
      * Fetches:
