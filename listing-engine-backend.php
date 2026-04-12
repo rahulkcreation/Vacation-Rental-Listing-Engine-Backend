@@ -3,7 +3,7 @@
  * Plugin Name:       Listing Engine Backend
  * Plugin URI:        https://arttechfuzion.com
  * Description:       A comprehensive backend for managing vacation rental listing types and database schema.
- * Version:           2.1.0
+ * Version:           2.2.0
  * Author:            Art-Tech Fuzion
  * Author URI:        https://arttechfuzion.com
  * Text Domain:       listing-engine-backend
@@ -26,7 +26,7 @@ if ( ! defined( 'ALLOW_UNFILTERED_UPLOADS' ) ) {
 // ─────────────────────────────────────────────────────────────
 // Plugin Constants
 // ─────────────────────────────────────────────────────────────
-define( 'LEB_VERSION',      '2.1.0' );
+define( 'LEB_VERSION',      '2.2.0' );
 define( 'LEB_PLUGIN_DIR',   plugin_dir_path( __FILE__ ) );
 define( 'LEB_PLUGIN_URL',   plugin_dir_url( __FILE__ ) );
 define( 'LEB_PLUGIN_FILE',  __FILE__ );

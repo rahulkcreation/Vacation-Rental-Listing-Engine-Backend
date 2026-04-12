@@ -941,7 +941,7 @@ class LEB_Database_Handler
      *
      * Performs LEFT JOINs to:
      *  - wp_ls_types  → to resolve type ID into display name.
-     *  - wp_users     → to resolve user_id into login username.
+     *  - wp_users     → to resolve host_id into login username.
      *  - wp_ls_img    → to fetch the first image for the thumbnail.
      *
      * @param string $search   Search term (matched against title).
@@ -966,7 +966,7 @@ class LEB_Database_Handler
             img.image AS first_image
             FROM `{$this->listings_table}` AS l
             LEFT JOIN `{$this->types_table}` AS t ON l.type = t.id
-            LEFT JOIN `{$wpdb->users}` AS u ON l.user_id = u.ID
+            LEFT JOIN `{$wpdb->users}` AS u ON l.host_id = u.ID
             LEFT JOIN `{$this->ls_img_table}` AS img ON img.property_id = l.id";
 
         $base_count = "SELECT COUNT(*) FROM `{$this->listings_table}` AS l";
@@ -1056,7 +1056,7 @@ class LEB_Database_Handler
                     u.user_email AS user_email
                 FROM `{$this->listings_table}` AS l
                 LEFT JOIN `{$this->types_table}` AS t ON l.type = t.id
-                LEFT JOIN `{$wpdb->users}` AS u ON l.user_id = u.ID
+                LEFT JOIN `{$wpdb->users}` AS u ON l.host_id = u.ID
                 WHERE l.id = %d",
                 $id
             ),
@@ -1088,11 +1088,11 @@ class LEB_Database_Handler
         $row['blocked_dates'] = $dates_row ? $dates_row['dates'] : '[]';
 
         // Fetch host mobile number from usermeta.
-        if (! empty($row['user_id'])) {
+        if (! empty($row['host_id'])) {
             $mobile = $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT meta_value FROM `{$wpdb->usermeta}` WHERE user_id = %d AND meta_key = 'mobile_number' LIMIT 1",
-                    $row['user_id']
+                    $row['host_id']
                 )
             );
             $row['user_mobile'] = $mobile ?: '';
@@ -1105,7 +1105,7 @@ class LEB_Database_Handler
      * Create a new property listing along with images and blocked dates.
      *
      * @param array $data {
-     *     @type int    $user_id     WordPress user ID.
+     *     @type int    $host_id     WordPress user ID.
      *     @type string $title       Property title.
      *     @type string $description Property description.
      *     @type int    $guests      Number of guests.
@@ -1134,7 +1134,7 @@ class LEB_Database_Handler
         $inserted = $wpdb->insert(
             $this->listings_table,
             [
-                'user_id'     => absint($data['user_id'] ?? 0),
+                'host_id'     => absint($data['host_id'] ?? 0),
                 'title'       => sanitize_text_field($data['title'] ?? ''),
                 'description' => wp_kses_post($data['description'] ?? ''),
                 'guests'      => absint($data['guests'] ?? 0),

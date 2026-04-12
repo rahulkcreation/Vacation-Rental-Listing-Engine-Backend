@@ -1102,7 +1102,7 @@ function leb_ajax_listing_create_listing()
     }
 
     $data = [
-        'user_id'     => get_current_user_id(),
+        'host_id'     => get_current_user_id(),
         'title'       => $title,
         'description' => isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description'])) : '',
         'guests'      => isset($_POST['guests'])      ? absint($_POST['guests'])      : 0,

@@ -116,7 +116,7 @@ function leb_get_locations_schema() {
  * Returns the CREATE TABLE SQL for the `{prefix}ls_property` table.
  *
  * This is the CORE table of the plugin. It stores all primary property information:
- * - user_id:   The WP User ID who owns the listing.
+ * - host_id:    The WP User ID who owns the listing.
  * - location:  Detailed location info (often longtext/JSON).
  * - amenities: List of IDs/names of amenities available.
  * - bed/bath:  Physical inventory of the property.
@@ -128,7 +128,7 @@ function leb_get_listings_schema() {
     $table_name = $wpdb->prefix . 'ls_property';
     return "CREATE TABLE $table_name (
         id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        user_id bigint(20) UNSIGNED NOT NULL,
+        host_id bigint(20) UNSIGNED NOT NULL,
         title varchar(255) NOT NULL,
         location longtext NOT NULL,
         address longtext NOT NULL,
