@@ -7,52 +7,6 @@
  * @package ListingEngineBackend
  */
 
-/* ─── Background Decoration ─────────────────────────────────── */
-
-.leb-pm-bg-decoration {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.leb-pm-bg-orb-1 {
-    position: absolute;
-    top: -10%;
-    right: -5%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, var(--leb-primary-light-bg) 0%, transparent 70%);
-    border-radius: 50%;
-    opacity: 0.6;
-}
-
-.leb-pm-bg-orb-2 {
-    position: absolute;
-    bottom: -15%;
-    left: -10%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, var(--leb-info-light-bg) 0%, transparent 70%);
-    border-radius: 50%;
-    opacity: 0.5;
-}
-
-/* ─── Main Container ─────────────────────────────────── */
-
-.leb-pm-main-container {
-    max-width: 1400px;
-    margin: 20px auto;
-    position: relative;
-    z-index: 1;
-    width: 96%;
-    font-family: var(--leb-font-family);
-    color: var(--leb-text-color);
-}
 
 /* ─── Header ─────────────────────────────────── */
 

@@ -1,15 +1,3 @@
-/* ── Location Management – List Screen ──────────────────────────────
-   Scoped to #leb-loc-list to prevent conflicts with other templates.
-─────────────────────────────────────────────────────────────── */
-
-#leb-loc-list {
-   font-family: var(--leb-font-family);
-    color: var(--leb-text-color);
-    max-width: 1200px;
-    margin: 2rem auto;
-    width: 95%;
-}
-
 /* ── Header ─────────────────────────────────────────────────── */
 #leb-loc-list .leb-loc-header {
     display:          flex;

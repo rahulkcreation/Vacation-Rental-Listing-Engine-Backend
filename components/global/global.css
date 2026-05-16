@@ -62,14 +62,41 @@
  * ============================================ */
 
 /* Remove default browser/WordPress outline and focus shadow centrally */
-*:focus,
-*:focus-visible,
-*:active {
+.leb-global-plugin-wrapper :is(
+    input[type="checkbox"], input[type="color"], input[type="date"], 
+    input[type="datetime-local"], input[type="datetime"], input[type="email"], 
+    input[type="month"], input[type="number"], input[type="password"], 
+    input[type="radio"], input[type="search"], input[type="tel"], 
+    input[type="text"], input[type="time"], input[type="url"], 
+    input[type="week"], select, textarea, a
+):is(:hover, :focus, :focus-visible, :active) {
     outline: none !important;
-    box-shadow: none !important;
+    box-shadow: unset !important;
 }
 
-/* Reset WordPress default paragraph margin */
-p {
+/* Reset WordPress default paragraph margin and set base typography color */
+.leb-global-plugin-wrapper {
+    box-sizing: border-box !important;
+    color: var(--leb-text-color);
+    font-family: var(--leb-font-family);
+    overflow-x: clip;
+}
+
+.leb-global-plugin-wrapper *,
+.leb-global-plugin-wrapper *::before,
+.leb-global-plugin-wrapper *::after {
+    box-sizing: border-box !important;
+}
+
+.leb-global-plugin-wrapper * {
     margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    font-family: inherit;
+}
+
+/* Ensure WordPress admin notices don't break our layout */
+.leb-admin-notice-placeholder + .notice{
+    margin: 5px 0 15px 0 !important;
+    border-radius: 8px;
 }

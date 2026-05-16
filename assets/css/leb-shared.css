@@ -5,13 +5,6 @@
    DO NOT put layout or page-specific CSS here.
    ───────────────────────────────────────────────────────── */
 
-/* ── Global Reset Support ───────────────────────────────── */
-.leb-wrap *,
-.leb-wrap *::before,
-.leb-wrap *::after {
-    box-sizing: border-box;
-}
-
 /* ── Loading Overlay & Spinner ───────────────────────────── */
 .leb-loading-overlay {
     position:    absolute;

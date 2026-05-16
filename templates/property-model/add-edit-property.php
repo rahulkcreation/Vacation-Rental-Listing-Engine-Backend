@@ -18,8 +18,10 @@ $listing_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 $is_edit    = ( $listing_id > 0 );
 $back_url   = admin_url( 'admin.php?page=leb-properties' );
 ?>
-
-<div class="leb-aep-wrap" id="leb-prop-form-wrap" role="main">
+<div class="wrap">
+    <!-- This hidden h2 and the empty notice container catch WordPress admin notices before they get moved into our custom header. -->
+    <h2 class="leb-admin-notice-placeholder"></h2>
+    <div class="leb-global-plugin-wrapper leb-aep-wrap" id="leb-prop-form-wrap" role="main">
     <form id="propertyForm" novalidate>
         <!-- Hidden ID field for edit mode -->
         <input type="hidden" id="leb-prop-field-id" value="<?php echo esc_attr( $listing_id ); ?>">
@@ -286,4 +288,5 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
         </button>
 
     </form>
+</div>
 </div>

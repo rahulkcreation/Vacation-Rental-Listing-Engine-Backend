@@ -1,14 +1,3 @@
-/* ── Type Management – List Screen ──────────────────────────────
-   Scoped to #leb-type-list to prevent conflicts with other templates.
-─────────────────────────────────────────────────────────────── */
-
-#leb-type-list {
-   font-family: var(--leb-font-family);
-    color: var(--leb-text-color);
-    max-width: 1200px;
-    margin: 2rem auto;
-    width: 95%;
-}
 
 /* ── Header ─────────────────────────────────────────────────── */
 #leb-type-list .leb-tl-header {

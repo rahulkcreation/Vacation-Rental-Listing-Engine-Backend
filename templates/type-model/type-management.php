@@ -9,7 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<div id="leb-type-list" class="leb-wrap">
+<div class="wrap">
+    <!-- This hidden h2 and the empty notice container catch WordPress admin notices before they get moved into our custom header. -->
+    <h2 class="leb-admin-notice-placeholder"></h2>
+    <div id="leb-type-list" class="leb-global-plugin-wrapper">
 
     <!-- ── Page Header ──────────────────────────────────── -->
     <div class="leb-tl-header">
@@ -98,8 +101,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 </div><!-- /#leb-type-list -->
 
-<script>
-window.lebTypeMgmtCfg = {
-    editUrlBase: '<?php echo esc_js( admin_url( 'admin.php?page=leb-types&leb_action=edit&id=' ) ); ?>'
-};
-</script>
+
+</div>

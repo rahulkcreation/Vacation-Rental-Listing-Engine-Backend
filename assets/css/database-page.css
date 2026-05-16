@@ -2,13 +2,6 @@
    Scoped to #leb-database-page to prevent conflicts.
 ─────────────────────────────────────────────────────────────── */
 
-#leb-database-page {
-    font-family: var(--leb-font-family);
-    color: var(--leb-text-color);
-    max-width: 1200px;
-    margin: 2rem auto;
-    width: 96%;
-}
 
 /* ── Page Header ─────────────────────────────────────────── */
 #leb-database-page .leb-db-header {

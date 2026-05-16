@@ -10,7 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<div id="leb-amen-list" class="leb-wrap">
+<div class="wrap">
+    <!-- This hidden h2 and the empty notice container catch WordPress admin notices before they get moved into our custom header. -->
+    <h2 class="leb-admin-notice-placeholder"></h2>
+    <div id="leb-amen-list" class="leb-global-plugin-wrapper">
 
     <!-- ── Page Header ──────────────────────────────────────── -->
     <div class="leb-am-header">
@@ -91,9 +94,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 </div><!-- /#leb-amen-list -->
 
-<script>
-window.lebAmenMgmtCfg = {
-    editUrlBase: '<?php echo esc_js( admin_url( 'admin.php?page=leb-amenities&leb_action=edit&id=' ) ); ?>',
-    defaultSvgPath: '<?php echo esc_url( LEB_PLUGIN_URL . "assets/images/default-amenity.svg" ); ?>'
-};
-</script>
+
+</div>

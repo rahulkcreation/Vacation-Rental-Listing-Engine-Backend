@@ -1,1 +1,11 @@
 .code-review-graph
+.vscode
+.DS_Store
+.env
+.agents
+temp
+node_modules
+package-lock.json
+package.json
+vite.config.js
+minify

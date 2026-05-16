@@ -49,9 +49,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
                 }
                 
                 lebLocMediaFrame = wp.media( {
-                    title    : 'Select 24×24 SVG Icon',
-                    button   : { text: 'Use This SVG' },
-                    library  : { type: 'image/svg+xml' },
+                    title    : 'Select 24×24 Icon',
+                    button   : { text: 'Use This Icon' },
+                    library  : { type: ['image/svg+xml', 'image/webp'] },
                     multiple : false
                 } );
 
@@ -61,7 +61,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
                     // Basic client-side size check (1 MB = 1,048,576 bytes).
                     if ( attachment.filesizeInBytes && attachment.filesizeInBytes > 1048576 ) {
                         if ( typeof LEB_Toaster !== 'undefined' ) {
-                            LEB_Toaster.show( 'SVG file size must not exceed 1 MB.', 'error' );
+                            LEB_Toaster.show( 'Icon file size must not exceed 1 MB.', 'error' );
                         }
                         return;
                     }
@@ -78,7 +78,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
                     if (domPlaceholder) domPlaceholder.style.display = 'none';
 
                     // Toggle button labels.
-                    if (domBtnLabel) domBtnLabel.textContent = 'Change SVG';
+                    if (domBtnLabel) domBtnLabel.textContent = 'Change Icon';
                     if (domRemoveBtn) domRemoveBtn.style.display = 'inline-flex';
                 } );
             }
@@ -96,7 +96,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
                 domPreviewImg.style.display  = 'none';
             }
             if (domPlaceholder) domPlaceholder.style.display = 'flex';
-            if (domBtnLabel) domBtnLabel.textContent      = 'Upload / Choose SVG';
+            if (domBtnLabel) domBtnLabel.textContent      = 'Upload / Choose Icon';
             domRemoveBtn.style.display   = 'none';
         } );
     }
@@ -143,7 +143,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
                             domPreviewImg.style.display = 'block';
                         }
                         if (domPlaceholder) domPlaceholder.style.display = 'none';
-                        if (domBtnLabel) domBtnLabel.textContent = 'Change SVG';
+                        if (domBtnLabel) domBtnLabel.textContent = 'Change Icon';
                         if (domRemoveBtn) domRemoveBtn.style.display = 'inline-flex';
                     }
                 } else {
@@ -193,7 +193,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
         if ( ! svgUrl ) {
             if ( typeof LEB_Toaster !== 'undefined' ) {
-                LEB_Toaster.show( 'SVG Icon is required.', 'warning' );
+                LEB_Toaster.show( 'Icon is required.', 'warning' );
             }
             return;
         }

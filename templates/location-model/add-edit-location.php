@@ -26,7 +26,10 @@ $leb_loc_btn_label  = $leb_loc_is_edit
     ? esc_html__( 'Update Location', 'listing-engine-backend' )
     : esc_html__( 'Create Location', 'listing-engine-backend' );
 ?>
-<div id="leb-loc-add-edit" class="leb-wrap">
+<div class="wrap">
+    <!-- This hidden h2 and the empty notice container catch WordPress admin notices before they get moved into our custom header. -->
+    <h2 class="leb-admin-notice-placeholder"></h2>
+    <div id="leb-loc-add-edit" class="leb-global-plugin-wrapper">
 
     <article class="leb-ae-loc-card">
 
@@ -135,11 +138,5 @@ $leb_loc_btn_label  = $leb_loc_is_edit
 
 </div><!-- /#leb-loc-add-edit -->
 
-<script>
-window.lebLocAECfg = {
-    isEdit: <?php echo $leb_loc_is_edit ? 'true' : 'false'; ?>,
-    editId: <?php echo (int) $leb_loc_edit_id; ?>,
-    defaultSvgPath: '<?php echo esc_url( LEB_PLUGIN_URL . "assets/images/default-location.svg" ); ?>',
-    redirectUrl: '<?php echo esc_js( admin_url( 'admin.php?page=leb-locations' ) ); ?>'
-};
-</script>
+
+</div>

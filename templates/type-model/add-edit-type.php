@@ -23,7 +23,10 @@ $leb_btn_label  = $leb_is_edit
     ? esc_html__( 'Update Type', 'listing-engine-backend' )
     : esc_html__( 'Create Type', 'listing-engine-backend' );
 ?>
-<div id="leb-add-edit-type" class="leb-wrap">
+<div class="wrap">
+    <!-- This hidden h2 and the empty notice container catch WordPress admin notices before they get moved into our custom header. -->
+    <h2 class="leb-admin-notice-placeholder"></h2>
+    <div id="leb-add-edit-type" class="leb-global-plugin-wrapper">
 
     <article class="leb-ae-card">
 
@@ -80,10 +83,5 @@ $leb_btn_label  = $leb_is_edit
 
 </div><!-- /#leb-add-edit-type -->
 
-<script>
-window.lebTypeAECfg = {
-    isEdit: <?php echo $leb_is_edit ? 'true' : 'false'; ?>,
-    editId: <?php echo (int) $leb_edit_id; ?>,
-    redirectUrl: '<?php echo esc_js( admin_url( 'admin.php?page=leb-types' ) ); ?>'
-};
-</script>
+
+</div>

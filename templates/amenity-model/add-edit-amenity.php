@@ -26,7 +26,10 @@ $leb_amen_btn_label  = $leb_amen_is_edit
     ? esc_html__( 'Update Amenity', 'listing-engine-backend' )
     : esc_html__( 'Create Amenity', 'listing-engine-backend' );
 ?>
-<div id="leb-amen-add-edit" class="leb-wrap">
+<div class="wrap">
+    <!-- This hidden h2 and the empty notice container catch WordPress admin notices before they get moved into our custom header. -->
+    <h2 class="leb-admin-notice-placeholder"></h2>
+    <div id="leb-amen-add-edit" class="leb-global-plugin-wrapper">
 
     <article class="leb-ae-amen-card">
 
@@ -120,11 +123,5 @@ $leb_amen_btn_label  = $leb_amen_is_edit
 
 </div><!-- /#leb-amen-add-edit -->
 
-<script>
-window.lebAmenAECfg = {
-    isEdit: <?php echo $leb_amen_is_edit ? 'true' : 'false'; ?>,
-    editId: <?php echo (int) $leb_amen_edit_id; ?>,
-    defaultSvgPath: '<?php echo esc_url( LEB_PLUGIN_URL . "assets/images/default-amenity.svg" ); ?>',
-    redirectUrl: '<?php echo esc_js( admin_url( 'admin.php?page=leb-amenities' ) ); ?>'
-};
-</script>
+
+</div>

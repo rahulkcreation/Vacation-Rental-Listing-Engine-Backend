@@ -1,15 +1,3 @@
-/* ── Amenity Management – List Screen ──────────────────────────────
-   Scoped to #leb-amen-list to prevent conflicts with other templates.
-─────────────────────────────────────────────────────────────── */
-
-#leb-amen-list {
-   font-family: var(--leb-font-family);
-    color: var(--leb-text-color);
-    max-width: 1200px;
-    margin: 2rem auto;
-    width: 95%;
-}
-
 /* ── Header ─────────────────────────────────────────────────── */
 #leb-amen-list .leb-am-header {
     display:          flex;

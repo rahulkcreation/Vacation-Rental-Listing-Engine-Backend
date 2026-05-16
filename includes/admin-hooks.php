@@ -45,7 +45,7 @@ function leb_register_admin_menus()
         'leb-types',                      // Points to Types as the landing page.
         'leb_render_type_management_page',
         $icon_svg,
-        26                                // Position just after Comments (25).
+        27                                // Position just after Comments (25).
     );
 
     // Sub-menu 1: Types (duplicated to rename the auto-created first item).
@@ -618,11 +618,11 @@ function leb_ajax_amen_create_amenity()
         wp_send_json_error(['message' => __('Amenity SVG Icon is required.', 'listing-engine-backend')]);
     }
 
-    // Validate SVG attachment if one was provided.
+    // Validate SVG/WEBP attachment if one was provided.
     if ($attachment_id) {
-        $svg_validation = leb_amen_validate_svg_attachment($attachment_id);
-        if (is_wp_error($svg_validation)) {
-            wp_send_json_error(['message' => $svg_validation->get_error_message()]);
+        $icon_validation = leb_amen_validate_icon_attachment($attachment_id);
+        if (is_wp_error($icon_validation)) {
+            wp_send_json_error(['message' => $icon_validation->get_error_message()]);
         }
     }
 
@@ -670,9 +670,9 @@ function leb_ajax_amen_update_amenity()
 
     // Validate new SVG attachment if a new one was selected.
     if ($attachment_id) {
-        $svg_validation = leb_amen_validate_svg_attachment($attachment_id);
-        if (is_wp_error($svg_validation)) {
-            wp_send_json_error(['message' => $svg_validation->get_error_message()]);
+        $icon_validation = leb_amen_validate_icon_attachment($attachment_id);
+        if (is_wp_error($icon_validation)) {
+            wp_send_json_error(['message' => $icon_validation->get_error_message()]);
         }
     }
 
@@ -785,19 +785,19 @@ function leb_ajax_amen_bulk_delete_amenities()
 }
 
 // ─────────────────────────────────────────────────────────────
-// SVG Attachment Validation Helper
+// Icon Attachment Validation Helper
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Validate that a WP media attachment meets the SVG icon requirements:
- *   – Must exist and be an SVG (image/svg+xml).
+ * Validate that a WP media attachment meets the icon requirements:
+ *   – Must exist and be an SVG (image/svg+xml) or WEBP (image/webp).
  *   – File size must not exceed 1 MB.
  *   – Image dimensions must be exactly 24 × 24 px.
  *
  * @param int $attachment_id WordPress attachment post ID.
  * @return true|WP_Error TRUE if valid, WP_Error with a human-readable message otherwise.
  */
-function leb_amen_validate_svg_attachment(int $attachment_id)
+function leb_amen_validate_icon_attachment(int $attachment_id)
 {
     // Verify the attachment post exists.
     $attachment = get_post($attachment_id);
@@ -805,10 +805,10 @@ function leb_amen_validate_svg_attachment(int $attachment_id)
         return new WP_Error('leb_amen_invalid_attachment', __('Invalid attachment ID.', 'listing-engine-backend'));
     }
 
-    // Verify the MIME type is SVG.
+    // Verify the MIME type is SVG or WEBP.
     $mime_type = get_post_mime_type($attachment_id);
-    if ('image/svg+xml' !== $mime_type) {
-        return new WP_Error('leb_amen_not_svg', __('Only SVG files are allowed for amenity icons.', 'listing-engine-backend'));
+    if (! in_array($mime_type, ['image/svg+xml', 'image/webp'], true)) {
+        return new WP_Error('leb_amen_not_svg_webp', __('Only SVG and WEBP files are allowed for icons.', 'listing-engine-backend'));
     }
 
     // Verify file size (must be ≤ 1 MB = 1,048,576 bytes).
@@ -818,7 +818,7 @@ function leb_amen_validate_svg_attachment(int $attachment_id)
         if ($file_size > 1048576) {
             return new WP_Error(
                 'leb_amen_file_too_large',
-                __('SVG file size must not exceed 1 MB.', 'listing-engine-backend')
+                __('Icon file size must not exceed 1 MB.', 'listing-engine-backend')
             );
         }
     }
@@ -831,7 +831,7 @@ function leb_amen_validate_svg_attachment(int $attachment_id)
     $height     = isset($image_meta['height']) ? (int) $image_meta['height'] : 0;
 
     // Fallback: read width/height attributes directly from the SVG markup.
-    if ((! $width || ! $height) && $file_path && file_exists($file_path)) {
+    if ($mime_type === 'image/svg+xml' && (! $width || ! $height) && $file_path && file_exists($file_path)) {
         $svg_content = file_get_contents($file_path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
         if ($svg_content) {
             // Match width="24" and height="24" attributes (or viewBox="0 0 24 24").
@@ -854,7 +854,7 @@ function leb_amen_validate_svg_attachment(int $attachment_id)
             'leb_amen_wrong_dimensions',
             /* translators: 1: actual width, 2: actual height */
             sprintf(
-                __('SVG icon must be exactly 24×24 px. Uploaded file is %1$d×%2$d px.', 'listing-engine-backend'),
+                __('Icon must be exactly 24×24 px. Uploaded file is %1$d×%2$d px.', 'listing-engine-backend'),
                 $width,
                 $height
             )
@@ -913,11 +913,11 @@ function leb_ajax_loc_create_location()
     if (empty($name) || empty($slug)) wp_send_json_error(['message' => 'Name and Slug are required.']);
     if (empty($svg_path) && empty($attachment_id)) wp_send_json_error(['message' => 'SVG Icon is required.']);
 
-    // Validate SVG attachment if one was provided.
+    // Validate SVG/WEBP attachment if one was provided.
     if ($attachment_id) {
-        $svg_validation = leb_amen_validate_svg_attachment($attachment_id);
-        if (is_wp_error($svg_validation)) {
-            wp_send_json_error(['message' => $svg_validation->get_error_message()]);
+        $icon_validation = leb_amen_validate_icon_attachment($attachment_id);
+        if (is_wp_error($icon_validation)) {
+            wp_send_json_error(['message' => $icon_validation->get_error_message()]);
         }
     }
 
@@ -947,11 +947,11 @@ function leb_ajax_loc_update_location()
     if (! $id || empty($name) || empty($slug)) wp_send_json_error(['message' => 'ID, Name, and Slug are required.']);
     if (empty($svg_path) && empty($attachment_id)) wp_send_json_error(['message' => 'SVG Icon is required.']);
 
-    // Validate new SVG attachment if a new one was selected.
+    // Validate new SVG/WEBP attachment if a new one was selected.
     if ($attachment_id) {
-        $svg_validation = leb_amen_validate_svg_attachment($attachment_id);
-        if (is_wp_error($svg_validation)) {
-            wp_send_json_error(['message' => $svg_validation->get_error_message()]);
+        $icon_validation = leb_amen_validate_icon_attachment($attachment_id);
+        if (is_wp_error($icon_validation)) {
+            wp_send_json_error(['message' => $icon_validation->get_error_message()]);
         }
     }
 
